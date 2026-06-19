@@ -161,3 +161,12 @@ input, select, textarea {
 .theme-finances textarea {
   border: 1px solid #fdba74;
 }
+.screen {
+  display: none;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.screen.active {
+  display: block;
+}
