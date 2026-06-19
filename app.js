@@ -28,7 +28,10 @@ function toggleKptForm(){
 
   const form =
     document.getElementById("kptForm");
-
+const classe =
+  checked
+    ? "card rembourse"
+    : "card";
   form.style.display =
     form.style.display === "none"
       ? "block"
