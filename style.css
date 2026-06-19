@@ -295,3 +295,17 @@ input[type="checkbox"]:checked::after {
 
   font-weight: 600;
 }
+.checkbox-label {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  margin-top: 10px;
+
+  font-weight: 600;
+
+  color: #000;
+}
