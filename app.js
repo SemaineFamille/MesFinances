@@ -1,8 +1,7 @@
 
 console.log("APP VERSION 19-06-2026 11h35");
 
-const API_URL =
-"https://script.google.com/macros/s/AKfycbxcQPcOYKJDse5gU2dAHYk7bzmep0oZ9vEKZZt7b_pdKyDUUGOjWc3_nJPFr3Fk6JOWIg/exec";
+const API_URL ="https://script.google.com/macros/s/AKfycbxcQPcOYKJDse5gU2dAHYk7bzmep0oZ9vEKZZt7b_pdKyDUUGOjWc3_nJPFr3Fk6JOWIg/exec";
 
 
 function showScreen(screenId){
