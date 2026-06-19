@@ -113,3 +113,51 @@ input, select, textarea {
   margin-top: 10px;
   opacity: 0.3;
 }
+/* === THEMES === */
+
+/* ASSURA (bleu) */
+.theme-assura {
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+}
+
+.theme-assura button {
+  background: #2563eb;
+}
+
+.theme-assura input,
+.theme-assura select,
+.theme-assura textarea {
+  border: 1px solid #93c5fd;
+}
+
+
+/* KPT (vert) */
+.theme-kpt {
+  background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+}
+
+.theme-kpt button {
+  background: #16a34a;
+}
+
+.theme-kpt input,
+.theme-kpt select,
+.theme-kpt textarea {
+  border: 1px solid #86efac;
+}
+
+
+/* FINANCES (orange/violet) */
+.theme-finances {
+  background: linear-gradient(135deg, #fde68a, #fca5a5);
+}
+
+.theme-finances button {
+  background: #ea580c;
+}
+
+.theme-finances input,
+.theme-finances select,
+.theme-finances textarea {
+  border: 1px solid #fdba74;
+}
