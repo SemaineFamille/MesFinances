@@ -330,3 +330,7 @@ input[type="checkbox"]:checked::after {
   background: #2563eb;
   transition: width 0.4s;
 }
+.status-rembourse {
+  font-size: 1.1em;
+  font-weight: bold;
+}
