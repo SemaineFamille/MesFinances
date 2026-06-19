@@ -1,4 +1,4 @@
-console.log("APP VERSION 19-06-2026 16h00");
+console.log("APP VERSION 19-06-2026 16h40");
 
 function showScreen(screenId){
 
@@ -123,9 +123,9 @@ function renderAssura(data) {
 
     container.innerHTML += `
       <div class="card">
-        <strong>${item.Prestataire}</strong><br>
-        ${item.Type}<br>
-        ${item.Montant} CHF
+<strong>${item.Prestataire}</strong><br>
+${item.Type}<br>
+💳 Payé : ${item.Montant} CHF
       </div>
     `;
 
