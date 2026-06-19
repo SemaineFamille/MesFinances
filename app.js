@@ -1,4 +1,4 @@
-console.log("APP VERSION 19-06-2026 16h40");
+console.log("APP VERSION 19-06-2026 17h00");
 
 function showScreen(screenId){
 
@@ -28,10 +28,7 @@ function toggleKptForm(){
 
   const form =
     document.getElementById("kptForm");
-const classe =
-  checked
-    ? "card rembourse"
-    : "card";
+
   form.style.display =
     form.style.display === "none"
       ? "block"
