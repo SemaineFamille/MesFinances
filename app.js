@@ -111,53 +111,40 @@ window.onload = async () => {
 };
 function renderAssura(data) {
 
-  const container =
-    document.getElementById("assuraList");
-
-  const stats =
-    document.getElementById("assuraStats");
+  const container = document.getElementById("assuraList");
+  const stats = document.getElementById("assuraStats");
 
   container.innerHTML = "";
 
+  // ✅ TRI PAR DATE (du plus récent au plus ancien)
+  data.sort((a, b) => new Date(b.Date) - new Date(a.Date));
+
   const totalPaye =
     data.reduce(
-      (sum, item) =>
-        sum + Number(item.Montant || 0),
+      (sum, item) => sum + Number(item.Montant || 0),
       0
     );
 
   const franchise = 300;
 
   const pourcentage =
-    Math.min(
-      (totalPaye / franchise) * 100,
-      100
-    );
+    Math.min((totalPaye / franchise) * 100, 100);
 
   stats.innerHTML = `
     <div class="progress-card">
-
-      <div class="progress-header">
-        Franchise
-      </div>
+      <div class="progress-header">Franchise</div>
 
       <div class="progress-bar">
-        <div
-          id="franchiseProgress"
-          style="width:${pourcentage}%">
-        </div>
+        <div style="width:${pourcentage}%"></div>
       </div>
 
-      <div id="franchiseText">
-        ${totalPaye.toFixed(2)}
-        / ${franchise} CHF
+      <div>
+        ${totalPaye.toFixed(2)} / ${franchise} CHF
       </div>
-
     </div>
 
     <div class="progress-card">
-      💳 Total payé :
-      ${totalPaye.toFixed(2)} CHF
+      💳 Total payé : ${totalPaye.toFixed(2)} CHF
     </div>
   `;
 
@@ -168,10 +155,11 @@ function renderAssura(data) {
 
         <strong>${item.Prestataire}</strong><br>
 
+        🗓 ${item.Date}<br>
+
         ${item.Type}<br>
 
-        💳 Payé :
-        ${item.Montant} CHF
+        💳 Payé : ${item.Montant} CHF
 
       </div>
     `;
@@ -179,12 +167,15 @@ function renderAssura(data) {
   });
 
 }
+
 function renderKpt(data) {
 
-  const container =
-    document.getElementById("kptList");
+  const container = document.getElementById("kptList");
 
   container.innerHTML = "";
+
+  // ✅ TRI PAR DATE
+  data.sort((a, b) => new Date(b.Date) - new Date(a.Date));
 
   data.forEach((item, index) => {
 
@@ -193,10 +184,11 @@ function renderKpt(data) {
       item["Reçu"] === "TRUE";
 
     container.innerHTML += `
-
       <div class="card">
 
         <strong>${item.Assurance}</strong><br>
+
+        🗓 ${item.Date}<br>
 
         ${item.Type}<br>
 
@@ -205,22 +197,19 @@ function renderKpt(data) {
         Remboursement prévu :
         ${item.Remboursé} CHF<br><br>
 
-       <label class="checkbox-label">
+        <label class="checkbox-label">
 
-  <input
-    type="checkbox"
-    ${checked ? "checked" : ""}
-    onchange="toggleKptRemboursement(${index}, this.checked)"
-  >
+          <input
+            type="checkbox"
+            ${checked ? "checked" : ""}
+            onchange="toggleKptRemboursement(${index}, this.checked)"
+          >
 
-  ${checked
-      ? "💸 Remboursé"
-      : "⏳ En attente"}
+          ${checked ? "💸 Remboursé" : "⏳ En attente"}
 
-</label>
+        </label>
 
       </div>
-
     `;
 
   });
