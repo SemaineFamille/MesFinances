@@ -158,17 +158,19 @@ function renderKpt(data) {
         Remboursement prévu :
         ${item.Remboursé} CHF<br><br>
 
-        <label class="checkbox-label">
+       <label class="checkbox-label">
 
-          <input
-            type="checkbox"
-            ${checked ? "checked" : ""}
-            onchange="toggleKptRemboursement(${index}, this.checked)"
-          >
+  <input
+    type="checkbox"
+    ${checked ? "checked" : ""}
+    onchange="toggleKptRemboursement(${index}, this.checked)"
+  >
 
-          Remboursement reçu
+  ${checked
+      ? "💸 Remboursé"
+      : "⏳ En attente"}
 
-        </label>
+</label>
 
       </div>
 
