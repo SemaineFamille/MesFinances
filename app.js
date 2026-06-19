@@ -155,7 +155,7 @@ function renderAssura(data) {
 
         <strong>${item.Prestataire}</strong><br>
 
-        🗓 ${item.Date}<br>
+       🗓 ${formatDate(item.Date)}
 
         ${item.Type}<br>
 
@@ -166,6 +166,18 @@ function renderAssura(data) {
 
   });
 
+}
+function formatDate(dateString) {
+
+  if (!dateString) return "";
+
+  const date = new Date(dateString);
+
+  return date.toLocaleDateString("fr-CH", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  });
 }
 
 function renderKpt(data) {
@@ -188,7 +200,7 @@ function renderKpt(data) {
 
         <strong>${item.Assurance}</strong><br>
 
-        🗓 ${item.Date}<br>
+       🗓 ${formatDate(item.Date)}
 
         ${item.Type}<br>
 
