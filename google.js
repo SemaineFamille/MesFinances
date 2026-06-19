@@ -66,7 +66,20 @@ async function loadKpt() {
 
   }
 }
+async function updateKptRemboursement(index, value) {
 
+  return fetch(API_URL, {
+    method: "POST",
+    body: JSON.stringify({
+      action: "updateKptRemboursement",
+      index: index,
+      value: value
+    }),
+    headers: {
+      "Content-Type": "application/json"
+    }
+  });
+}
 async function loadParams() {
 
   try {
