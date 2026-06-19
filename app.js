@@ -117,15 +117,65 @@ function renderAssura(data) {
   const container =
     document.getElementById("assuraList");
 
+  const stats =
+    document.getElementById("assuraStats");
+
   container.innerHTML = "";
+
+  const totalPaye =
+    data.reduce(
+      (sum, item) =>
+        sum + Number(item.Montant || 0),
+      0
+    );
+
+  const franchise = 300;
+
+  const pourcentage =
+    Math.min(
+      (totalPaye / franchise) * 100,
+      100
+    );
+
+  stats.innerHTML = `
+    <div class="progress-card">
+
+      <div class="progress-header">
+        Franchise
+      </div>
+
+      <div class="progress-bar">
+        <div
+          id="franchiseProgress"
+          style="width:${pourcentage}%">
+        </div>
+      </div>
+
+      <div id="franchiseText">
+        ${totalPaye.toFixed(2)}
+        / ${franchise} CHF
+      </div>
+
+    </div>
+
+    <div class="progress-card">
+      💳 Total payé :
+      ${totalPaye.toFixed(2)} CHF
+    </div>
+  `;
 
   data.forEach(item => {
 
     container.innerHTML += `
       <div class="card">
-<strong>${item.Prestataire}</strong><br>
-${item.Type}<br>
-💳 Payé : ${item.Montant} CHF
+
+        <strong>${item.Prestataire}</strong><br>
+
+        ${item.Type}<br>
+
+        💳 Payé :
+        ${item.Montant} CHF
+
       </div>
     `;
 
