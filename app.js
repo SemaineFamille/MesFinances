@@ -169,10 +169,10 @@ function renderKpt(data) {
   });
 
 }
-toggleKptRasync function toggleKptRemboursement(index, value) {
+async function toggleKptRemboursement(index, value) {
 
   await updateKptRemboursement(index, value);
 
   loadKpt();
 
-}emboursement(
+}
