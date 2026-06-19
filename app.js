@@ -1,4 +1,4 @@
-console.log("APP VERSION 19-06-2026 15h30");
+console.log("APP VERSION 19-06-2026 15h40");
 
 function showScreen(screenId){
 
@@ -136,16 +136,43 @@ function renderKpt(data) {
 
   container.innerHTML = "";
 
-  data.forEach(item => {
+  data.forEach((item, index) => {
+
+    const checked =
+      item["Reçu"] === true ||
+      item["Reçu"] === "TRUE";
 
     container.innerHTML += `
       <div class="card">
+
         <strong>${item.Assurance}</strong><br>
+
         ${item.Type}<br>
-        ${item.Facture} CHF
+
+        Facture : ${item.Facture} CHF<br>
+
+        Remboursement prévu :
+        ${item.Remboursé} CHF<br>
+
+        <label>
+          <input
+            type="checkbox"
+            ${checked ? "checked" : ""}
+            onchange="toggleKptRemboursement(${index}, this.checked)"
+          >
+          Remboursement reçu
+        </label>
+
       </div>
     `;
 
   });
 
 }
+toggleKptRasync function toggleKptRemboursement(index, value) {
+
+  await updateKptRemboursement(index, value);
+
+  loadKpt();
+
+}emboursement(
