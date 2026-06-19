@@ -1,4 +1,4 @@
-console.log("APP VERSION 19-06-2026 17h45");
+console.log("APP VERSION 19-06-2026 21h35");
 
 function showScreen(screenId){
 
@@ -111,61 +111,90 @@ window.onload = async () => {
 };
 function renderAssura(data) {
 
-  const container = document.getElementById("assuraList");
-  const stats = document.getElementById("assuraStats");
+  const container =
+    document.getElementById("assuraList");
+
+  const stats =
+    document.getElementById("assuraStats");
 
   container.innerHTML = "";
 
-  // ✅ TRI PAR DATE (du plus récent au plus ancien)
   data.sort((a, b) => new Date(b.Date) - new Date(a.Date));
 
-  const totalPaye =
+  const franchiseAtteinte =
     data.reduce(
-      (sum, item) => sum + Number(item.Montant || 0),
+      (sum, item) => sum + Number(item.PartFranchise || 0),
+      0
+    );
+
+  const quotePartAtteinte =
+    data.reduce(
+      (sum, item) => sum + Number(item.PartQuotePart || 0),
+      0
+    );
+
+  const totalVotrePart =
+    data.reduce(
+      (sum, item) => sum + Number(item.VotrePart || 0),
+      0
+    );
+
+  const totalRembourse =
+    data.reduce(
+      (sum, item) => sum + Number(item.RemboursementAssura || 0),
       0
     );
 
   const franchise = 300;
+  const quotePartMax = 700;
 
-  const pourcentage =
-    Math.min((totalPaye / franchise) * 100, 100);
+  const franchisePct =
+    Math.min((franchiseAtteinte / franchise) * 100, 100);
+
+  const quotePartPct =
+    Math.min((quotePartAtteinte / quotePartMax) * 100, 100);
 
   stats.innerHTML = `
     <div class="progress-card">
       <div class="progress-header">Franchise</div>
-
       <div class="progress-bar">
-        <div style="width:${pourcentage}%"></div>
+        <div style="width:${franchisePct}%"></div>
       </div>
-
-      <div>
-        ${totalPaye.toFixed(2)} / ${franchise} CHF
-      </div>
+      <div>${franchiseAtteinte.toFixed(2)} / ${franchise} CHF</div>
     </div>
 
     <div class="progress-card">
-      💳 Total payé : ${totalPaye.toFixed(2)} CHF
+      <div class="progress-header">Quote-part</div>
+      <div class="progress-bar">
+        <div style="width:${quotePartPct}%"></div>
+      </div>
+      <div>${quotePartAtteinte.toFixed(2)} / ${quotePartMax} CHF</div>
+    </div>
+
+    <div class="progress-card">
+      💳 Total à votre charge : ${totalVotrePart.toFixed(2)} CHF
+    </div>
+
+    <div class="progress-card">
+      🏥 Total remboursé par Assura : ${totalRembourse.toFixed(2)} CHF
     </div>
   `;
 
   data.forEach(item => {
-
     container.innerHTML += `
       <div class="card">
-
         <strong>${item.Prestataire}</strong><br>
+        🗓 ${formatDate(item.Date)}<br>
+        ${item.Type}<br><br>
 
-       🗓 ${formatDate(item.Date)}
-
-        ${item.Type}<br>
-
-        💳 Payé : ${item.Montant} CHF
-
+        Facture : ${Number(item.MontantFacture || 0).toFixed(2)} CHF<br>
+        Franchise : ${Number(item.PartFranchise || 0).toFixed(2)} CHF<br>
+        Quote-part : ${Number(item.PartQuotePart || 0).toFixed(2)} CHF<br>
+        💳 Votre part : ${Number(item.VotrePart || 0).toFixed(2)} CHF<br>
+        ✅ Remboursé par Assura : ${Number(item.RemboursementAssura || 0).toFixed(2)} CHF
       </div>
     `;
-
   });
-
 }
 function formatDate(dateString) {
 
