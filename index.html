@@ -1,1 +1,138 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mes Finances</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
+<header>
+  <h1>💰 Mes Finances</h1>
+</header>
+
+<main>
+
+  <!-- ACCUEIL -->
+  <section id="homeScreen" class="screen active">
+
+    <div class="card" onclick="showScreen('assuraScreen')">
+      <h2>🩺 ASSURA</h2>
+      <p id="assuraResume">
+        Chargement...
+      </p>
+    </div>
+
+    <div class="card" onclick="showScreen('kptScreen')">
+      <h2>🦷 KPT</h2>
+      <p id="kptResume">
+        Chargement...
+      </p>
+    </div>
+
+    <div class="card disabled">
+      <h2>💰 FINANCES</h2>
+      <p>Bientôt disponible</p>
+    </div>
+
+  </section>
+
+  <!-- ASSURA -->
+  <section id="assuraScreen" class="screen">
+
+    <button onclick="showScreen('homeScreen')">
+      ← Retour
+    </button>
+
+    <h2>🩺 ASSURA</h2>
+
+    <div id="assuraStats"></div>
+
+    <button onclick="toggleAssuraForm()">
+      ➕ Ajouter une facture
+    </button>
+
+    <div id="assuraForm" style="display:none">
+
+      <input type="date" id="assuraDate">
+
+      <input type="text"
+             id="assuraPrestataire"
+             placeholder="Nom du médecin">
+
+      <select id="assuraType">
+        <option>Médecin</option>
+        <option>Psy</option>
+        <option>Pharmacie</option>
+        <option>Autre</option>
+      </select>
+
+      <input type="number"
+             id="assuraMontant"
+             placeholder="Montant">
+
+      <textarea id="assuraNotes"
+                placeholder="Notes"></textarea>
+
+      <button onclick="addAssuraFacture()">
+        Enregistrer
+      </button>
+
+    </div>
+
+    <div id="assuraList"></div>
+
+  </section>
+
+  <!-- KPT -->
+  <section id="kptScreen" class="screen">
+
+    <button onclick="showScreen('homeScreen')">
+      ← Retour
+    </button>
+
+    <h2>🦷 KPT</h2>
+
+    <div id="kptStats"></div>
+
+    <button onclick="toggleKptForm()">
+      ➕ Ajouter une prestation
+    </button>
+
+    <div id="kptForm" style="display:none">
+
+      <input type="date" id="kptDate">
+
+      <select id="kptAssurance">
+        <option>Natura</option>
+        <option>Dentaire</option>
+      </select>
+
+      <select id="kptType">
+        <option>Ostéo</option>
+        <option>Massage</option>
+        <option>Dentiste</option>
+      </select>
+
+      <input type="number"
+             id="kptFacture"
+             placeholder="Montant">
+
+      <button onclick="addKptFacture()">
+        Enregistrer
+      </button>
+
+    </div>
+
+    <div id="kptList"></div>
+
+  </section>
+
+</main>
+
+<script src="google.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>
