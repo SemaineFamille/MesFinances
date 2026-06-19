@@ -1,4 +1,4 @@
-console.log("APP VERSION 19-06-2026 13h35");
+console.log("APP VERSION 19-06-2026 13h40");
 
 function showScreen(screenId){
 
@@ -34,7 +34,7 @@ function toggleKptForm(){
       ? "block"
       : "none";
 }
-function addAssuraFacture() {
+async function addAssuraFacture() {
 
   const date =
     document.getElementById("assuraDate").value;
@@ -51,7 +51,14 @@ function addAssuraFacture() {
   const notes =
     document.getElementById("assuraNotes").value;
 
-  console.log({
+  if (!date || !montant) {
+
+    alert("Veuillez remplir les champs");
+
+    return;
+  }
+
+  await saveAssura({
     date,
     prestataire,
     type,
@@ -59,9 +66,11 @@ function addAssuraFacture() {
     notes
   });
 
-  alert("Facture enregistrée !");
+  alert("Facture enregistrée");
+
+  loadAssura();
 }
-function addKptFacture() {
+async function addKptFacture() {
 
   const date =
     document.getElementById("kptDate").value;
@@ -75,12 +84,68 @@ function addKptFacture() {
   const facture =
     document.getElementById("kptFacture").value;
 
-  console.log({
+  if (!date || !facture) {
+
+    alert("Veuillez remplir les champs");
+
+    return;
+  }
+
+  await saveKpt({
     date,
     assurance,
     type,
     facture
   });
 
-  alert("Prestation enregistrée !");
+  alert("Prestation enregistrée");
+
+  loadKpt();
+}
+window.onload = async () => {
+
+  await loadAssura();
+
+  await loadKpt();
+
+};
+function renderAssura(data) {
+
+  const container =
+    document.getElementById("assuraList");
+
+  container.innerHTML = "";
+
+  data.forEach(item => {
+
+    container.innerHTML += `
+      <div class="card">
+        <strong>${item.Prestataire}</strong><br>
+        ${item.Type}<br>
+        ${item.Montant} CHF
+      </div>
+    `;
+
+  });
+
+}
+function renderKpt(data) {
+
+  const container =
+    document.getElementById("kptList");
+
+  container.innerHTML = "";
+
+  data.forEach(item => {
+
+    container.innerHTML += `
+      <div class="card">
+        <strong>${item.Assurance}</strong><br>
+        ${item.Type}<br>
+        ${item.Facture} CHF
+      </div>
+    `;
+
+  });
+
 }
