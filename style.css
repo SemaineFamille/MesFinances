@@ -47,25 +47,28 @@ main {
 /* ✅ COULEURS FORTES & LISIBLES */
 
 /* ASSURA → bleu */
+
 .card.assura {
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  background: #eaf4ff; /* bleu pastel */
+  border-left: 6px solid #4a90e2;
 }
 
-/* KPT → vert */
 .card.kpt {
-  background: linear-gradient(135deg, #22c55e, #15803d);
+  background: #e8fff3; /* vert pastel */
+  border-left: 6px solid #2ecc71;
 }
 
-/* FINANCES → violet/orange premium */
 .card.finances {
-  background: linear-gradient(135deg, #a855f7, #7c3aed);
+  background: #fff4e8; /* orange pastel */
+  border-left: 6px solid #f39c12;
 }
 
 /* CARTE DESACTIVE */
 .card.disabled {
-  opacity: 0.5;
+  opacity: 0.6;
   cursor: not-allowed;
 }
+
 
 /* TEXTES */
 h2 {
