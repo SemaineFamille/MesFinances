@@ -91,3 +91,15 @@ input, select, textarea {
   border: 1px solid #ddd;
   box-sizing: border-box;
 }
+
+h1 {
+  font-size: 24px;
+}
+
+h2 {
+  margin-top: 0;
+}
+
+p {
+  color: #555;
+}
