@@ -1,4 +1,4 @@
-console.log("APP VERSION 19-06-2026 17h00");
+console.log("APP VERSION 19-06-2026 17h45");
 
 function showScreen(screenId){
 
