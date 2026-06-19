@@ -1,17 +1,17 @@
-/* RESET SIMPLE */
 body {
   font-family: Arial, sans-serif;
   margin: 0;
-  background: #f5f7fb; /* fond pastel léger */
-  color: #333;
+  background: linear-gradient(135deg, #eef2ff, #f8fafc);
+  color: #1e293b;
 }
 
 /* HEADER */
 header {
   text-align: center;
   padding: 20px;
-  background: white;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  background: #ffffffcc;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 
 /* STRUCTURE */
@@ -27,52 +27,64 @@ main {
   display: block;
 }
 
-/* CARTES GENERIQUES */
+/* CARTES */
 .card {
-  background: white;
   border-radius: 20px;
   padding: 20px;
   margin-bottom: 15px;
+  color: white;
+  font-weight: 500;
   cursor: pointer;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-/* effet hover */
 .card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 25px rgba(0,0,0,0.08);
+  transform: translateY(-4px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.2);
 }
 
-/* CARTES PAR TYPE */
+/* ✅ COULEURS FORTES & LISIBLES */
+
+/* ASSURA → bleu */
 .card.assura {
-  background: #eaf4ff; /* bleu pastel */
-  border-left: 6px solid #4a90e2;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
 }
 
+/* KPT → vert */
 .card.kpt {
-  background: #e8fff3; /* vert pastel */
-  border-left: 6px solid #2ecc71;
+  background: linear-gradient(135deg, #22c55e, #15803d);
 }
 
+/* FINANCES → violet/orange premium */
 .card.finances {
-  background: #fff4e8; /* orange pastel */
-  border-left: 6px solid #f39c12;
+  background: linear-gradient(135deg, #a855f7, #7c3aed);
 }
 
 /* CARTE DESACTIVE */
 .card.disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* TEXTES */
+h2 {
+  margin: 0 0 10px 0;
+  font-size: 20px;
+}
+
+p {
+  margin: 0;
+  opacity: 0.9;
 }
 
 /* BOUTONS */
 button {
   border: none;
-  padding: 10px 15px;
+  padding: 12px;
   margin-top: 10px;
-  border-radius: 10px;
-  background: #4a90e2;
+  border-radius: 12px;
+  background: #1d4ed8;
   color: white;
   font-weight: bold;
   cursor: pointer;
@@ -86,20 +98,8 @@ button:hover {
 input, select, textarea {
   width: 100%;
   margin-top: 8px;
-  padding: 10px;
-  border-radius: 10px;
+  padding: 12px;
+  border-radius: 12px;
   border: 1px solid #ddd;
   box-sizing: border-box;
-}
-
-h1 {
-  font-size: 24px;
-}
-
-h2 {
-  margin-top: 0;
-}
-
-p {
-  color: #555;
 }
