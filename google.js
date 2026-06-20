@@ -66,6 +66,14 @@ async function loadKpt() {
 
   }
 }
+async function deleteKptFacture(id) {
+
+  return await apiPost({
+    action: "deleteKpt",
+    id
+  });
+
+}
 async function updateKptRemboursement(index, value) {
 
   return fetch(API_URL, {
