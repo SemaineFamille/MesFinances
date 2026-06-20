@@ -1,4 +1,4 @@
-console.log("APP VERSION 20-06-2026 11h05");
+console.log("APP VERSION 20-06-2026 13h45");
 
 function showScreen(screenId){
 
@@ -212,7 +212,16 @@ function formatDate(dateString) {
     year: "numeric"
   });
 }
+async function deleteKpt(id) {
 
+  if (!confirm(
+    "Supprimer cette prestation ?"
+  )) return;
+
+  await deleteKptFacture(id);
+
+  loadKpt();
+}
 function renderKpt(data) {
 
   const container = document.getElementById("kptList");
