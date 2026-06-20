@@ -1,4 +1,4 @@
-console.log("APP VERSION 20-06-2026 16h00");
+console.log("APP VERSION 20-06-2026 16h25");
 
 function showScreen(screenId){
 
@@ -257,7 +257,7 @@ container.innerHTML += `
       <input
         type="checkbox"
         ${checked ? "checked" : ""}
-        onchange="toggleKptRemboursement('${item.ID}', this.checked)"
+        onchange="toggleKptRemboursement(${item._rowNumber}, this.checked)"
       >
 
       ${checked ? "💰 Reçu" : "🕒 En attente"}
