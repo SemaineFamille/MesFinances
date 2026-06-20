@@ -1,4 +1,4 @@
-console.log("APP VERSION 20-06-2026 13h45");
+console.log("APP VERSION 20-06-2026 16h00");
 
 function showScreen(screenId){
 
@@ -114,7 +114,8 @@ window.onload = async () => {
 
 };
 function renderAssura(data) {
-
+console.log("DATA ASSURA");
+console.log(data);
   const container =
     document.getElementById("assuraList");
 
