@@ -1,4 +1,4 @@
-console.log("APP VERSION 20-06-2026 16h40");
+console.log("APP VERSION 20-06-2026 17h40");
 
 function showScreen(screenId){
 
@@ -362,3 +362,4 @@ window.toggleAssuraForm = toggleAssuraForm;
 window.toggleKptForm = toggleKptForm;
 window.addAssuraFacture = addAssuraFacture;
 window.addKptFacture = addKptFacture;
+window.editKpt = editKpt;
