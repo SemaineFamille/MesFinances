@@ -349,12 +349,14 @@ input[type="checkbox"]:checked::after {
   border-radius: 20px;
   overflow: hidden;
 }
-
-#franchiseProgress {
+.progress-bar div {
   height: 100%;
-  width: 0%;
-  background: #2563eb;
-  transition: width 0.4s;
+  background: linear-gradient(
+    90deg,
+    #3b82f6,
+    #2563eb
+  );
+  transition: width 0.4s ease;
 }
 .status-rembourse {
   font-size: 1.1em;
