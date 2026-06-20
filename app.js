@@ -92,6 +92,34 @@ async function addKptFacture() {
     alert("Veuillez remplir les champs");
 
     return;
+    
+if (window.currentKptEditId) {
+
+  await updateKptData({
+    id: window.currentKptEditId,
+    date,
+    assurance,
+    type,
+    facture
+  });
+
+  window.currentKptEditId = null;
+
+  alert("Modifié ✅");
+
+} else {
+
+  await saveKpt({
+    date,
+    assurance,
+    type,
+    facture
+  });
+
+  alert("Ajouté ✅");
+
+}
+
   }
 
 async function saveKpt(data) {
