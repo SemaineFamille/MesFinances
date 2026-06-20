@@ -94,6 +94,24 @@ async function addKptFacture() {
     return;
   }
 
+async function saveKpt(data) {
+
+  return await apiPost({
+    action: "addKpt",
+    ...data
+  });
+
+}
+
+async function updateKptData(data) {
+
+  return await apiPost({
+    action: "updateKptData",
+    ...data
+  });
+
+}
+
   await saveKpt({
     id,
     date,
