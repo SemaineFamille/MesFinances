@@ -269,19 +269,45 @@ input[type="checkbox"]:checked {
   border-color: #16a34a;
 }
 
+input[type="checkbox"] {
+
+  appearance: none;
+
+  width: 30px;
+
+  height: 30px;
+
+  border-radius: 50%;
+
+  border: 3px solid #16a34a;
+
+  background: white;
+
+  cursor: pointer;
+
+  position: relative;
+}
+
+input[type="checkbox"]:checked {
+
+  background: #16a34a;
+}
+
 input[type="checkbox"]:checked::after {
 
-  content: "VU";
+  content: "✓";
+
+  color: white;
+
+  font-size: 20px;
+
+  font-weight: bold;
 
   position: absolute;
 
-  top: 7px;
-  left: 4px;
+  top: 1px;
 
-  font-size: 10px;
-  font-weight: 800;
-
-  color: white;
+  left: 7px;
 }
 .checkbox-label {
 
@@ -333,4 +359,25 @@ input[type="checkbox"]:checked::after {
 .status-rembourse {
   font-size: 1.1em;
   font-weight: bold;
+}
+.card-actions {
+
+  display: flex;
+
+  gap: 10px;
+
+  margin-top: 15px;
+
+}
+
+.card-actions button {
+
+  flex: 1;
+
+  padding: 10px;
+
+  border-radius: 10px;
+
+  font-size: 14px;
+
 }
