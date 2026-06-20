@@ -1,4 +1,4 @@
-console.log("APP VERSION 19-06-2026 21h35");
+console.log("APP VERSION 20-06-2026 11h05");
 
 function showScreen(screenId){
 
@@ -35,6 +35,7 @@ function toggleKptForm(){
       : "none";
 }
 async function addAssuraFacture() {
+  const id = Date.now();
 
   const date =
     document.getElementById("assuraDate").value;
@@ -59,6 +60,7 @@ async function addAssuraFacture() {
   }
 
   await saveAssura({
+    id,
     date,
     prestataire,
     type,
@@ -72,6 +74,7 @@ async function addAssuraFacture() {
 }
 async function addKptFacture() {
 
+  const id = Date.now();
   const date =
     document.getElementById("kptDate").value;
 
@@ -92,6 +95,7 @@ async function addKptFacture() {
   }
 
   await saveKpt({
+    id,
     date,
     assurance,
     type,
@@ -224,36 +228,69 @@ function renderKpt(data) {
       item["Reçu"] === true ||
       item["Reçu"] === "TRUE";
 
-    container.innerHTML += `
-      <div class="card">
+container.innerHTML += `
+  <div class="card">
 
-        <strong>${item.Assurance}</strong><br>
+    <strong>${item.Assurance}</strong><br>
 
-       🗓 ${formatDate(item.Date)}
+    🗓 ${formatDate(item.Date)}<br>
 
-        ${item.Type}<br>
+    ${item.Type}<br><br>
 
-        Facture : ${item.Facture} CHF<br>
+    Facture : ${item.Facture} CHF<br>
 
-        Remboursement prévu :
-        ${item.Remboursé} CHF<br><br>
+    💸 Remboursement prévu :
+    ${item.Remboursé} CHF<br><br>
 
-        <label class="checkbox-label">
+    <label class="checkbox-label">
 
-          <input
-            type="checkbox"
-            ${checked ? "checked" : ""}
-            onchange="toggleKptRemboursement(${index}, this.checked)"
-          >
+      <input
+        type="checkbox"
+        ${checked ? "checked" : ""}
+        onchange="toggleKptRemboursement('${item.ID}', this.checked)"
+      >
 
-          ${checked ? "💸 Remboursé" : "⏳ En attente"}
+      ${checked ? "💰 Reçu" : "🕒 En attente"}
 
-        </label>
+    </label>
 
-      </div>
-    `;
+    <div class="card-actions">
+
+      <button onclick="editKpt('${item.ID}')">
+        ✏️ Modifier
+      </button>
+
+      <button onclick="deleteKpt('${item.ID}')">
+        🗑️ Supprimer
+      </button>
+
+    </div>
+
+  </div>
+`;
 
   });
+
+}
+function editKpt(id) {
+
+  alert(
+    "Modification de la prestation " + id +
+    "\n(à connecter ensuite au formulaire)"
+  );
+
+}
+async function deleteKpt(id) {
+
+  if (
+    !confirm(
+      "Supprimer cette prestation ?"
+    )
+  ) return;
+
+  await deleteKptFacture(id);
+
+  loadKpt();
 
 }
 async function toggleKptRemboursement(index, value) {
