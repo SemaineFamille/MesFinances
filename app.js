@@ -1,4 +1,4 @@
-console.log("APP VERSION 20-06-2026 16h25");
+console.log("APP VERSION 20-06-2026 16h30");
 
 function showScreen(screenId){
 
@@ -310,3 +310,9 @@ async function toggleKptRemboursement(index, value) {
   loadKpt();
 
 }
+window.toggleKptRemboursement = toggleKptRemboursement;
+window.showScreen = showScreen;
+window.toggleAssuraForm = toggleAssuraForm;
+window.toggleKptForm = toggleKptForm;
+window.addAssuraFacture = addAssuraFacture;
+window.addKptFacture = addKptFacture;
