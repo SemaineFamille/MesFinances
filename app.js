@@ -1,4 +1,4 @@
-console.log("APP VERSION 21-06-2026 17h40");
+console.log("APP VERSION 21-06-2026 18h00");
 
 function normalizeLabel(label) {
   return (label || "")
@@ -528,7 +528,7 @@ async function addFinanceMovementManual() {
     return;
   }
 
-  await addFinanceMovement({
+  await addFinanceMovementApi({
     date,
     compte,
     sens,
@@ -630,7 +630,7 @@ async function applyMonthlyTransfers(count) {
 
     if (montant <= 0) continue;
 
-    await addFinanceMovement({
+    await addFinanceMovementApi({
       date,
       compte: "Factures",
       sens: "Entrée",
