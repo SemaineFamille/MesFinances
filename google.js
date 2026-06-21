@@ -70,7 +70,7 @@ async function getFinancePostes() {
   return await fetchSheetData("getFinancePostes");
 }
 
-async function addFinanceMovement(data) {
+async function addFinanceMovementApi(data) {
   return await postSheetData("addFinanceMovement", data);
 }
 
