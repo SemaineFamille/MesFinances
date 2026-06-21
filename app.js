@@ -357,7 +357,12 @@ function computeReservesFromMovements(movements) {
     const montant = Number(m["Montant"] || 0);
 
     // On considère qu'une réserve est un poste contenant "réserve"
-    if (poste.toLowerCase().includes("réserve")) {
+    if (
+ poste.toLowerCase().includes("réserve") ||
+  poste.toLowerCase().includes("voiture") ||
+  poste.toLowerCase().includes("impôts")
+) 
+    {
 
       if (!reserves[poste]) {
         reserves[poste] = 0;
