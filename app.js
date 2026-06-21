@@ -1,4 +1,4 @@
-console.log("APP VERSION 21-06-2026 21h55");
+console.log("APP VERSION 21-06-2026 22h05");
 
 
 function normalizeLabel(label) {
@@ -346,6 +346,35 @@ async function toggleKptRemboursement(index, value) {
 /* =========================
 FINANCES
 ========================= */
+
+function computeReservesFromMovements(movements) {
+
+  let reserves = {};
+
+  movements.forEach(m => {
+
+    const poste = m["Poste"] || "";
+    const montant = Number(m["Montant"] || 0);
+
+    // On considère qu'une réserve est un poste contenant "réserve"
+    if (poste.toLowerCase().includes("réserve")) {
+
+      if (!reserves[poste]) {
+        reserves[poste] = 0;
+      }
+
+      if (m["Sens"] === "Entrée") {
+        reserves[poste] += montant;
+      } else {
+        reserves[poste] -= montant;
+      }
+    }
+
+  });
+
+  return reserves;
+}
+
 function computeBalancesFromMovements(movements) {
 
   let comptes = {
@@ -459,13 +488,15 @@ function renderFinanceChartFromBalances(comptes) {
 }
 
 
-function renderFinanceStats(dashboardRows) {
-  const stats = document.getElementById("financeStats");
-  const reserves = document.getElementById("financeReserves");
-  if (!stats || !reserves) return;
+function renderFinanceStats(dashboardRows, reservesCalc) {
 
-  const vue = dashboardRows.filter(r => r["Bloc"] === "Vue générale");
-  const reserveRows = dashboardRows.filter(r => r["Bloc"] === "Réserves / Postes");
+  const stats = document.getElementById("financeStats");
+  const reservesEl = document.getElementById("financeReserves");
+
+  // ➜ Vue générale (reste comme avant)
+  const vue = dashboardRows.filter(r =>
+    normalizeLabel(r["Bloc"]).includes("vue")
+  );
 
   stats.innerHTML = `
     <div class="finance-stat-list">
@@ -478,17 +509,24 @@ function renderFinanceStats(dashboardRows) {
     </div>
   `;
 
-  reserves.innerHTML = `
+  // ➜ Réserves dynamiques
+  const reserveEntries = Object.entries(reservesCalc);
+
+  reservesEl.innerHTML = `
     <div class="finance-stat-list">
-      ${reserveRows.map(v => `
-        <div class="finance-stat-item">
-          <strong>${v["Libellé"]}</strong><br>
-          ${formatCHF(v["Valeur"])}
-        </div>
-      `).join("")}
+      ${reserveEntries.length > 0
+        ? reserveEntries.map(([poste, montant]) => `
+          <div class="finance-stat-item">
+            <strong>${poste}</strong><br>
+            ${formatCHF(montant)}
+          </div>
+        `).join("")
+        : `<div class="finance-stat-item">Aucune réserve détectée</div>`
+      }
     </div>
   `;
 }
+
 
 function renderFinanceHistory(movements) {
   const list = document.getElementById("financeList");
@@ -527,9 +565,10 @@ async function loadFinanceScreen() {
     const movements = await getFinanceMovements();
 
     const comptes = computeBalancesFromMovements(movements);
+    const reserves = computeReservesFromMovements(movements);
 
     renderFinanceChartFromBalances(comptes);
-    renderFinanceStats(dashboard);
+    renderFinanceStats(dashboard, reserves);
     renderFinanceHistory(movements);
 
   } catch (e) {
