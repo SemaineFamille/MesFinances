@@ -142,10 +142,40 @@
 
   <h2>💰 FINANCES 💸</h2>
 
-  <div id="financeStats"></div>
+  <!-- Graphique des 3 comptes -->
+  <div class="finance-block">
+    <h3>Vue rapide des comptes</h3>
+    <div id="financeChart"></div>
+  </div>
 
+  <!-- Stats générales -->
+  <div class="finance-block">
+    <h3>Vue générale</h3>
+    <div id="financeStats"></div>
+  </div>
+
+  <!-- Réserves -->
+  <div class="finance-block">
+    <h3>Réserves</h3>
+    <div id="financeReserves"></div>
+  </div>
+
+  <!-- Virements mensuels -->
+  <div class="finance-block">
+    <h3>Virements mensuels</h3>
+    <p class="muted">
+      Les montants sont proposés automatiquement à partir de la feuille Postes.
+      Tu peux les modifier avant validation.
+    </p>
+    <button onclick="prepareMonthlyTransfers()">
+      📅 Préparer les virements du mois
+    </button>
+    <div id="financeMonthlyTransfers"></div>
+  </div>
+
+  <!-- Ajout manuel -->
   <button onclick="toggleFinanceForm()">
-    ➕ Ajouter un mouvement
+    ➕ Ajouter un mouvement manuel
   </button>
 
   <div id="financeForm" style="display:none">
@@ -165,9 +195,10 @@
 
     <input type="text"
            id="financePoste"
-           placeholder="Poste (Impôts, Cadeaux...)">
+           placeholder="Poste (Impôts, Cadeaux, Assurance...)">
 
     <input type="number"
+           step="0.01"
            id="financeMontant"
            placeholder="Montant">
 
@@ -175,16 +206,21 @@
            id="financeDescription"
            placeholder="Description">
 
-    <button onclick="addFinanceMovement()">
+    <button onclick="addFinanceMovementManual()">
       Enregistrer
     </button>
 
   </div>
 
-  <div id="financeList"></div>
+  <!-- Historique -->
+  <div class="finance-block">
+    <h3>Historique des mouvements</h3>
+    <div id="financeList"></div>
+  </div>
 
 </section>
 
+ 
 </main>
 
 <script src="google.js"></script>
