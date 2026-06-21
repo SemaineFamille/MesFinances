@@ -34,7 +34,7 @@ async function postSheetData(action, payload) {
 }
 
 /* =========================
-FINANCES
+   FINANCES
 ========================= */
 
 async function getFinanceDashboard() {
@@ -53,17 +53,16 @@ async function addFinanceMovementApi(data) {
   return await postSheetData("addFinanceMovement", data);
 }
 
+/* =========================
+   API GENERIQUE EXISTANTE
+========================= */
+
 async function apiGet(action) {
-
-  const response = await fetch(
-    `${API_URL}?action=${action}`
-  );
-
+  const response = await fetch(`${API_URL}?action=${action}`);
   return await response.json();
 }
 
 async function apiPost(data) {
-
   const formData = new FormData();
 
   Object.keys(data).forEach(key => {
@@ -83,74 +82,48 @@ async function apiPost(data) {
 ========================= */
 
 async function loadAssura() {
-
   try {
-
     const data = await apiGet("getAssura");
-
     console.log("ASSURA", data);
-
     renderAssura(data);
-
   } catch (err) {
-
     console.error(err);
-
   }
 }
 
 async function loadKpt() {
-
   try {
-
     const data = await apiGet("getKpt");
-
     console.log("KPT", data);
-
     renderKpt(data);
-
   } catch (err) {
-
     console.error(err);
-
   }
 }
-async function deleteKptFacture(id) {
 
+async function deleteKptFacture(id) {
   return await apiPost({
     action: "deleteKpt",
     id
   });
-
 }
 
 async function updateKptRemboursement(row, value) {
-
   return await apiPost({
     action: "updateKpt",
     row: row,
     recu: value
   });
-
 }
 
-
 async function loadParams() {
-
   try {
-
     const data = await apiGet("getParams");
-
     console.log("PARAMS", data);
-
     return data;
-
   } catch (err) {
-
     console.error(err);
-
     return [];
-
   }
 }
 
@@ -159,12 +132,10 @@ async function loadParams() {
 ========================= */
 
 async function saveAssura(data) {
-
   return await apiPost({
     action: "addAssura",
     ...data
   });
-
 }
 
 /* =========================
@@ -172,10 +143,8 @@ async function saveAssura(data) {
 ========================= */
 
 async function saveKpt(data) {
-
   return await apiPost({
     action: "addKpt",
     ...data
   });
-
 }
