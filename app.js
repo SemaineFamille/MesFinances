@@ -1,4 +1,4 @@
-console.log("APP VERSION 21-06-2026 7h05");
+console.log("APP VERSION 21-06-2026 15h45");
 
 function showScreen(screenId){
 
@@ -11,6 +11,10 @@ function showScreen(screenId){
   document
     .getElementById(screenId)
     .classList.add("active");
+  
+if (screenId === "financeScreen") {
+    loadFinanceScreen();
+  }
 }
 
 function toggleAssuraForm(){
@@ -34,6 +38,13 @@ function toggleKptForm(){
       ? "block"
       : "none";
 }
+
+function toggleFinanceForm() {
+  const form = document.getElementById("financeForm");
+  form.style.display =
+    form.style.display === "none" ? "block" : "none";
+}
+
 async function addAssuraFacture() {
   const id = Date.now();
 
@@ -130,7 +141,78 @@ async function saveKpt(data) {
   });
 
 }
+  async function loadFinanceScreen() {
+  const stats = document.getElementById("financeStats");
 
+  try {
+    const data = await getFinanceDashboard();
+
+    const vue = data.filter(r => r.Bloc === "Vue générale");
+    const reserves = data.filter(r => r.Bloc === "Réserves / Postes");
+
+    stats.innerHTML = `
+      <h3>Vue générale</h3>
+      <ul>
+        ${vue.map(v => `
+          <li><b>${v.Libellé}</b>: ${v.Valeur}</li>
+        `).join("")}
+      </ul>
+
+      <h3>Réserves</h3>
+      <ul>
+        ${reserves.map(v => `
+          <li><b>${v.Libellé}</b>: ${v.Valeur}</li>
+        `).join("")}
+      </ul>
+    `;
+
+  } catch (e) {
+    stats.innerHTML = "Erreur chargement";
+  }
+}
+  async function addFinanceMovement() {
+
+  const date = document.getElementById("financeDate").value;
+  const compte = document.getElementById("financeCompte").value;
+  const sens = document.getElementById("financeSens").value;
+  const poste = document.getElementById("financePoste").value;
+  const montant = document.getElementById("financeMontant").value;
+  const description = document.getElementById("financeDescription").value;
+
+  if (!montant) {
+    alert("Montant requis");
+    return;
+  }
+
+  await postSheetData("addFinanceMovement", {
+    date,
+    compte,
+    sens,
+    poste,
+    montant,
+    description
+  });
+
+  toggleFinanceForm();
+  loadFinanceScreen();
+  loadFinanceResume();
+}
+async function loadFinanceResume() {
+  try {
+    const data = await getFinanceDashboard();
+
+    const solde = data.find(row => row.Libellé === "Solde Factures");
+
+    document.getElementById("financeResume").innerText =
+      solde
+        ? `💰 ${solde.Valeur} CHF`
+        : "Aucune donnée";
+
+  } catch (e) {
+    document.getElementById("financeResume").innerText =
+      "Erreur";
+  }
+}
 async function updateKptData(data) {
 
   return await apiPost({
