@@ -392,3 +392,101 @@ input[type="checkbox"]:checked::after {
   font-size: 14px;
 
 }
+.theme-finance {
+  background: #f7fff9;
+}
+
+.finance-block {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 14px;
+  margin: 14px 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.muted {
+  opacity: 0.7;
+  font-size: 0.92rem;
+}
+
+.finance-chart-item {
+  margin: 12px 0;
+}
+
+.finance-chart-label {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.finance-bar-bg {
+  width: 100%;
+  height: 14px;
+  background: #e8eef2;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.finance-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+.finance-bar-factures {
+  background: linear-gradient(90deg, #4f46e5, #7c3aed);
+}
+
+.finance-bar-epargne {
+  background: linear-gradient(90deg, #0891b2, #06b6d4);
+}
+
+.finance-bar-vacances {
+  background: linear-gradient(90deg, #16a34a, #22c55e);
+}
+
+.finance-stat-list,
+.finance-history-list,
+.finance-monthly-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.finance-stat-item,
+.finance-history-item,
+.finance-monthly-item {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+.finance-history-top,
+.finance-monthly-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.finance-positive {
+  color: #15803d;
+  font-weight: 700;
+}
+
+.finance-negative {
+  color: #b91c1c;
+  font-weight: 700;
+}
+
+.finance-monthly-item input {
+  width: 110px;
+}
+
+.finance-monthly-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
