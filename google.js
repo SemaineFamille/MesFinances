@@ -33,27 +33,6 @@ async function postSheetData(action, payload) {
   return await response.json();
 }
 
-async function postSheetData(action, payload) {
-  const body = new URLSearchParams({
-    action,
-    ...payload
-  });
-
-  const response = await fetch(SCRIPT_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
-    },
-    body
-  });
-
-  if (!response.ok) {
-    throw new Error(`Erreur POST ${action}`);
-  }
-
-  return await response.json();
-}
-
 /* =========================
 FINANCES
 ========================= */
