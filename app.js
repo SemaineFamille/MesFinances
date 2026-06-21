@@ -139,12 +139,6 @@ window.onload = async () => {
   await loadFinanceResume();
 };
 
-
-  await loadAssura();
-
-  await loadKpt();
-
-};
 function renderAssura(data) {
 console.log("DATA ASSURA");
 console.log(data);
