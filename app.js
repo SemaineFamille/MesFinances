@@ -1,5 +1,6 @@
 console.log("APP VERSION 21-06-2026 15h55");
 
+
 function showScreen(screenId){
 
   document
@@ -436,6 +437,299 @@ async function toggleKptRemboursement(index, value) {
   await updateKptRemboursement(index, value);
 
   loadKpt();
+
+/* =========================
+FINANCES
+========================= */
+
+function formatCHF(value) {
+  const number = Number(value || 0);
+  return `${number.toFixed(2)} CHF`;
+}
+
+function parseFrDate(dateStr) {
+  if (!dateStr) return new Date(0);
+
+  if (dateStr.includes("-")) {
+    return new Date(dateStr);
+  }
+
+  const parts = dateStr.split("/");
+  if (parts.length === 3) {
+    return new Date(parts[2], parts[1] - 1, parts[0]);
+  }
+
+  return new Date(dateStr);
+}
+
+function getCurrentMonthKey() {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, "0");
+  return `${y}-${m}`;
+}
+
+function getMonthKeyFromDate(dateStr) {
+  const d = parseFrDate(dateStr);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  return `${y}-${m}`;
+}
+
+function toggleFinanceForm() {
+  const form = document.getElementById("financeForm");
+  form.style.display =
+    form.style.display === "none" ? "block" : "none";
+}
+
+async function loadFinanceResume() {
+  try {
+    const data = await getFinanceDashboard();
+    const solde = data.find(row => row["Libellé"] === "Solde Factures");
+
+    document.getElementById("financeResume").innerText =
+      solde ? `💰 ${formatCHF(solde["Valeur"])}` : "Aucune donnée";
+  } catch (e) {
+    document.getElementById("financeResume").innerText = "Erreur";
+    console.error(e);
+  }
+}
+
+function renderFinanceChart(dashboardRows) {
+  const chart = document.getElementById("financeChart");
+  if (!chart) return;
+
+  const factures = Number((dashboardRows.find(r => r["Libellé"] === "Solde Factures") || {})["Valeur"] || 0);
+  const epargne = Number((dashboardRows.find(r => r["Libellé"] === "Solde Epargne") || {})["Valeur"] || 0);
+  const vacances = Number((dashboardRows.find(r => r["Libellé"] === "Solde Vacances") || {})["Valeur"] || 0);
+
+  const maxValue = Math.max(factures, epargne, vacances, 1);
+
+  const items = [
+    { label: "Factures", value: factures, className: "finance-bar-factures" },
+    { label: "Epargne", value: epargne, className: "finance-bar-epargne" },
+    { label: "Vacances", value: vacances, className: "finance-bar-vacances" }
+  ];
+
+  chart.innerHTML = items.map(item => {
+    const width = Math.max((item.value / maxValue) * 100, item.value > 0 ? 4 : 0);
+    return `
+      <div class="finance-chart-item">
+        <div class="finance-chart-label">
+          <span>${item.label}</span>
+          <span>${formatCHF(item.value)}</span>
+        </div>
+        <div class="finance-bar-bg">
+          <div class="finance-bar-fill ${item.className}" style="width:${width}%"></div>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function renderFinanceStats(dashboardRows) {
+  const stats = document.getElementById("financeStats");
+  const reserves = document.getElementById("financeReserves");
+  if (!stats || !reserves) return;
+
+  const vue = dashboardRows.filter(r => r["Bloc"] === "Vue générale");
+  const reserveRows = dashboardRows.filter(r => r["Bloc"] === "Réserves / Postes");
+
+  stats.innerHTML = `
+    <div class="finance-stat-list">
+      ${vue.map(v => `
+        <div class="finance-stat-item">
+          <strong>${v["Libellé"]}</strong><br>
+          ${formatCHF(v["Valeur"])}
+        </div>
+      `).join("")}
+    </div>
+  `;
+
+  reserves.innerHTML = `
+    <div class="finance-stat-list">
+      ${reserveRows.map(v => `
+        <div class="finance-stat-item">
+          <strong>${v["Libellé"]}</strong><br>
+          ${formatCHF(v["Valeur"])}
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderFinanceHistory(movements) {
+  const list = document.getElementById("financeList");
+  if (!list) return;
+
+  const sorted = [...movements]
+    .sort((a, b) => parseFrDate(b["Date"]) - parseFrDate(a["Date"]))
+    .slice(0, 20);
+
+  list.innerHTML = `
+    <div class="finance-history-list">
+      ${sorted.map(item => {
+        const isEntry = item["Sens"] === "Entrée";
+        return `
+          <div class="finance-history-item">
+            <div class="finance-history-top">
+              <strong>${item["Date"] || ""}</strong>
+              <span class="${isEntry ? "finance-positive" : "finance-negative"}">
+                ${isEntry ? "+" : "-"} ${formatCHF(item["Montant"])}
+              </span>
+            </div>
+            <div><strong>Compte :</strong> ${item["Compte"] || ""}</div>
+            <div><strong>Poste :</strong> ${item["Poste"] || "-"}</div>
+            <div><strong>Description :</strong> ${item["Description"] || "-"}</div>
+          </div>
+        `;
+      }).join("")}
+    </div>
+  `;
+}
+
+async function loadFinanceScreen() {
+  try {
+    const dashboard = await getFinanceDashboard();
+    const movements = await getFinanceMovements();
+
+    renderFinanceChart(dashboard);
+    renderFinanceStats(dashboard);
+    renderFinanceHistory(movements);
+  } catch (e) {
+    console.error(e);
+    document.getElementById("financeStats").innerHTML = "Erreur chargement finances";
+  }
+}
+
+async function addFinanceMovementManual() {
+  const date = document.getElementById("financeDate").value;
+  const compte = document.getElementById("financeCompte").value;
+  const sens = document.getElementById("financeSens").value;
+  const poste = document.getElementById("financePoste").value;
+  const montant = document.getElementById("financeMontant").value;
+  const description = document.getElementById("financeDescription").value;
+
+  if (!montant) {
+    alert("Montant requis");
+    return;
+  }
+
+  await addFinanceMovement({
+    date,
+    compte,
+    sens,
+    poste,
+    montant,
+    description
+  });
+
+  document.getElementById("financeDate").value = "";
+  document.getElementById("financePoste").value = "";
+  document.getElementById("financeMontant").value = "";
+  document.getElementById("financeDescription").value = "";
+
+  toggleFinanceForm();
+  await loadFinanceScreen();
+  await loadFinanceResume();
+}
+
+async function prepareMonthlyTransfers() {
+  const container = document.getElementById("financeMonthlyTransfers");
+  if (!container) return;
+
+  try {
+    const postes = await getFinancePostes();
+    const movements = await getFinanceMovements();
+    const monthKey = getCurrentMonthKey();
+
+    const activePostes = postes.filter(row =>
+      String(row["Budget mensuel"] || "").trim() !== "" &&
+      Number(row["Budget mensuel"] || 0) > 0
+    );
+
+    const existingThisMonth = movements.filter(m =>
+      getMonthKeyFromDate(m["Date"]) === monthKey &&
+      m["Compte"] === "Factures" &&
+      m["Sens"] === "Entrée"
+    );
+
+    const proposals = activePostes.map(poste => {
+      const posteName = poste["Poste"];
+      const alreadyExists = existingThisMonth.some(m => m["Poste"] === posteName);
+
+      return {
+        poste: posteName,
+        montant: Number(poste["Budget mensuel"] || 0),
+        alreadyExists
+      };
+    });
+
+    container.innerHTML = `
+      <div class="finance-monthly-list">
+        ${proposals.map((item, index) => `
+          <div class="finance-monthly-item">
+            <div class="finance-monthly-top">
+              <strong>${item.poste}</strong>
+              <span>${item.alreadyExists ? "Déjà ajouté ce mois" : "À prévoir"}</span>
+            </div>
+            <input
+              type="number"
+              step="0.01"
+              id="monthlyAmount_${index}"
+              value="${item.montant}"
+              ${item.alreadyExists ? "disabled" : ""}
+            />
+            <input
+              type="hidden"
+              id="monthlyPoste_${index}"
+              value="${item.poste}"
+            />
+          </div>
+        `).join("")}
+      </div>
+
+      <div class="finance-monthly-actions">
+        <button onclick='applyMonthlyTransfers(${JSON.stringify(proposals.filter(p => !p.alreadyExists).length)})'>
+          ✅ Appliquer les virements du mois
+        </button>
+      </div>
+    `;
+
+  } catch (e) {
+    console.error(e);
+    container.innerHTML = "Erreur préparation virements";
+  }
+}
+
+async function applyMonthlyTransfers(count) {
+  const today = new Date();
+  const date = today.toISOString().slice(0, 10);
+
+  for (let i = 0; i < count; i++) {
+    const posteEl = document.getElementById(`monthlyPoste_${i}`);
+    const amountEl = document.getElementById(`monthlyAmount_${i}`);
+
+    if (!posteEl || !amountEl || amountEl.disabled) continue;
+
+    const poste = posteEl.value;
+    const montant = Number(amountEl.value || 0);
+
+    if (montant <= 0) continue;
+
+    await addFinanceMovement({
+      date,
+      compte: "Factures",
+      sens: "Entrée",
+      poste,
+      montant,
+      description: `Provision mensuelle ${poste}`
+    });
+  }
+
+  await loadFinanceScreen();
+  await loadFinanceResume();
+  alert("Virements mensuels ajoutés.");
 
 }
 window.toggleKptRemboursement = toggleKptRemboursement;
