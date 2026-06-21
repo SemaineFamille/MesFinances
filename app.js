@@ -1,4 +1,4 @@
-console.log("APP VERSION 21-06-2026 21h45");
+console.log("APP VERSION 21-06-2026 21h55");
 
 
 function normalizeLabel(label) {
@@ -346,7 +346,26 @@ async function toggleKptRemboursement(index, value) {
 /* =========================
 FINANCES
 ========================= */
+function computeBalancesFromMovements(movements) {
 
+  let comptes = {
+    Factures: 0,
+    Epargne: 0,
+    Vacances: 0
+  };
+
+  movements.forEach(m => {
+    const montant = Number(m["Montant"] || 0);
+
+    if (m["Sens"] === "Entrée") {
+      comptes[m["Compte"]] += montant;
+    } else {
+      comptes[m["Compte"]] -= montant;
+    }
+  });
+
+  return comptes;
+}
 function formatCHF(value) {
   const number = Number(value || 0);
 
@@ -404,17 +423,15 @@ async function loadFinanceResume() {
   }
 }
 
-function renderFinanceChart(dashboardRows) {
+
+function renderFinanceChartFromBalances(comptes) {
+
   const chart = document.getElementById("financeChart");
   if (!chart) return;
 
- const facturesRow = dashboardRows.find(r => r["Libellé"]?.includes("Solde Factures"));
-const epargneRow = dashboardRows.find(r => r["Libellé"]?.includes("Solde Epargne"));
-const vacancesRow = dashboardRows.find(r => r["Libellé"]?.includes("Solde Vacances"));
-
-const factures = Number(facturesRow?.["Valeur"] || 0);
-const epargne = Number(epargneRow?.["Valeur"] || 0);
-const vacances = Number(vacancesRow?.["Valeur"] || 0);
+  const factures = comptes["Factures"] || 0;
+  const epargne = comptes["Epargne"] || 0;
+  const vacances = comptes["Vacances"] || 0;
 
   const maxValue = Math.max(factures, epargne, vacances, 1);
 
@@ -426,6 +443,7 @@ const vacances = Number(vacancesRow?.["Valeur"] || 0);
 
   chart.innerHTML = items.map(item => {
     const width = Math.max((item.value / maxValue) * 100, item.value > 0 ? 4 : 0);
+
     return `
       <div class="finance-chart-item">
         <div class="finance-chart-label">
@@ -439,6 +457,7 @@ const vacances = Number(vacancesRow?.["Valeur"] || 0);
     `;
   }).join("");
 }
+
 
 function renderFinanceStats(dashboardRows) {
   const stats = document.getElementById("financeStats");
@@ -501,19 +520,25 @@ function renderFinanceHistory(movements) {
   `;
 }
 
+
 async function loadFinanceScreen() {
   try {
     const dashboard = await getFinanceDashboard();
     const movements = await getFinanceMovements();
 
-    renderFinanceChart(dashboard);
+    const comptes = computeBalancesFromMovements(movements);
+
+    renderFinanceChartFromBalances(comptes);
     renderFinanceStats(dashboard);
     renderFinanceHistory(movements);
+
   } catch (e) {
     console.error(e);
-    document.getElementById("financeStats").innerHTML = "Erreur chargement finances";
+    document.getElementById("financeStats").innerHTML =
+      "Erreur chargement finances";
   }
 }
+
 
 async function addFinanceMovementManual() {
   const date = document.getElementById("financeDate").value;
