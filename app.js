@@ -85,157 +85,64 @@ async function addAssuraFacture() {
   loadAssura();
 }
 async function addKptFacture() {
-
   const id = Date.now();
-  const date =
-    document.getElementById("kptDate").value;
 
-  const assurance =
-    document.getElementById("kptAssurance").value;
-
-  const type =
-    document.getElementById("kptType").value;
-
-  const facture =
-    document.getElementById("kptFacture").value;
+  const date = document.getElementById("kptDate").value;
+  const assurance = document.getElementById("kptAssurance").value;
+  const type = document.getElementById("kptType").value;
+  const facture = document.getElementById("kptFacture").value;
 
   if (!date || !facture) {
-
     alert("Veuillez remplir les champs");
-
     return;
-    
-if (window.currentKptEditId) {
-
-  await updateKptData({
-    id: window.currentKptEditId,
-    date,
-    assurance,
-    type,
-    facture
-  });
-
-  window.currentKptEditId = null;
-
-  alert("Modifié ✅");
-
-} else {
-
-  await saveKpt({
-    date,
-    assurance,
-    type,
-    facture
-  });
-
-  alert("Ajouté ✅");
-
-}
-
   }
 
-async function saveKpt(data) {
+  if (window.currentKptEditId) {
+    await updateKptData({
+      id: window.currentKptEditId,
+      date,
+      assurance,
+      type,
+      facture
+    });
 
+    window.currentKptEditId = null;
+    alert("Modifié ✅");
+  } else {
+    await saveKpt({
+      id,
+      date,
+      assurance,
+      type,
+      facture
+    });
+
+    alert("Prestation enregistrée");
+  }
+
+  loadKpt();
+}
+
+async function saveKpt(data) {
   return await apiPost({
     action: "addKpt",
     ...data
   });
-
 }
-  async function loadFinanceScreen() {
-  const stats = document.getElementById("financeStats");
 
-  try {
-    const data = await getFinanceDashboard();
-
-    const vue = data.filter(r => r.Bloc === "Vue générale");
-    const reserves = data.filter(r => r.Bloc === "Réserves / Postes");
-
-    stats.innerHTML = `
-      <h3>Vue générale</h3>
-      <ul>
-        ${vue.map(v => `
-          <li><b>${v.Libellé}</b>: ${v.Valeur}</li>
-        `).join("")}
-      </ul>
-
-      <h3>Réserves</h3>
-      <ul>
-        ${reserves.map(v => `
-          <li><b>${v.Libellé}</b>: ${v.Valeur}</li>
-        `).join("")}
-      </ul>
-    `;
-
-  } catch (e) {
-    stats.innerHTML = "Erreur chargement";
-  }
-}
-  async function addFinanceMovement() {
-
-  const date = document.getElementById("financeDate").value;
-  const compte = document.getElementById("financeCompte").value;
-  const sens = document.getElementById("financeSens").value;
-  const poste = document.getElementById("financePoste").value;
-  const montant = document.getElementById("financeMontant").value;
-  const description = document.getElementById("financeDescription").value;
-
-  if (!montant) {
-    alert("Montant requis");
-    return;
-  }
-
-  await postSheetData("addFinanceMovement", {
-    date,
-    compte,
-    sens,
-    poste,
-    montant,
-    description
-  });
-
-  toggleFinanceForm();
-  loadFinanceScreen();
-  loadFinanceResume();
-}
-async function loadFinanceResume() {
-  try {
-    const data = await getFinanceDashboard();
-
-    const solde = data.find(row => row.Libellé === "Solde Factures");
-
-    document.getElementById("financeResume").innerText =
-      solde
-        ? `💰 ${solde.Valeur} CHF`
-        : "Aucune donnée";
-
-  } catch (e) {
-    document.getElementById("financeResume").innerText =
-      "Erreur";
-  }
-}
 async function updateKptData(data) {
-
   return await apiPost({
     action: "updateKptData",
     ...data
   });
-
 }
 
-  await saveKpt({
-    id,
-    date,
-    assurance,
-    type,
-    facture
-  });
-
-  alert("Prestation enregistrée");
-
-  loadKpt();
-}
 window.onload = async () => {
+  await loadAssura();
+  await loadKpt();
+  await loadFinanceResume();
+};
+
 
   await loadAssura();
 
