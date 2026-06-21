@@ -1,4 +1,4 @@
-console.log("APP VERSION 21-06-2026 21h15");
+console.log("APP VERSION 21-06-2026 21h25");
 
 
 function normalizeLabel(label) {
