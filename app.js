@@ -40,11 +40,7 @@ function toggleKptForm(){
       : "none";
 }
 
-function toggleFinanceForm() {
-  const form = document.getElementById("financeForm");
-  form.style.display =
-    form.style.display === "none" ? "block" : "none";
-}
+
 
 async function addAssuraFacture() {
   const id = Date.now();
@@ -344,6 +340,7 @@ async function toggleKptRemboursement(index, value) {
   await updateKptRemboursement(index, value);
 
   loadKpt();
+  }
 
 /* =========================
 FINANCES
@@ -639,11 +636,24 @@ async function applyMonthlyTransfers(count) {
   alert("Virements mensuels ajoutés.");
 
 }
+
 window.toggleKptRemboursement = toggleKptRemboursement;
 window.showScreen = showScreen;
 window.toggleAssuraForm = toggleAssuraForm;
 window.toggleKptForm = toggleKptForm;
+window.toggleFinanceForm = toggleFinanceForm;
+
 window.addAssuraFacture = addAssuraFacture;
 window.addKptFacture = addKptFacture;
+
+/* IMPORTANT :
+   si ton HTML appelle onclick="addFinanceMovement()",
+   il faut exposer la fonction correcte */
+window.addFinanceMovement = addFinanceMovementManual;
+
+window.prepareMonthlyTransfers = prepareMonthlyTransfers;
+
 window.editKpt = editKpt;
+window.deleteKpt = deleteKpt;
+
   
