@@ -31,10 +31,14 @@
       </p>
     </div>
 
-    <div class="card finances disabled">
-      <h2>💰 FINANCES 💸</h2>
-      <p>Bientôt disponible</p>
-    </div>
+ 
+<div class="card finances" onclick="showScreen('financeScreen')">
+  <h2>💰 FINANCES 💸</h2>
+  <p id="financeResume">
+    Chargement...
+  </p>
+</div>
+
 
   </section>
 
@@ -128,6 +132,58 @@
     <div id="kptList"></div>
 
   </section>
+
+<!-- FINANCES -->
+<section id="financeScreen" class="screen theme-finance">
+
+  <button onclick="showScreen('homeScreen')">
+    ⏪⏪ Retour
+  </button>
+
+  <h2>💰 FINANCES 💸</h2>
+
+  <div id="financeStats"></div>
+
+  <button onclick="toggleFinanceForm()">
+    ➕ Ajouter un mouvement
+  </button>
+
+  <div id="financeForm" style="display:none">
+
+    <input type="date" id="financeDate">
+
+    <select id="financeCompte">
+      <option>Factures</option>
+      <option>Epargne</option>
+      <option>Vacances</option>
+    </select>
+
+    <select id="financeSens">
+      <option>Entrée</option>
+      <option>Sortie</option>
+    </select>
+
+    <input type="text"
+           id="financePoste"
+           placeholder="Poste (Impôts, Cadeaux...)">
+
+    <input type="number"
+           id="financeMontant"
+           placeholder="Montant">
+
+    <input type="text"
+           id="financeDescription"
+           placeholder="Description">
+
+    <button onclick="addFinanceMovement()">
+      Enregistrer
+    </button>
+
+  </div>
+
+  <div id="financeList"></div>
+
+</section>
 
 </main>
 
