@@ -358,10 +358,7 @@ function computeReservesFromMovements(movements) {
 
     // On considère qu'une réserve est un poste contenant "réserve"
     if (
- poste.toLowerCase().includes("réserve") ||
-  poste.toLowerCase().includes("voiture") ||
-  poste.toLowerCase().includes("impôts")
-) 
+ poste.toLowerCase().includes("réserve")) 
     {
 
       if (!reserves[poste]) {
