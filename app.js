@@ -1,4 +1,4 @@
-console.log("APP VERSION 21-06-2026 18h00");
+console.log("APP VERSION 21-06-2026 21h15");
 
 
 function normalizeLabel(label) {
@@ -661,7 +661,7 @@ window.addKptFacture = addKptFacture;
 window.addFinanceMovement = addFinanceMovementManual;
 
 window.prepareMonthlyTransfers = prepareMonthlyTransfers;
-
+window.applyMonthlyTransfers = applyMonthlyTransfers;
 window.editKpt = editKpt;
 window.deleteKpt = deleteKpt;
 
