@@ -603,14 +603,14 @@ async function prepareMonthlyTransfers() {
       </div>
 
       <div class="finance-monthly-actions">
-        <button onclick='applyMonthlyTransfers(${JSON.stringify(proposals.filter(p => !p.alreadyExists).length)})'>
+        <button onclick="applyMonthlyTransfers(${proposals.length})">
           ✅ Appliquer les virements du mois
         </button>
       </div>
     `;
 
   } catch (e) {
-    console.error(e);
+    console.error("Erreur préparation virements", e);
     container.innerHTML = "Erreur préparation virements";
   }
 }
@@ -643,7 +643,6 @@ async function applyMonthlyTransfers(count) {
   await loadFinanceScreen();
   await loadFinanceResume();
   alert("Virements mensuels ajoutés.");
-
 }
 
 window.toggleKptRemboursement = toggleKptRemboursement;
