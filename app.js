@@ -1,11 +1,13 @@
 console.log("APP VERSION 21-06-2026 18h00");
 
+
 function normalizeLabel(label) {
   return (label || "")
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "");
 }
+
 
 function showScreen(screenId) {
   document
