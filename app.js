@@ -347,16 +347,14 @@ async function toggleKptRemboursement(index, value) {
 FINANCES
 ========================= */
 
-
 function formatCHF(value) {
   const number = Number(value || 0);
 
-  return number-CH", {  return number
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }) + " CHF";
+  return number.toLocaleString("fr-CH", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }) + " CHF";
 }
-
 
 function parseFrDate(dateStr) {
   if (!dateStr) return new Date(0);
