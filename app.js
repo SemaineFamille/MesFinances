@@ -1,14 +1,13 @@
-console.log("APP VERSION 21-06-2026 17h20");
+console.log("APP VERSION 21-06-2026 17h40");
 
-function normalizeLabel(label) {function normalizeLabelCase()
+function normalizeLabel(label) {
+  return (label || "")
+    .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "");
 }
 
-  return (label || "")
-
-function showScreen(screenId){
-
+function showScreen(screenId) {
   document
     .querySelectorAll(".screen")
     .forEach(screen =>
@@ -18,8 +17,8 @@ function showScreen(screenId){
   document
     .getElementById(screenId)
     .classList.add("active");
-  
-if (screenId === "financeScreen") {
+
+  if (screenId === "financeScreen") {
     loadFinanceScreen();
   }
 }
