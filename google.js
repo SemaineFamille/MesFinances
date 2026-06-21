@@ -5,10 +5,31 @@ const API_URL ="https://script.google.com/macros/s/AKfycbxcQPcOYKJDse5gU2dAHYk7b
 ========================= */
 
 async function fetchSheetData(action) {
-  const response = await fetch(`${SCRIPT_URL}?action=${action}`);
+  const response = await fetch(`${API_URL}?action=${action}`);
   if (!response.ok) {
     throw new Error(`Erreur GET ${action}`);
   }
+  return await response.json();
+}
+
+async function postSheetData(action, payload) {
+  const body = new URLSearchParams({
+    action,
+    ...payload
+  });
+
+  const response = await fetch(API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
+    },
+    body
+  });
+
+  if (!response.ok) {
+    throw new Error(`Erreur POST ${action}`);
+  }
+
   return await response.json();
 }
 
