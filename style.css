@@ -192,6 +192,10 @@ color: #000;           /* ✅ texte en noir */
 .screen.active {
   display: block;
 }
+
+.finance-history-item {.finance-left: 5px solid #f97316;
+}
+
 /* =====================================
    CHECKBOX PERSONNALISEE
 ===================================== */
