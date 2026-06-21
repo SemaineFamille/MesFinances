@@ -1,4 +1,4 @@
-console.log("APP VERSION 21-06-2026 16h20");
+console.log("APP VERSION 21-06-2026 17h20");
 
 
 function showScreen(screenId){
@@ -397,9 +397,13 @@ function renderFinanceChart(dashboardRows) {
   const chart = document.getElementById("financeChart");
   if (!chart) return;
 
-  const factures = Number((dashboardRows.find(r => r["Libellé"] === "Solde Factures") || {})["Valeur"] || 0);
-  const epargne = Number((dashboardRows.find(r => r["Libellé"] === "Solde Epargne") || {})["Valeur"] || 0);
-  const vacances = Number((dashboardRows.find(r => r["Libellé"] === "Solde Vacances") || {})["Valeur"] || 0);
+ const facturesRow = dashboardRows.find(r => r["Libellé"]?.includes("Solde Factures"));
+const epargneRow = dashboardRows.find(r => r["Libellé"]?.includes("Solde Epargne"));
+const vacancesRow = dashboardRows.find(r => r["Libellé"]?.includes("Solde Vacances"));
+
+const factures = Number(facturesRow?.["Valeur"] || 0);
+const epargne = Number(epargneRow?.["Valeur"] || 0);
+const vacances = Number(vacancesRow?.["Valeur"] || 0);
 
   const maxValue = Math.max(factures, epargne, vacances, 1);
 
@@ -471,7 +475,7 @@ function renderFinanceHistory(movements) {
         return `
           <div class="finance-history-item">
             <div class="finance-history-top">
-              <strong>${item["Date"] || ""}</strong>
+             <strong>${formatDate(item["Date"])}</strong>
               <span class="${isEntry ? "finance-positive" : "finance-negative"}">
                 ${isEntry ? "+" : "-"} ${formatCHF(item["Montant"])}
               </span>
