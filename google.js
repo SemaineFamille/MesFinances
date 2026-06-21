@@ -4,6 +4,55 @@ const API_URL ="https://script.google.com/macros/s/AKfycbxcQPcOYKJDse5gU2dAHYk7b
    APPEL API
 ========================= */
 
+async function fetchSheetData(action) {
+  const response = await fetch(`${SCRIPT_URL}?action=${action}`);
+  if (!response.ok) {
+    throw new Error(`Erreur GET ${action}`);
+  }
+  return await response.json();
+}
+
+async function postSheetData(action, payload) {
+  const body = new URLSearchParams({
+    action,
+    ...payload
+  });
+
+  const response = await fetch(SCRIPT_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
+    },
+    body
+  });
+
+  if (!response.ok) {
+    throw new Error(`Erreur POST ${action}`);
+  }
+
+  return await response.json();
+}
+
+/* =========================
+FINANCES
+========================= */
+
+async function getFinanceDashboard() {
+  return await fetchSheetData("getFinanceDashboard");
+}
+
+async function getFinanceMovements() {
+  return await fetchSheetData("getFinanceMovements");
+}
+
+async function getFinancePostes() {
+  return await fetchSheetData("getFinancePostes");
+}
+
+async function addFinanceMovement(data) {
+  return await postSheetData("addFinanceMovement", data);
+}
+
 async function apiGet(action) {
 
   const response = await fetch(
