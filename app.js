@@ -1,4 +1,4 @@
-console.log("APP VERSION 22-06-2026 13h00");
+console.log("APP VERSION 22-06-2026 13h10");
 
 
 function normalizeLabel(label) {
@@ -464,29 +464,36 @@ function renderFinanceChartFromBalances(comptes) {
   const epargne = comptes["Epargne"] || 0;
   const vacances = comptes["Vacances"] || 0;
 
-  const maxValue = Math.max(factures, epargne, vacances, 1);
+  const total = factures + epargne + vacances;
 
-  const items = [
-    { label: "Factures", value: factures, className: "finance-bar-factures" },
-    { label: "Epargne", value: epargne, className: "finance-bar-epargne" },
-    { label: "Vacances", value: vacances, className: "finance-bar-vacances" }
-  ];
+  if (total === 0) {
+    chart.innerHTML = "Aucune donnée";
+    return;
+  }
 
-  chart.innerHTML = items.map(item => {
-    const width = Math.max((item.value / maxValue) * 100, item.value > 0 ? 4 : 0);
+  const pFactures = (factures / total) * 100;
+  const pEpargne = (epargne / total) * 100;
+  const pVacances = (vacances / total) * 100;
 
-    return `
-      <div class="finance-chart-item">
-        <div class="finance-chart-label">
-          <span>${item.label}</span>
-          <span>${formatCHF(item.value)}</span>
-        </div>
-        <div class="finance-bar-bg">
-          <div class="finance-bar-fill ${item.className}" style="width:${width}%"></div>
-        </div>
-      </div>
-    `;
-  }).join("");
+  chart.innerHTML = `
+    <div class="pie-chart"></div>
+
+    <div class="pie-legend">
+      <div>🔵 Factures : ${formatCHF(factures)}</div>
+      <div>🟢 Epargne : ${formatCHF(epargne)}</div>
+      <div>🟠 Vacances : ${formatCHF(vacances)}</div>
+    </div>
+  `;
+
+  const pie = chart.querySelector(".pie-chart");
+
+  pie.style.background = `
+    conic-gradient(
+      #4da6ff 0% ${pFactures}%,
+      #66cc99 ${pFactures}% ${pFactures + pEpargne}%,
+      #ff9933 ${pFactures + pEpargne}% 100%
+    )
+  `;
 }
 
 
