@@ -1,4 +1,4 @@
-console.log("APP VERSION 22-06-2026 12h50");
+console.log("APP VERSION 22-06-2026 13h00");
 
 
 function normalizeLabel(label) {
@@ -490,19 +490,58 @@ function renderFinanceChartFromBalances(comptes) {
 }
 
 
-function renderFinanceStats(dashboardRows, reservesCalc) {
-
+function renderFinanceStats(dashboardRows) {
   const stats = document.getElementById("financeStats");
-  const reservesEl = document.getElementById("financeReserves");
+  const reserves = document.getElementById("financeReserves");
+  if (!stats || !reserves) return;
 
-  // ➜ Vue générale (reste comme avant)
-  const vue = dashboardRows.filter(r =>
-    normalizeLabel(r["Bloc"]).includes("vue")
-  );
+  // ✅ Récupération des valeurs
+  const getValue = (labelPart) => {
+    const row = dashboardRows.find(r =>
+      normalizeLabel(r["Libellé"]).includes(labelPart)
+    );
+    return Number(row?.["Valeur"] || 0);
+  };
 
+  const totalReserves = getValue("total reserves");
+  const dispoFactures = getValue("disponible");
+  const soldeFactures = getValue("factures");
+  const soldeEpargne = getValue("epargne");
+  const soldeVacances = getValue("vacances");
+
+  const totalGlobal =
+    soldeFactures + soldeEpargne + soldeVacances;
+
+  // ✅ Nouvelle Vue générale (utile)
   stats.innerHTML = `
     <div class="finance-stat-list">
-      ${vue.map(v => `
+
+      <div class="finance-stat-item">
+        <strong>🔒 Total réserves</strong><br>
+        ${formatCHF(totalReserves)}
+      </div>
+
+      <div class="finance-stat-item">
+        <strong>💸 Disponible réel (Factures)</strong><br>
+        ${formatCHF(dispoFactures)}
+      </div>
+
+      <div class="finance-stat-item">
+        <strong>💰 Total global</strong><br>
+        ${formatCHF(totalGlobal)}
+      </div>
+
+    </div>
+  `;
+
+  // ✅ Partie Réserves (inchangée)
+  const reserveRows = dashboardRows.filter(r =>
+    normalizeLabel(r["Bloc"]).includes("reserv")
+  );
+
+  reserves.innerHTML = `
+    <div class="finance-stat-list">
+      ${reserveRows.map(v => `
         <div class="finance-stat-item">
           <strong>${v["Libellé"]}</strong><br>
           ${formatCHF(v["Valeur"])}
@@ -510,24 +549,8 @@ function renderFinanceStats(dashboardRows, reservesCalc) {
       `).join("")}
     </div>
   `;
-
-  // ➜ Réserves dynamiques
-  const reserveEntries = Object.entries(reservesCalc);
-
-  reservesEl.innerHTML = `
-    <div class="finance-stat-list">
-      ${reserveEntries.length > 0
-        ? reserveEntries.map(([poste, montant]) => `
-          <div class="finance-stat-item">
-            <strong>${poste}</strong><br>
-            ${formatCHF(montant)}
-          </div>
-        `).join("")
-        : `<div class="finance-stat-item">Aucune réserve détectée</div>`
-      }
-    </div>
-  `;
 }
+
 
 
 function renderFinanceHistory(movements) {
