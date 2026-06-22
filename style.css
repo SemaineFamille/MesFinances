@@ -499,3 +499,14 @@ input[type="checkbox"]:checked::after {
   gap: 10px;
   flex-wrap: wrap;
 }
+.finance-stat-item strong {
+  font-size: 14px;
+}
+
+.finance-stat-item {
+  background: #fff;
+  border-radius: 12px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
