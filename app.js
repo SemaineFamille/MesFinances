@@ -620,7 +620,43 @@ async function loadFinanceScreen() {
       "Erreur chargement finances";
   }
 }
+function renderFinanceAccounts(dashboardRows) {
 
+  const container = document.getElementById("financeChart"); // on réutilise la zone
+  if (!container) return;
+
+  const getValue = (labelPart) => {
+    const row = dashboardRows.find(r =>
+      normalizeLabel(r["Libellé"]).includes(labelPart)
+    );
+    return Number(row?.["Valeur"] || 0);
+  };
+
+  const factures = getValue("factures");
+  const epargne = getValue("epargne");
+  const vacances = getValue("vacances");
+
+  container.innerHTML = `
+    <div class="finance-stat-list">
+
+      <div class="finance-stat-item">
+        <strong>Factures</strong><br>
+        ${formatCHF(factures)}
+      </div>
+
+      <div class="finance-stat-item">
+        <strong>Epargne</strong><br>
+        ${formatCHF(epargne)}
+      </div>
+
+      <div class="finance-stat-item">
+        <strong>Vacances</strong><br>
+        ${formatCHF(vacances)}
+      </div>
+
+    </div>
+  `;
+}
 
 async function addFinanceMovementManual() {
   const date = document.getElementById("financeDate").value;
