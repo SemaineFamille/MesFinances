@@ -1,4 +1,4 @@
-console.log("APP VERSION 22-06-2026 13h10");
+console.log("APP VERSION 22-06-2026 13h30");
 
 
 function normalizeLabel(label) {
@@ -564,28 +564,39 @@ function renderFinanceHistory(movements) {
   const list = document.getElementById("financeList");
   if (!list) return;
 
-  const sorted = [...movements]
+  const currentMonth = getCurrentMonthKey();
+
+  // ✅ Filtrer uniquement le mois en cours
+  const filtered = movements.filter(item =>
+    getMonthKeyFromDate(item["Date"]) === currentMonth
+  );
+
+  // ✅ Trier et limiter (optionnel)
+  const sorted = [...filtered]
     .sort((a, b) => parseFrDate(b["Date"]) - parseFrDate(a["Date"]))
     .slice(0, 20);
 
   list.innerHTML = `
     <div class="finance-history-list">
-      ${sorted.map(item => {
-        const isEntry = item["Sens"] === "Entrée";
-        return `
-          <div class="finance-history-item">
-            <div class="finance-history-top">
-             <strong>${formatDate(item["Date"])}</strong>
-              <span class="${isEntry ? "finance-positive" : "finance-negative"}">
-                ${isEntry ? "+" : "-"} ${formatCHF(item["Montant"])}
-              </span>
-            </div>
-            <div><strong>Compte :</strong> ${item["Compte"] || ""}</div>
-            <div><strong>Poste :</strong> ${item["Poste"] || "-"}</div>
-            <div><strong>Description :</strong> ${item["Description"] || "-"}</div>
-          </div>
-        `;
-      }).join("")}
+      ${sorted.length > 0
+        ? sorted.map(item => {
+            const isEntry = item["Sens"] === "Entrée";
+            return `
+              <div class="finance-history-item">
+                <div class="finance-history-top">
+                  <strong>${formatDate(item["Date"])}</strong>
+                  <span class="${isEntry ? "finance-positive" : "finance-negative"}">
+                    ${isEntry ? "+" : "-"} ${formatCHF(item["Montant"])}
+                  </span>
+                </div>
+                <div><strong>Compte :</strong> ${item["Compte"] || ""}</div>
+                <div><strong>Poste :</strong> ${item["Poste"] || "-"}</div>
+                <div><strong>Description :</strong> ${item["Description"] || "-"}</div>
+              </div>
+            `;
+          }).join("")
+        : `<div class="finance-history-item">Aucun mouvement ce mois</div>`
+      }
     </div>
   `;
 }
