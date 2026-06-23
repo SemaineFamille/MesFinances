@@ -7,6 +7,16 @@ function normalizeLabel(label) {
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "");
 }
+function toggleHistory() {
+  const container = document.getElementById("financeHistoryContainer");
+  const arrow = document.getElementById("historyArrow");
+
+  const isVisible = container.style.display === "block";
+
+  container.style.display = isVisible ? "none" : "block";
+
+  arrow.style.transform = isVisible ? "rotate(0deg)" : "rotate(180deg)";
+}
 
 
 function showScreen(screenId) {
