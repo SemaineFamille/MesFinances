@@ -1,4 +1,4 @@
-console.log("APP VERSION 22-06-2026 13h30");
+console.log("APP VERSION 23-06-2026 09h10");
 
 
 function normalizeLabel(label) {
@@ -499,10 +499,9 @@ function renderFinanceChartFromBalances(comptes) {
 
 function renderFinanceStats(dashboardRows) {
   const stats = document.getElementById("financeStats");
-  const reserves = document.getElementById("financeReserves");
-  if (!stats || !reserves) return;
+  const reservesEl = document.getElementById("financeReserves");
+  if (!stats || !reservesEl) return;
 
-  // ✅ Récupération des valeurs
   const getValue = (labelPart) => {
     const row = dashboardRows.find(r =>
       normalizeLabel(r["Libellé"]).includes(labelPart)
@@ -510,50 +509,132 @@ function renderFinanceStats(dashboardRows) {
     return Number(row?.["Valeur"] || 0);
   };
 
-  const totalReserves = getValue("total reserves");
-  const dispoFactures = getValue("disponible");
-  const soldeFactures = getValue("factures");
-  const soldeEpargne = getValue("epargne");
-  const soldeVacances = getValue("vacances");
+  // =========================
+  // SOLDES COMPTES
+  // =========================
+  const factures = getValue("solde factures");
+  const epargne = getValue("solde epargne");
+  const vacances = getValue("solde vacances");
+  const totalGlobal = factures + epargne + vacances;
 
-  const totalGlobal =
-    soldeFactures + soldeEpargne + soldeVacances;
+  // =========================
+  // RESERVES
+  // =========================
+  const reserveRows = dashboardRows.filter(r =>
+    normalizeLabel(r["Bloc"]).includes("reserv")
+  );
 
-  // ✅ Nouvelle Vue générale (utile)
+  const voiture = Number(
+    reserveRows.find(r => normalizeLabel(r["Libellé"]).includes("voiture"))?.["Valeur"] || 0
+  );
+  const lunettes = Number(
+    reserveRows.find(r => normalizeLabel(r["Libellé"]).includes("lunette"))?.["Valeur"] || 0
+  );
+  const cadeaux = Number(
+    reserveRows.find(r => normalizeLabel(r["Libellé"]).includes("cadeau"))?.["Valeur"] || 0
+  );
+  const impots = Number(
+    reserveRows.find(r => normalizeLabel(r["Libellé"]).includes("impot"))?.["Valeur"] || 0
+  );
+
+  const totalReserves = voiture + lunettes + cadeaux + impots;
+  const disponibleFactures = factures - totalReserves;
+
+  // =========================
+  // POURCENTAGES
+  // =========================
+  const safePercent = (value, total) => {
+    if (!total || total <= 0) return 0;
+    return Math.max(0, Math.min(100, (value / total) * 100));
+  };
+
+  const pctVoiture = safePercent(voiture, totalReserves);
+  const pctLunettes = safePercent(lunettes, totalReserves);
+  const pctCadeaux = safePercent(cadeaux, totalReserves);
+  const pctImpots = safePercent(impots, totalReserves);
+
+  const pctDisponible = safePercent(disponibleFactures, factures);
+  const pctReserveDansFactures = safePercent(totalReserves, factures);
+
+  const pctFactures = safePercent(factures, totalGlobal);
+  const pctEpargne = safePercent(epargne, totalGlobal);
+  const pctVacances = safePercent(vacances, totalGlobal);
+
+  // =========================
+  // VUE GENERALE AVEC BARRES
+  // =========================
   stats.innerHTML = `
     <div class="finance-stat-list">
 
       <div class="finance-stat-item">
         <strong>🔒 Total réserves</strong><br>
         ${formatCHF(totalReserves)}
+
+        <div class="stacked-bar">
+          <div class="seg seg-voiture" style="width:${pctVoiture}%"></div>
+          <div class="seg seg-lunettes" style="width:${pctLunettes}%"></div>
+          <div class="seg seg-cadeaux" style="width:${pctCadeaux}%"></div>
+          <div class="seg seg-impots" style="width:${pctImpots}%"></div>
+        </div>
+
+        <div class="stacked-legend">
+          <span><span class="dot seg-voiture"></span> Voiture ${formatCHF(voiture)}</span>
+          <span><span class="dot seg-lunettes"></span> Lunettes ${formatCHF(lunettes)}</span>
+          <span><span class="dot seg-cadeaux"></span> Cadeaux ${formatCHF(cadeaux)}</span>
+          <span><span class="dot seg-impots"></span> Impôts ${formatCHF(impots)}</span>
+        </div>
       </div>
 
       <div class="finance-stat-item">
         <strong>💸 Disponible réel (Factures)</strong><br>
-        ${formatCHF(dispoFactures)}
+        ${formatCHF(disponibleFactures)}
+
+        <div class="stacked-bar">
+          <div class="seg seg-disponible" style="width:${pctDisponible}%"></div>
+          <div class="seg seg-reserve-total" style="width:${pctReserveDansFactures}%"></div>
+        </div>
+
+        <div class="stacked-legend">
+          <span><span class="dot seg-disponible"></span> Disponible ${formatCHF(disponibleFactures)}</span>
+          <span><span class="dot seg-reserve-total"></span> Réservé ${formatCHF(totalReserves)}</span>
+          <span><strong>Total compte Factures : ${formatCHF(factures)}</strong></span>
+        </div>
       </div>
 
       <div class="finance-stat-item">
         <strong>💰 Total global</strong><br>
         ${formatCHF(totalGlobal)}
+
+        <div class="stacked-bar">
+          <div class="seg seg-factures" style="width:${pctFactures}%"></div>
+          <div class="seg seg-epargne" style="width:${pctEpargne}%"></div>
+          <div class="seg seg-vacances" style="width:${pctVacances}%"></div>
+        </div>
+
+        <div class="stacked-legend">
+          <span><span class="dot seg-factures"></span> Factures ${formatCHF(factures)}</span>
+          <span><span class="dot seg-epargne"></span> Épargne ${formatCHF(epargne)}</span>
+          <span><span class="dot seg-vacances"></span> Vacances ${formatCHF(vacances)}</span>
+        </div>
       </div>
 
     </div>
   `;
 
-  // ✅ Partie Réserves (inchangée)
-  const reserveRows = dashboardRows.filter(r =>
-    normalizeLabel(r["Bloc"]).includes("reserv")
-  );
-
-  reserves.innerHTML = `
+  // =========================
+  // DETAIL RESERVES (section en dessous)
+  // =========================
+  reservesEl.innerHTML = `
     <div class="finance-stat-list">
-      ${reserveRows.map(v => `
-        <div class="finance-stat-item">
-          <strong>${v["Libellé"]}</strong><br>
-          ${formatCHF(v["Valeur"])}
-        </div>
-      `).join("")}
+      ${reserveRows.length > 0
+        ? reserveRows.map(v => `
+          <div class="finance-stat-item">
+            <strong>${v["Libellé"]}</strong><br>
+            ${formatCHF(v["Valeur"])}
+          </div>
+        `).join("")
+        : `<div class="finance-stat-item">Aucune réserve détectée</div>`
+      }
     </div>
   `;
 }
