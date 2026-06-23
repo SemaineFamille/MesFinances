@@ -520,3 +520,48 @@ input[type="checkbox"]:checked::after {
   text-align: center;
   font-size: 14px;
 }
+.stacked-bar {
+  width: 100%;
+  height: 18px;
+  display: flex;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e5e7eb;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.seg {
+  height: 100%;
+}
+
+.stacked-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  margin-top: 6px;
+}
+
+.dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+/* Réserves */
+.seg-voiture { background: #f97316; }
+.seg-lunettes { background: #eab308; }
+.seg-cadeaux { background: #ec4899; }
+.seg-impots { background: #8b5cf6; }
+
+/* Disponible vs réservé */
+.seg-disponible { background: #22c55e; }
+.seg-reserve-total { background: #f97316; }
+
+/* Total global */
+.seg-factures { background: #4f46e5; }
+.seg-epargne { background: #16a34a; }
+.seg-vacances { background: #f59e0b; }
