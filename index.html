@@ -213,10 +213,16 @@
   </div>
 
   <!-- Historique -->
-  <div class="finance-block">
-    <h3>Historique des mouvements</h3>
-    <div id="financeList"></div>
-  </div>
+ 
+<div class="collapsible-header" onclick="toggleHistory()">
+  <span>📜 Historique des mouvements</span>
+  <span id="historyArrow">▼</span>
+</div>
+
+<div id="financeHistoryContainer" style="display: none;">
+  <div id="financeList"></div>
+</div>
+
 
 </section>
 
