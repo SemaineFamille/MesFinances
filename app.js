@@ -40,6 +40,7 @@ function showScreen(screenId) {
   }
 }
 
+
 function toggleAssuraForm(){
 
   const form =
@@ -756,7 +757,6 @@ function renderFinanceAccounts(dashboardRows) {
 
 
 async function addFinanceMovementManual() {
-
   const date = document.getElementById("financeDate").value;
   const compte = document.getElementById("financeCompte").value;
   const sens = document.getElementById("financeSens").value;
@@ -776,8 +776,6 @@ async function addFinanceMovementManual() {
     return;
   }
 
-
-
   await addFinanceMovementApi({
     date,
     compte,
@@ -791,6 +789,9 @@ async function addFinanceMovementManual() {
   document.getElementById("financePoste").value = "";
   document.getElementById("financeMontant").value = "";
   document.getElementById("financeDescription").value = "";
+
+  const subField = document.getElementById("financeSubCategory");
+  if (subField) subField.value = "";
 
   toggleFinanceForm();
   await loadFinanceScreen();
