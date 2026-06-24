@@ -683,3 +683,218 @@ async function prepareMonthlyTransfers() {
           <div class="finance-monthly-item">
             <div class="finance-monthly-top">
               <strong>${item.poste}</strong>
+              <span>${item.alreadyExists ? "Déjà ajouté ce mois" : "À prévoir"}</span>
+            </div>
+            <input
+              type="number"
+              step="0.01"
+              id="monthlyAmount_${index}"
+              value="${item.montant}"
+              ${item.alreadyExists ? "disabled" : ""}
+            />
+            <input
+              type="hidden"
+              id="monthlyPoste_${index}"
+              value="${item.poste}"
+            />
+          </div>
+        `).join("")}
+      </div>
+
+      <div class="finance-monthly-actions">
+        <button onclick="applyMonthlyTransfers(${proposals.length})">
+          ✅ Appliquer les virements du mois
+        </button>
+      </div>
+    `;
+  } catch (e) {
+    console.error("Erreur préparation virements", e);
+    container.innerHTML = "Erreur préparation virements";
+  }
+}
+
+async function applyMonthlyTransfers(count) {
+  const today = new Date();
+  const date = today.toISOString().slice(0, 10);
+
+  for (let i = 0; i < count; i++) {
+    const posteEl = document.getElementById(`monthlyPoste_${i}`);
+    const amountEl = document.getElementById(`monthlyAmount_${i}`);
+
+    if (!posteEl || !amountEl || amountEl.disabled) continue;
+
+    const poste = posteEl.value;
+    const montant = Number(amountEl.value || 0);
+
+    if (montant <= 0) continue;
+
+    await addFinanceMovementApi({
+      date,
+      compte: "Factures",
+      sens: "Entrée",
+      poste,
+      montant,
+      description: `Provision mensuelle ${poste}`
+    });
+  }
+
+  await loadFinanceScreen();
+  await loadFinanceResume();
+  alert("Virements mensuels ajoutés.");
+}
+
+/* =========================
+   EPARGNE 3 - COURBE
+========================= */
+
+function prepareLineData(data) {
+  let byCompte = {};
+
+  data.forEach(row => {
+    if (!byCompte[row.Compte]) {
+      byCompte[row.Compte] = [];
+    }
+
+    byCompte[row.Compte].push({
+      date: new Date(row.Date),
+      solde: Number(row.Solde || 0)
+    });
+  });
+
+  Object.values(byCompte).forEach(list => {
+    list.sort((a, b) => a.date - b.date);
+
+    for (let i = 1; i < list.length; i++) {
+      list[i].interet = list[i].solde - list[i - 1].solde;
+    }
+  });
+
+  return byCompte;
+}
+
+function renderEpargneLineChart(data) {
+  const container = document.getElementById("epargneChart");
+  if (!container) return;
+
+  const comptes = prepareLineData(data);
+
+  let max = 0;
+
+  Object.values(comptes).forEach(list => {
+    list.forEach(p => {
+      if (p.solde > max) max = p.solde;
+    });
+  });
+
+  if (max === 0) {
+    container.innerHTML = `<div class="finance-stat-item">Aucune donnée</div>`;
+    return;
+  }
+
+  const width = 600;
+  const height = 220;
+
+  let svg = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">`;
+
+  const colors = [
+    "#4f46e5",
+    "#16a34a",
+    "#f59e0b",
+    "#dc2626"
+  ];
+
+  let colorIndex = 0;
+
+  Object.keys(comptes).forEach(compte => {
+    const list = comptes[compte];
+    if (list.length === 0) return;
+
+    const stepX = list.length > 1 ? width / (list.length - 1) : width / 2;
+    let path = "";
+
+    list.forEach((point, index) => {
+      const x = list.length > 1 ? index * stepX : width / 2;
+      const y = height - (point.solde / max) * (height - 20);
+
+      if (index === 0) {
+        path += `M ${x} ${y}`;
+      } else {
+        path += ` L ${x} ${y}`;
+      }
+    });
+
+    const color = colors[colorIndex % colors.length];
+    colorIndex++;
+
+    svg += `<path d="${path}" stroke="${color}" fill="none" stroke-width="3" />`;
+
+    list.forEach((point, index) => {
+      const x = list.length > 1 ? index * stepX : width / 2;
+      const y = height - (point.solde / max) * (height - 20);
+
+      svg += `<circle cx="${x}" cy="${y}" r="4" fill="${color}" />`;
+    });
+  });
+
+  svg += `</svg>`;
+
+  container.innerHTML = `
+    <div style="overflow-x:auto">
+      ${svg}
+    </div>
+  `;
+}
+
+/* =========================
+   CHARGEMENT FINANCES
+========================= */
+
+async function loadFinanceScreen() {
+  try {
+    const dashboard = await getFinanceDashboard();
+    const movements = await getFinanceMovements();
+
+    renderFinancePieChart(dashboard);
+    renderFinanceStats(dashboard);
+    renderFinanceHistory(movements);
+
+    // Facultatif : n'affiche la courbe que si l'élément existe et que l'API répond
+    try {
+      const epargneChart = document.getElementById("epargneChart");
+      if (epargneChart && typeof getEpargne3 === "function") {
+        const epargne3 = await getEpargne3();
+        renderEpargneLineChart(epargne3);
+      }
+    } catch (epargneErr) {
+      console.error("Erreur chargement Epargne 3", epargneErr);
+    }
+
+  } catch (e) {
+    console.error(e);
+    document.getElementById("financeStats").innerHTML =
+      "Erreur chargement finances";
+  }
+}
+
+/* =========================
+   EXPOSITION AU HTML
+========================= */
+
+window.showScreen = showScreen;
+
+window.toggleAssuraForm = toggleAssuraForm;
+window.toggleKptForm = toggleKptForm;
+window.toggleFinanceForm = toggleFinanceForm;
+window.toggleHistory = toggleHistory;
+window.handleFinanceCompteChange = handleFinanceCompteChange;
+
+window.addAssuraFacture = addAssuraFacture;
+window.addKptFacture = addKptFacture;
+window.addFinanceMovement = addFinanceMovementManual;
+
+window.prepareMonthlyTransfers = prepareMonthlyTransfers;
+window.applyMonthlyTransfers = applyMonthlyTransfers;
+
+window.toggleKptRemboursement = toggleKptRemboursement;
+window.editKpt = editKpt;
+window.deleteKpt = deleteKpt;
