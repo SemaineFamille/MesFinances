@@ -53,6 +53,14 @@ async function addFinanceMovementApi(data) {
   return await postSheetData("addFinanceMovement", data);
 }
 
+async function getEpargne3() {
+  return await fetchSheetData("getEpargne3");
+}
+
+async function addEpargne3(data) {
+  return await postSheetData("addEpargne3", data);
+}
+
 /* =========================
    API GENERIQUE EXISTANTE
 ========================= */
