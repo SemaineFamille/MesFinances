@@ -754,17 +754,29 @@ function renderFinanceAccounts(dashboardRows) {
   `;
 }
 
+
 async function addFinanceMovementManual() {
+
   const date = document.getElementById("financeDate").value;
   const compte = document.getElementById("financeCompte").value;
   const sens = document.getElementById("financeSens").value;
-  const poste = document.getElementById("financePoste").value;
+
+  let poste = document.getElementById("financePoste").value;
+  const sub = document.getElementById("financeSubCategory").value;
+
+  if (compte === "Factures" && sub) {
+    poste = sub;
+  }
+
   const montant = document.getElementById("financeMontant").value;
   const description = document.getElementById("financeDescription").value;
 
   if (!montant) {
     alert("Montant requis");
     return;
+  }
+
+
   }
 
   await addFinanceMovementApi({
