@@ -361,19 +361,50 @@ async function toggleKptRemboursement(index, value) {
 }
 
 /* =========================
-   FINANCES
+FINANCES
 ========================= */
 
-function toggleHistory() {
-  const container = document.getElementById("financeHistoryContainer");
-  const arrow = document.getElementById("historyArrow");
+function formatCHF(value) {
+  const number = Number(value || 0);
+  return number.toLocaleString("fr-CH", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }) + " CHF";
+}
 
-  if (!container || !arrow) return;
+function parseFrDate(dateStr) {
+  if (!dateStr) return new Date(0);
 
-  const isVisible = container.style.display === "block";
+  if (dateStr.includes("-")) {
+    return new Date(dateStr);
+  }
 
-  container.style.display = isVisible ? "none" : "block";
-  arrow.style.transform = isVisible ? "rotate(0deg)" : "rotate(180deg)";
+  const parts = dateStr.split("/");
+  if (parts.length === 3) {
+    return new Date(parts[2], parts[1] - 1, parts[0]);
+  }
+
+  return new Date(dateStr);
+}
+
+function getCurrentMonthKey() {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, "0");
+  return `${y}-${m}`;
+}
+
+function getMonthKeyFromDate(dateStr) {
+  const d = parseFrDate(dateStr);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  return `${y}-${m}`;
+}
+
+function toggleFinanceForm() {
+  const form = document.getElementById("financeForm");
+  form.style.display =
+    form.style.display === "none" ? "block" : "none";
 }
 
 async function loadFinanceResume() {
@@ -779,7 +810,6 @@ function renderEpargneLineChart(data) {
   const comptes = prepareLineData(data);
 
   let max = 0;
-
   Object.values(comptes).forEach(list => {
     list.forEach(p => {
       if (p.solde > max) max = p.solde;
@@ -793,16 +823,9 @@ function renderEpargneLineChart(data) {
 
   const width = 600;
   const height = 220;
-
   let svg = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">`;
 
-  const colors = [
-    "#4f46e5",
-    "#16a34a",
-    "#f59e0b",
-    "#dc2626"
-  ];
-
+  const colors = ["#4f46e5", "#16a34a", "#f59e0b", "#dc2626"];
   let colorIndex = 0;
 
   Object.keys(comptes).forEach(compte => {
@@ -858,7 +881,6 @@ async function loadFinanceScreen() {
     renderFinanceStats(dashboard);
     renderFinanceHistory(movements);
 
-    // Facultatif : n'affiche la courbe que si l'élément existe et que l'API répond
     try {
       const epargneChart = document.getElementById("epargneChart");
       if (epargneChart && typeof getEpargne3 === "function") {
