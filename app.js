@@ -727,6 +727,9 @@ async function loadFinanceScreen() {
   try {
     const dashboard = await getFinanceDashboard();
     const movements = await getFinanceMovements();
+    
+    const epargne3 = await getEpargne3();
+    renderEpargneChart(epargne3);
 
     const comptes = computeBalancesFromMovements(movements);
     const reserves = computeReservesFromMovements(movements);
