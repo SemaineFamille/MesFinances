@@ -94,7 +94,12 @@ function toggleFinanceForm() {
   const form = document.getElementById("financeForm");
   form.style.display = form.style.display === "none" ? "block" : "none";
 }
+function toggleEpargneForm() {
+  const form = document.getElementById("epargneForm");
 
+  form.style.display =
+    form.style.display === "none" ? "block" : "none";
+}
 function toggleHistory() {
   const container = document.getElementById("financeHistoryContainer");
   const arrow = document.getElementById("historyArrow");
@@ -676,6 +681,59 @@ async function addFinanceMovementManual() {
   await loadFinanceScreen();
   await loadFinanceResume();
 }
+async function addEpargne3Entry() {
+
+  const compte = document.getElementById("epargneCompte").value;
+  const date = document.getElementById("epargneDate").value;
+  const solde = document.getElementById("epargneSolde").value;
+
+  if (!date || !solde) {
+    alert("Remplis les champs");
+    return;
+  }
+
+  await addEpargne3({
+    compte,
+    date,
+    solde
+  });
+
+  alert("Solde enregistré ✅");
+
+  toggleEpargneForm();
+
+  await loadFinanceScreen(); // recharge tout (courbe + résumé)
+}
+function renderEpargneSummary(data) {
+
+  const container = document.getElementById("epargneSummary");
+  if (!container) return;
+
+  const comptes = prepareLineData(data);
+
+  let html = "";
+
+  Object.keys(comptes).forEach(compte => {
+
+    const list = comptes[compte];
+    if (list.length === 0) return;
+
+    const last = list[list.length - 1];
+
+    html += `
+      <div class="finance-stat-item">
+        <strong>${compte}</strong><br>
+        ${formatCHF(last.solde)}
+      </div>
+    `;
+  });
+
+  container.innerHTML = `
+    <div class="finance-stat-list">
+      ${html}
+    </div>
+  `;
+}
 
 async function prepareMonthlyTransfers() {
   const container = document.getElementById("financeMonthlyTransfers");
@@ -885,6 +943,7 @@ async function loadFinanceScreen() {
       const epargneChart = document.getElementById("epargneChart");
       if (epargneChart && typeof getEpargne3 === "function") {
         const epargne3 = await getEpargne3();
+         renderEpargneSummary(epargne3);
         renderEpargneLineChart(epargne3);
       }
     } catch (epargneErr) {
