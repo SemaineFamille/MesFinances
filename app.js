@@ -1,4 +1,4 @@
-console.log("APP VERSION 24-06-2026 16h00");
+console.log("APP VERSION 24-06-2026 16h15");
 
 
 function normalizeLabel(label) {
@@ -494,7 +494,38 @@ function computeEvolution(data) {
   return byCompte;
 }
 
+function renderEpargneChart(data) {
+  const container = document.getElementById("epargneChart");
 
+  const comptes = computeEvolution(data);
+
+  let html = "";
+
+  Object.keys(comptes).forEach(compte => {
+
+    const list = comptes[compte];
+
+    html += `<h4>${compte}</h4>`;
+
+    list.forEach(item => {
+
+      const height = item.solde / 100; // ajustable
+
+      html += `
+        <div class="bar-item">
+          <div class="bar" style="height:${height}px"></div>
+          <div class="bar-label">
+            ${new Date(item.date).getMonth()+1}<br>
+            ${formatCHF(item.solde)}
+          </div>
+        </div>
+      `;
+    });
+
+  });
+
+  container.innerHTML = html;
+}
 function renderFinanceChartFromBalances(comptes) {
 
   const chart = document.getElementById("financeChart");
