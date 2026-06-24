@@ -1,4 +1,4 @@
-console.log("APP VERSION 24-06-2026 16h15");
+console.log("APP VERSION 24-06-2026 16h25");
 
 
 function normalizeLabel(label) {
@@ -451,16 +451,13 @@ function getMonthKeyFromDate(dateStr) {
   return `${y}-${m}`;
 }
 
-function toggleFinanceForm() {
-  const form = document.getElementById("financeForm");
-  form.style.display =
-    form.style.display === "none" ? "block" : "none";
-}
-
 async function loadFinanceResume() {
   try {
     const data = await getFinanceDashboard();
-    const solde = data.find(row => row["Libellé"] === "Solde Factures");
+
+    const solde = data.find(row =>
+      normalizeLabel(row["Libellé"]).includes("solde factures")
+    );
 
     document.getElementById("financeResume").innerText =
       solde ? `💰 ${formatCHF(solde["Valeur"])}` : "Aucune donnée";
@@ -469,25 +466,25 @@ async function loadFinanceResume() {
     console.error(e);
   }
 }
-function computeEvolution(data) {
-
+function prepareLineData(data) {
   let byCompte = {};
 
   data.forEach(row => {
     if (!byCompte[row.Compte]) {
       byCompte[row.Compte] = [];
     }
+
     byCompte[row.Compte].push({
-      date: row.Date,
+      date: new Date(row.Date),
       solde: Number(row.Solde || 0)
     });
   });
 
   Object.values(byCompte).forEach(list => {
-    list.sort((a, b) => new Date(a.date) - new Date(b.date));
+    list.sort((a, b) => a.date - b.date);
 
     for (let i = 1; i < list.length; i++) {
-      list[i].interet = list[i].solde - list[i-1].solde;
+      list[i].interet = list[i].solde - list[i - 1].solde;
     }
   });
 
@@ -496,7 +493,6 @@ function computeEvolution(data) {
 
 
 function renderEpargneLineChart(data) {
-
   const container = document.getElementById("epargneChart");
   if (!container) return;
 
@@ -516,9 +512,9 @@ function renderEpargneLineChart(data) {
   }
 
   const width = 600;
-  const height = 200;
+  const height = 220;
 
-  let svg = `<svg width="${width}" height="${height}">`;
+  let svg = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">`;
 
   const colors = [
     "#4f46e5",
@@ -530,16 +526,15 @@ function renderEpargneLineChart(data) {
   let colorIndex = 0;
 
   Object.keys(comptes).forEach(compte => {
-
     const list = comptes[compte];
-    const stepX = width / (list.length - 1);
+    if (list.length === 0) return;
 
+    const stepX = list.length > 1 ? width / (list.length - 1) : width / 2;
     let path = "";
 
     list.forEach((point, index) => {
-
-      const x = index * stepX;
-      const y = height - (point.solde / max) * height;
+      const x = list.length > 1 ? index * stepX : width / 2;
+      const y = height - (point.solde / max) * (height - 20);
 
       if (index === 0) {
         path += `M ${x} ${y}`;
@@ -551,16 +546,14 @@ function renderEpargneLineChart(data) {
     const color = colors[colorIndex % colors.length];
     colorIndex++;
 
-    svg += `<path d="${path}" stroke="${color}" fill="none" stroke-width="2"/>`;
+    svg += `<path d="${path}" stroke="${color}" fill="none" stroke-width="3" />`;
 
-    // points
     list.forEach((point, index) => {
-      const x = index * stepX;
-      const y = height - (point.solde / max) * height;
+      const x = list.length > 1 ? index * stepX : width / 2;
+      const y = height - (point.solde / max) * (height - 20);
 
-      svg += `<circle cx="${x}" cy="${y}" r="3" fill="${color}" />`;
+      svg += `<circle cx="${x}" cy="${y}" r="4" fill="${color}" />`;
     });
-
   });
 
   svg += `</svg>`;
@@ -571,6 +564,7 @@ function renderEpargneLineChart(data) {
     </div>
   `;
 }
+
 
 function renderFinanceChartFromBalances(comptes) {
 
@@ -625,6 +619,121 @@ function renderFinanceStats(dashboardRows) {
     );
     return Number(row?.["Valeur"] || 0);
   };
+
+  const factures = getValue("solde factures");
+  const epargne = getValue("solde epargne");
+  const vacances = getValue("solde vacances");
+  const totalGlobal = factures + epargne + vacances;
+
+  const reserveRows = dashboardRows.filter(r =>
+    normalizeLabel(r["Bloc"]).includes("reserv")
+  );
+
+  const voiture = Number(
+    reserveRows.find(r => normalizeLabel(r["Libellé"]).includes("voiture"))?.["Valeur"] || 0
+  );
+  const lunettes = Number(
+    reserveRows.find(r => normalizeLabel(r["Libellé"]).includes("lunette"))?.["Valeur"] || 0
+  );
+  const cadeaux = Number(
+    reserveRows.find(r => normalizeLabel(r["Libellé"]).includes("cadeau"))?.["Valeur"] || 0
+  );
+  const impots = Number(
+    reserveRows.find(r => normalizeLabel(r["Libellé"]).includes("impot"))?.["Valeur"] || 0
+  );
+
+  const totalReserves = voiture + lunettes + cadeaux + impots;
+  const disponibleFactures = factures - totalReserves;
+
+  const safePercent = (value, total) => {
+    if (!total || total <= 0) return 0;
+    return Math.max(0, Math.min(100, (value / total) * 100));
+  };
+
+  const pctVoiture = safePercent(voiture, totalReserves);
+  const pctLunettes = safePercent(lunettes, totalReserves);
+  const pctCadeaux = safePercent(cadeaux, totalReserves);
+  const pctImpots = safePercent(impots, totalReserves);
+
+  const pctDisponible = safePercent(disponibleFactures, factures);
+  const pctReserveDansFactures = safePercent(totalReserves, factures);
+
+  const pctFactures = safePercent(factures, totalGlobal);
+  const pctEpargne = safePercent(epargne, totalGlobal);
+  const pctVacances = safePercent(vacances, totalGlobal);
+
+  stats.innerHTML = `
+    <div class="finance-stat-list">
+
+      <div class="finance-stat-item">
+        <strong>🔒 Total réserves</strong><br>
+        ${formatCHF(totalReserves)}
+
+        <div class="stacked-bar">
+          <div class="seg seg-voiture" style="width:${pctVoiture}%"></div>
+          <div class="seg seg-lunettes" style="width:${pctLunettes}%"></div>
+          <div class="seg seg-cadeaux" style="width:${pctCadeaux}%"></div>
+          <div class="seg seg-impots" style="width:${pctImpots}%"></div>
+        </div>
+
+        <div class="stacked-legend">
+          <span><span class="dot seg-voiture"></span> Voiture ${formatCHF(voiture)}</span>
+          <span><span class="dot seg-lunettes"></span> Lunettes ${formatCHF(lunettes)}</span>
+          <span><span class="dot seg-cadeaux"></span> Cadeaux ${formatCHF(cadeaux)}</span>
+          <span><span class="dot seg-impots"></span> Impôts ${formatCHF(impots)}</span>
+        </div>
+      </div>
+
+      <div class="finance-stat-item">
+        <strong>💸 Disponible réel (Factures)</strong><br>
+        ${formatCHF(disponibleFactures)}
+
+        <div class="stacked-bar">
+          <div class="seg seg-disponible" style="width:${pctDisponible}%"></div>
+          <div class="seg seg-reserve-total" style="width:${pctReserveDansFactures}%"></div>
+        </div>
+
+        <div class="stacked-legend">
+          <span><span class="dot seg-disponible"></span> Disponible ${formatCHF(disponibleFactures)}</span>
+          <span><span class="dot seg-reserve-total"></span> Réservé ${formatCHF(totalReserves)}</span>
+          <span><strong>Total compte Factures : ${formatCHF(factures)}</strong></span>
+        </div>
+      </div>
+
+      <div class="finance-stat-item">
+        <strong>💰 Total global</strong><br>
+        ${formatCHF(totalGlobal)}
+
+        <div class="stacked-bar">
+          <div class="seg seg-factures" style="width:${pctFactures}%"></div>
+          <div class="seg seg-epargne" style="width:${pctEpargne}%"></div>
+          <div class="seg seg-vacances" style="width:${pctVacances}%"></div>
+        </div>
+
+        <div class="stacked-legend">
+          <span><span class="dot seg-factures"></span> Factures ${formatCHF(factures)}</span>
+          <span><span class="dot seg-epargne"></span> Épargne ${formatCHF(epargne)}</span>
+          <span><span class="dot seg-vacances"></span> Vacances ${formatCHF(vacances)}</span>
+        </div>
+      </div>
+
+    </div>
+  `;
+
+  reservesEl.innerHTML = `
+    <div class="finance-stat-list">
+      ${reserveRows.length > 0
+        ? reserveRows.map(v => `
+          <div class="finance-stat-item">
+            <strong>${v["Libellé"]}</strong><br>
+            ${formatCHF(v["Valeur"])}
+          </div>
+        `).join("")
+        : `<div class="finance-stat-item">Aucune réserve détectée</div>`
+      }
+    </div>
+  `;
+}
 
   // =========================
   // SOLDES COMPTES
@@ -804,16 +913,12 @@ async function loadFinanceScreen() {
   try {
     const dashboard = await getFinanceDashboard();
     const movements = await getFinanceMovements();
-    
     const epargne3 = await getEpargne3();
-   renderEpargneLineChart(epargne3);
 
-    const comptes = computeBalancesFromMovements(movements);
-    const reserves = computeReservesFromMovements(movements);
-
-    renderFinanceChartFromBalances(comptes);
-    renderFinanceStats(dashboard, reserves);
-    renderFinanceHistory(movements);
+    renderFinanceAccounts(dashboard);   // ✅ vue rapide des 3 comptes
+    renderFinanceStats(dashboard);      // ✅ vue générale avec barres
+    renderFinanceHistory(movements);    // ✅ historique du mois
+    renderEpargneLineChart(epargne3);   // ✅ courbe épargne 3
 
   } catch (e) {
     console.error(e);
@@ -822,8 +927,7 @@ async function loadFinanceScreen() {
   }
 }
 function renderFinanceAccounts(dashboardRows) {
-
-  const container = document.getElementById("financeChart"); // on réutilise la zone
+  const container = document.getElementById("financeChart");
   if (!container) return;
 
   const getValue = (labelPart) => {
@@ -839,7 +943,6 @@ function renderFinanceAccounts(dashboardRows) {
 
   container.innerHTML = `
     <div class="finance-stat-list">
-
       <div class="finance-stat-item">
         <strong>Factures</strong><br>
         ${formatCHF(factures)}
@@ -854,7 +957,6 @@ function renderFinanceAccounts(dashboardRows) {
         <strong>Vacances</strong><br>
         ${formatCHF(vacances)}
       </div>
-
     </div>
   `;
 }
@@ -1018,5 +1120,6 @@ window.prepareMonthlyTransfers = prepareMonthlyTransfers;
 window.applyMonthlyTransfers = applyMonthlyTransfers;
 window.editKpt = editKpt;
 window.deleteKpt = deleteKpt;
-
+window.toggleHistory = toggleHistory;
+window.handleFinanceCompteChange = handleFinanceCompteChange;
   
