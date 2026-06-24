@@ -777,7 +777,6 @@ async function addFinanceMovementManual() {
   }
 
 
-  }
 
   await addFinanceMovementApi({
     date,
