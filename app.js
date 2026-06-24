@@ -806,7 +806,7 @@ async function loadFinanceScreen() {
     const movements = await getFinanceMovements();
     
     const epargne3 = await getEpargne3();
-    renderEpargneChart(epargne3);
+   renderEpargneLineChart(epargne3);
 
     const comptes = computeBalancesFromMovements(movements);
     const reserves = computeReservesFromMovements(movements);
