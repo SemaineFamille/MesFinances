@@ -1,4 +1,4 @@
-console.log("APP VERSION 23-06-2026 09h10");
+console.log("APP VERSION 24-06-2026 12h00");
 
 
 function normalizeLabel(label) {
@@ -17,7 +17,12 @@ function toggleHistory() {
 
   arrow.style.transform = isVisible ? "rotate(0deg)" : "rotate(180deg)";
 }
+function handleFinanceCompteChange() {
+  const compte = document.getElementById("financeCompte").value;
+  const subContainer = document.getElementById("financeSubCategoryContainer");
 
+  subContainer.style.display = (compte === "Factures") ? "block" : "none";
+}
 
 function showScreen(screenId) {
   document
