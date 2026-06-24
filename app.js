@@ -1,4 +1,4 @@
-console.log("APP VERSION 24-06-2026 12h00");
+console.log("APP VERSION 24-06-2026 16h00");
 
 
 function normalizeLabel(label) {
@@ -468,6 +468,30 @@ async function loadFinanceResume() {
     document.getElementById("financeResume").innerText = "Erreur";
     console.error(e);
   }
+}
+function computeEvolution(data) {
+
+  let byCompte = {};
+
+  data.forEach(row => {
+    if (!byCompte[row.Compte]) {
+      byCompte[row.Compte] = [];
+    }
+    byCompte[row.Compte].push({
+      date: row.Date,
+      solde: Number(row.Solde || 0)
+    });
+  });
+
+  Object.values(byCompte).forEach(list => {
+    list.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    for (let i = 1; i < list.length; i++) {
+      list[i].interet = list[i].solde - list[i-1].solde;
+    }
+  });
+
+  return byCompte;
 }
 
 
