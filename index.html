@@ -161,10 +161,43 @@
   </div>
 
 
+
 <div class="finance-block">
   <h3>📈 Épargne long terme</h3>
+
+  <!-- ✅ Résumé du solde -->
+  <div id="epargneSummary"></div>
+
+  <!-- ✅ Bouton -->
+  <button onclick="toggleEpargneForm()">
+    ✏️ Mettre à jour le solde
+  </button>
+
+  <!-- ✅ Formulaire -->
+  <div id="epargneForm" style="display:none; margin-top:10px;">
+    
+    <label>Compte</label>
+    <select id="epargneCompte">
+      <option value="Compte A">Compte A</option>
+      <option value="Compte B">Compte B</option>
+    </select>
+
+    <label>Date</label>
+    <input type="date" id="epargneDate">
+
+    <label>Solde</label>
+    <input type="number" id="epargneSolde">
+
+    <button onclick="addEpargne3Entry()">
+      ✅ Enregistrer
+    </button>
+
+  </div>
+
+  <!-- ✅ Courbe -->
   <div id="epargneChart"></div>
 </div>
+
 
   
   <!-- Virements mensuels -->
