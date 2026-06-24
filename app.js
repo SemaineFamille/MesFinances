@@ -1,35 +1,75 @@
-console.log("APP VERSION 24-06-2026 16h25");
+console.log("APP VERSION 24-06-2026 16h45");
 
+/* =========================
+   OUTILS GENERAUX
+========================= */
 
 function normalizeLabel(label) {
   return (label || "")
     .toLowerCase()
+    .trim()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "");
 }
-function toggleHistory() {
-  const container = document.getElementById("financeHistoryContainer");
-  const arrow = document.getElementById("historyArrow");
 
-  const isVisible = container.style.display === "block";
+function formatDate(dateString) {
+  if (!dateString) return "";
 
-  container.style.display = isVisible ? "none" : "block";
+  const date = new Date(dateString);
 
-  arrow.style.transform = isVisible ? "rotate(0deg)" : "rotate(180deg)";
+  return date.toLocaleDateString("fr-CH", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  });
 }
-function handleFinanceCompteChange() {
-  const compte = document.getElementById("financeCompte").value;
-  const subContainer = document.getElementById("financeSubCategoryContainer");
 
-  subContainer.style.display = (compte === "Factures") ? "block" : "none";
+function formatCHF(value) {
+  const number = Number(value || 0);
+
+  return number.toLocaleString("fr-CH", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }) + " CHF";
 }
+
+function parseFrDate(dateStr) {
+  if (!dateStr) return new Date(0);
+
+  if (dateStr.includes("-")) {
+    return new Date(dateStr);
+  }
+
+  const parts = dateStr.split("/");
+  if (parts.length === 3) {
+    return new Date(parts[2], parts[1] - 1, parts[0]);
+  }
+
+  return new Date(dateStr);
+}
+
+function getCurrentMonthKey() {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, "0");
+  return `${y}-${m}`;
+}
+
+function getMonthKeyFromDate(dateStr) {
+  const d = parseFrDate(dateStr);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  return `${y}-${m}`;
+}
+
+/* =========================
+   NAVIGATION / UI
+========================= */
 
 function showScreen(screenId) {
   document
     .querySelectorAll(".screen")
-    .forEach(screen =>
-      screen.classList.remove("active")
-    );
+    .forEach(screen => screen.classList.remove("active"));
 
   document
     .getElementById(screenId)
@@ -40,53 +80,75 @@ function showScreen(screenId) {
   }
 }
 
-
-function toggleAssuraForm(){
-
-  const form =
-    document.getElementById("assuraForm");
-
-  form.style.display =
-    form.style.display === "none"
-      ? "block"
-      : "none";
+function toggleAssuraForm() {
+  const form = document.getElementById("assuraForm");
+  form.style.display = form.style.display === "none" ? "block" : "none";
 }
 
-function toggleKptForm(){
-
-  const form =
-    document.getElementById("kptForm");
-
-  form.style.display =
-    form.style.display === "none"
-      ? "block"
-      : "none";
+function toggleKptForm() {
+  const form = document.getElementById("kptForm");
+  form.style.display = form.style.display === "none" ? "block" : "none";
 }
 
+function toggleFinanceForm() {
+  const form = document.getElementById("financeForm");
+  form.style.display = form.style.display === "none" ? "block" : "none";
+}
 
+function toggleHistory() {
+  const container = document.getElementById("financeHistoryContainer");
+  const arrow = document.getElementById("historyArrow");
+
+  if (!container || !arrow) return;
+
+  const isVisible = container.style.display === "block";
+
+  container.style.display = isVisible ? "none" : "block";
+  arrow.style.transform = isVisible ? "rotate(0deg)" : "rotate(180deg)";
+}
+
+function handleFinanceCompteChange() {
+  const compte = document.getElementById("financeCompte").value;
+  const subContainer = document.getElementById("financeSubCategoryContainer");
+  const posteField = document.getElementById("financePoste");
+
+  if (!subContainer || !posteField) return;
+
+  const isFactures = compte === "Factures";
+
+  subContainer.style.display = isFactures ? "block" : "none";
+  posteField.disabled = isFactures;
+  if (isFactures) {
+    posteField.value = "";
+  }
+}
+
+/* =========================
+   DEMARRAGE
+========================= */
+
+window.onload = async () => {
+  await loadAssura();
+  await loadKpt();
+  await loadFinanceResume();
+  handleFinanceCompteChange();
+};
+
+/* =========================
+   ASSURA
+========================= */
 
 async function addAssuraFacture() {
   const id = Date.now();
 
-  const date =
-    document.getElementById("assuraDate").value;
-
-  const prestataire =
-    document.getElementById("assuraPrestataire").value;
-
-  const type =
-    document.getElementById("assuraType").value;
-
-  const montant =
-    document.getElementById("assuraMontant").value;
-
-  const notes =
-    document.getElementById("assuraNotes").value;
+  const date = document.getElementById("assuraDate").value;
+  const prestataire = document.getElementById("assuraPrestataire").value;
+  const type = document.getElementById("assuraType").value;
+  const montant = document.getElementById("assuraMontant").value;
+  const notes = document.getElementById("assuraNotes").value;
 
   if (!date || !montant) {
-
     alert("Veuillez remplir les champs");
-
     return;
   }
 
@@ -100,113 +162,42 @@ async function addAssuraFacture() {
   });
 
   alert("Facture enregistrée");
-
   loadAssura();
 }
-async function addKptFacture() {
-  const id = Date.now();
-
-  const date = document.getElementById("kptDate").value;
-  const assurance = document.getElementById("kptAssurance").value;
-  const type = document.getElementById("kptType").value;
-  const facture = document.getElementById("kptFacture").value;
-
-  if (!date || !facture) {
-    alert("Veuillez remplir les champs");
-    return;
-  }
-
-  if (window.currentKptEditId) {
-    await updateKptData({
-      id: window.currentKptEditId,
-      date,
-      assurance,
-      type,
-      facture
-    });
-
-    window.currentKptEditId = null;
-    alert("Modifié ✅");
-  } else {
-    await saveKpt({
-      id,
-      date,
-      assurance,
-      type,
-      facture
-    });
-
-    alert("Prestation enregistrée");
-  }
-
-  loadKpt();
-}
-
-async function saveKpt(data) {
-  return await apiPost({
-    action: "addKpt",
-    ...data
-  });
-}
-
-async function updateKptData(data) {
-  return await apiPost({
-    action: "updateKptData",
-    ...data
-  });
-}
-
-window.onload = async () => {
-  await loadAssura();
-  await loadKpt();
-  await loadFinanceResume();
-};
 
 function renderAssura(data) {
-console.log("DATA ASSURA");
-console.log(data);
-  const container =
-    document.getElementById("assuraList");
-
-  const stats =
-    document.getElementById("assuraStats");
+  const container = document.getElementById("assuraList");
+  const stats = document.getElementById("assuraStats");
 
   container.innerHTML = "";
 
   data.sort((a, b) => new Date(b.Date) - new Date(a.Date));
 
-  const franchiseAtteinte =
-    data.reduce(
-      (sum, item) => sum + Number(item.PartFranchise || 0),
-      0
-    );
+  const franchiseAtteinte = data.reduce(
+    (sum, item) => sum + Number(item.PartFranchise || 0),
+    0
+  );
 
-  const quotePartAtteinte =
-    data.reduce(
-      (sum, item) => sum + Number(item.PartQuotePart || 0),
-      0
-    );
+  const quotePartAtteinte = data.reduce(
+    (sum, item) => sum + Number(item.PartQuotePart || 0),
+    0
+  );
 
-  const totalVotrePart =
-    data.reduce(
-      (sum, item) => sum + Number(item.VotrePart || 0),
-      0
-    );
+  const totalVotrePart = data.reduce(
+    (sum, item) => sum + Number(item.VotrePart || 0),
+    0
+  );
 
-  const totalRembourse =
-    data.reduce(
-      (sum, item) => sum + Number(item.RemboursementAssura || 0),
-      0
-    );
+  const totalRembourse = data.reduce(
+    (sum, item) => sum + Number(item.RemboursementAssura || 0),
+    0
+  );
 
   const franchise = 300;
   const quotePartMax = 700;
 
-  const franchisePct =
-    Math.min((franchiseAtteinte / franchise) * 100, 100);
-
-  const quotePartPct =
-    Math.min((quotePartAtteinte / quotePartMax) * 100, 100);
+  const franchisePct = Math.min((franchiseAtteinte / franchise) * 100, 100);
+  const quotePartPct = Math.min((quotePartAtteinte / quotePartMax) * 100, 100);
 
   stats.innerHTML = `
     <div class="progress-card">
@@ -250,205 +241,139 @@ console.log(data);
     `;
   });
 }
-function formatDate(dateString) {
 
-  if (!dateString) return "";
+/* =========================
+   KPT
+========================= */
 
-  const date = new Date(dateString);
+async function addKptFacture() {
+  const id = Date.now();
 
-  return date.toLocaleDateString("fr-CH", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric"
-  });
-}
-async function deleteKpt(id) {
+  const date = document.getElementById("kptDate").value;
+  const assurance = document.getElementById("kptAssurance").value;
+  const type = document.getElementById("kptType").value;
+  const facture = document.getElementById("kptFacture").value;
 
-  if (!confirm(
-    "Supprimer cette prestation ?"
-  )) return;
+  if (!date || !facture) {
+    alert("Veuillez remplir les champs");
+    return;
+  }
 
-  await deleteKptFacture(id);
+  if (window.currentKptEditId) {
+    await updateKptData({
+      id: window.currentKptEditId,
+      date,
+      assurance,
+      type,
+      facture
+    });
+
+    window.currentKptEditId = null;
+    alert("Modifié ✅");
+  } else {
+    await saveKpt({
+      id,
+      date,
+      assurance,
+      type,
+      facture
+    });
+
+    alert("Prestation enregistrée");
+  }
 
   loadKpt();
 }
+
+async function updateKptData(data) {
+  return await apiPost({
+    action: "updateKptData",
+    ...data
+  });
+}
+
 function renderKpt(data) {
-
   const container = document.getElementById("kptList");
-
   container.innerHTML = "";
 
-  // ✅ TRI PAR DATE
   data.sort((a, b) => new Date(b.Date) - new Date(a.Date));
 
-  data.forEach((item, index) => {
-
+  data.forEach(item => {
     const checked =
       item["Reçu"] === true ||
       item["Reçu"] === "TRUE";
 
-container.innerHTML += `
-  <div class="card">
+    container.innerHTML += `
+      <div class="card">
 
-    <strong>${item.Assurance}</strong><br>
+        <strong>${item.Assurance}</strong><br>
 
-    🗓 ${formatDate(item.Date)}<br>
+        🗓 ${formatDate(item.Date)}<br>
 
-    ${item.Type}<br><br>
+        ${item.Type}<br><br>
 
-    Facture : ${item.Facture} CHF<br>
+        Facture : ${item.Facture} CHF<br>
 
-    💸 Remboursement prévu :
-    ${item.Remboursé} CHF<br><br>
+        💸 Remboursement prévu :
+        ${item.Remboursé} CHF<br><br>
 
-    <label class="checkbox-label">
+        <label class="checkbox-label">
+          <input
+            type="checkbox"
+            ${checked ? "checked" : ""}
+            onchange="toggleKptRemboursement(${item._rowNumber}, this.checked)"
+          >
+          ${checked ? "💰 Reçu" : "🕒 En attente"}
+        </label>
 
-      <input
-        type="checkbox"
-        ${checked ? "checked" : ""}
-        onchange="toggleKptRemboursement(${item._rowNumber}, this.checked)"
-      >
+        <div class="card-actions">
+          <button onclick="editKpt('${item.ID}')">
+            ✏️ Modifier
+          </button>
 
-      ${checked ? "💰 Reçu" : "🕒 En attente"}
+          <button onclick="deleteKpt('${item.ID}')">
+            🗑️ Supprimer
+          </button>
+        </div>
 
-    </label>
-
-    <div class="card-actions">
-
-      <button onclick="editKpt('${item.ID}')">
-        ✏️ Modifier
-      </button>
-
-      <button onclick="deleteKpt('${item.ID}')">
-        🗑️ Supprimer
-      </button>
-
-    </div>
-
-  </div>
-`;
-
+      </div>
+    `;
   });
-
 }
-function editKpt(id) {
 
+function editKpt(id) {
   alert(
     "Modification de la prestation " + id +
     "\n(à connecter ensuite au formulaire)"
   );
-
 }
-async function deleteKpt(id) {
 
-  if (
-    !confirm(
-      "Supprimer cette prestation ?"
-    )
-  ) return;
+async function deleteKpt(id) {
+  if (!confirm("Supprimer cette prestation ?")) return;
 
   await deleteKptFacture(id);
-
   loadKpt();
-
 }
+
 async function toggleKptRemboursement(index, value) {
-
   await updateKptRemboursement(index, value);
-
   loadKpt();
-  }
+}
 
 /* =========================
-FINANCES
+   FINANCES
 ========================= */
 
-function computeReservesFromMovements(movements) {
+function toggleHistory() {
+  const container = document.getElementById("financeHistoryContainer");
+  const arrow = document.getElementById("historyArrow");
 
-  let reserves = {};
+  if (!container || !arrow) return;
 
-  movements.forEach(m => {
+  const isVisible = container.style.display === "block";
 
-    const poste = m["Poste"] || "";
-    const montant = Number(m["Montant"] || 0);
-
-    // On considère qu'une réserve est un poste contenant "réserve"
-    if (
- poste.toLowerCase().includes("réserve")) 
-    {
-
-      if (!reserves[poste]) {
-        reserves[poste] = 0;
-      }
-
-      if (m["Sens"] === "Entrée") {
-        reserves[poste] += montant;
-      } else {
-        reserves[poste] -= montant;
-      }
-    }
-
-  });
-
-  return reserves;
-}
-
-function computeBalancesFromMovements(movements) {
-
-  let comptes = {
-    Factures: 0,
-    Epargne: 0,
-    Vacances: 0
-  };
-
-  movements.forEach(m => {
-    const montant = Number(m["Montant"] || 0);
-
-    if (m["Sens"] === "Entrée") {
-      comptes[m["Compte"]] += montant;
-    } else {
-      comptes[m["Compte"]] -= montant;
-    }
-  });
-
-  return comptes;
-}
-function formatCHF(value) {
-  const number = Number(value || 0);
-
-  return number.toLocaleString("fr-CH", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  }) + " CHF";
-}
-
-function parseFrDate(dateStr) {
-  if (!dateStr) return new Date(0);
-
-  if (dateStr.includes("-")) {
-    return new Date(dateStr);
-  }
-
-  const parts = dateStr.split("/");
-  if (parts.length === 3) {
-    return new Date(parts[2], parts[1] - 1, parts[0]);
-  }
-
-  return new Date(dateStr);
-}
-
-function getCurrentMonthKey() {
-  const now = new Date();
-  const y = now.getFullYear();
-  const m = String(now.getMonth() + 1).padStart(2, "0");
-  return `${y}-${m}`;
-}
-
-function getMonthKeyFromDate(dateStr) {
-  const d = parseFrDate(dateStr);
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  return `${y}-${m}`;
+  container.style.display = isVisible ? "none" : "block";
+  arrow.style.transform = isVisible ? "rotate(0deg)" : "rotate(180deg)";
 }
 
 async function loadFinanceResume() {
@@ -466,119 +391,25 @@ async function loadFinanceResume() {
     console.error(e);
   }
 }
-function prepareLineData(data) {
-  let byCompte = {};
 
-  data.forEach(row => {
-    if (!byCompte[row.Compte]) {
-      byCompte[row.Compte] = [];
-    }
-
-    byCompte[row.Compte].push({
-      date: new Date(row.Date),
-      solde: Number(row.Solde || 0)
-    });
-  });
-
-  Object.values(byCompte).forEach(list => {
-    list.sort((a, b) => a.date - b.date);
-
-    for (let i = 1; i < list.length; i++) {
-      list[i].interet = list[i].solde - list[i - 1].solde;
-    }
-  });
-
-  return byCompte;
-}
-
-
-function renderEpargneLineChart(data) {
-  const container = document.getElementById("epargneChart");
-  if (!container) return;
-
-  const comptes = prepareLineData(data);
-
-  let max = 0;
-
-  Object.values(comptes).forEach(list => {
-    list.forEach(p => {
-      if (p.solde > max) max = p.solde;
-    });
-  });
-
-  if (max === 0) {
-    container.innerHTML = "Aucune donnée";
-    return;
-  }
-
-  const width = 600;
-  const height = 220;
-
-  let svg = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">`;
-
-  const colors = [
-    "#4f46e5",
-    "#16a34a",
-    "#f59e0b",
-    "#dc2626"
-  ];
-
-  let colorIndex = 0;
-
-  Object.keys(comptes).forEach(compte => {
-    const list = comptes[compte];
-    if (list.length === 0) return;
-
-    const stepX = list.length > 1 ? width / (list.length - 1) : width / 2;
-    let path = "";
-
-    list.forEach((point, index) => {
-      const x = list.length > 1 ? index * stepX : width / 2;
-      const y = height - (point.solde / max) * (height - 20);
-
-      if (index === 0) {
-        path += `M ${x} ${y}`;
-      } else {
-        path += ` L ${x} ${y}`;
-      }
-    });
-
-    const color = colors[colorIndex % colors.length];
-    colorIndex++;
-
-    svg += `<path d="${path}" stroke="${color}" fill="none" stroke-width="3" />`;
-
-    list.forEach((point, index) => {
-      const x = list.length > 1 ? index * stepX : width / 2;
-      const y = height - (point.solde / max) * (height - 20);
-
-      svg += `<circle cx="${x}" cy="${y}" r="4" fill="${color}" />`;
-    });
-  });
-
-  svg += `</svg>`;
-
-  container.innerHTML = `
-    <div style="overflow-x:auto">
-      ${svg}
-    </div>
-  `;
-}
-
-
-function renderFinanceChartFromBalances(comptes) {
-
+function renderFinancePieChart(dashboardRows) {
   const chart = document.getElementById("financeChart");
   if (!chart) return;
 
-  const factures = comptes["Factures"] || 0;
-  const epargne = comptes["Epargne"] || 0;
-  const vacances = comptes["Vacances"] || 0;
+  const getValue = (labelPart) => {
+    const row = dashboardRows.find(r =>
+      normalizeLabel(r["Libellé"]).includes(labelPart)
+    );
+    return Number(row?.["Valeur"] || 0);
+  };
 
+  const factures = getValue("factures");
+  const epargne = getValue("epargne");
+  const vacances = getValue("vacances");
   const total = factures + epargne + vacances;
 
-  if (total === 0) {
-    chart.innerHTML = "Aucune donnée";
+  if (total <= 0) {
+    chart.innerHTML = `<div class="finance-stat-item">Aucune donnée</div>`;
     return;
   }
 
@@ -587,26 +418,25 @@ function renderFinanceChartFromBalances(comptes) {
   const pVacances = (vacances / total) * 100;
 
   chart.innerHTML = `
-    <div class="pie-chart"></div>
-
-    <div class="pie-legend">
-      <div>🔵 Factures : ${formatCHF(factures)}</div>
-      <div>🟢 Epargne : ${formatCHF(epargne)}</div>
-      <div>🟠 Vacances : ${formatCHF(vacances)}</div>
+    <div class="pie-chart-wrap">
+      <div class="pie-chart"></div>
+      <div class="pie-legend">
+        <div><span class="dot seg-factures"></span> Factures : ${formatCHF(factures)}</div>
+        <div><span class="dot seg-epargne"></span> Épargne : ${formatCHF(epargne)}</div>
+        <div><span class="dot seg-vacances"></span> Vacances : ${formatCHF(vacances)}</div>
+      </div>
     </div>
   `;
 
   const pie = chart.querySelector(".pie-chart");
-
   pie.style.background = `
     conic-gradient(
-      #4da6ff 0% ${pFactures}%,
-      #66cc99 ${pFactures}% ${pFactures + pEpargne}%,
-      #ff9933 ${pFactures + pEpargne}% 100%
+      #4f46e5 0% ${pFactures}%,
+      #16a34a ${pFactures}% ${pFactures + pEpargne}%,
+      #f59e0b ${pFactures + pEpargne}% 100%
     )
   `;
 }
-
 
 function renderFinanceStats(dashboardRows) {
   const stats = document.getElementById("financeStats");
@@ -735,150 +565,16 @@ function renderFinanceStats(dashboardRows) {
   `;
 }
 
-  // =========================
-  // SOLDES COMPTES
-  // =========================
-  const factures = getValue("solde factures");
-  const epargne = getValue("solde epargne");
-  const vacances = getValue("solde vacances");
-  const totalGlobal = factures + epargne + vacances;
-
-  // =========================
-  // RESERVES
-  // =========================
-  const reserveRows = dashboardRows.filter(r =>
-    normalizeLabel(r["Bloc"]).includes("reserv")
-  );
-
-  const voiture = Number(
-    reserveRows.find(r => normalizeLabel(r["Libellé"]).includes("voiture"))?.["Valeur"] || 0
-  );
-  const lunettes = Number(
-    reserveRows.find(r => normalizeLabel(r["Libellé"]).includes("lunette"))?.["Valeur"] || 0
-  );
-  const cadeaux = Number(
-    reserveRows.find(r => normalizeLabel(r["Libellé"]).includes("cadeau"))?.["Valeur"] || 0
-  );
-  const impots = Number(
-    reserveRows.find(r => normalizeLabel(r["Libellé"]).includes("impot"))?.["Valeur"] || 0
-  );
-
-  const totalReserves = voiture + lunettes + cadeaux + impots;
-  const disponibleFactures = factures - totalReserves;
-
-  // =========================
-  // POURCENTAGES
-  // =========================
-  const safePercent = (value, total) => {
-    if (!total || total <= 0) return 0;
-    return Math.max(0, Math.min(100, (value / total) * 100));
-  };
-
-  const pctVoiture = safePercent(voiture, totalReserves);
-  const pctLunettes = safePercent(lunettes, totalReserves);
-  const pctCadeaux = safePercent(cadeaux, totalReserves);
-  const pctImpots = safePercent(impots, totalReserves);
-
-  const pctDisponible = safePercent(disponibleFactures, factures);
-  const pctReserveDansFactures = safePercent(totalReserves, factures);
-
-  const pctFactures = safePercent(factures, totalGlobal);
-  const pctEpargne = safePercent(epargne, totalGlobal);
-  const pctVacances = safePercent(vacances, totalGlobal);
-
-  // =========================
-  // VUE GENERALE AVEC BARRES
-  // =========================
-  stats.innerHTML = `
-    <div class="finance-stat-list">
-
-      <div class="finance-stat-item">
-        <strong>🔒 Total réserves</strong><br>
-        ${formatCHF(totalReserves)}
-
-        <div class="stacked-bar">
-          <div class="seg seg-voiture" style="width:${pctVoiture}%"></div>
-          <div class="seg seg-lunettes" style="width:${pctLunettes}%"></div>
-          <div class="seg seg-cadeaux" style="width:${pctCadeaux}%"></div>
-          <div class="seg seg-impots" style="width:${pctImpots}%"></div>
-        </div>
-
-        <div class="stacked-legend">
-          <span><span class="dot seg-voiture"></span> Voiture ${formatCHF(voiture)}</span>
-          <span><span class="dot seg-lunettes"></span> Lunettes ${formatCHF(lunettes)}</span>
-          <span><span class="dot seg-cadeaux"></span> Cadeaux ${formatCHF(cadeaux)}</span>
-          <span><span class="dot seg-impots"></span> Impôts ${formatCHF(impots)}</span>
-        </div>
-      </div>
-
-      <div class="finance-stat-item">
-        <strong>💸 Disponible réel (Factures)</strong><br>
-        ${formatCHF(disponibleFactures)}
-
-        <div class="stacked-bar">
-          <div class="seg seg-disponible" style="width:${pctDisponible}%"></div>
-          <div class="seg seg-reserve-total" style="width:${pctReserveDansFactures}%"></div>
-        </div>
-
-        <div class="stacked-legend">
-          <span><span class="dot seg-disponible"></span> Disponible ${formatCHF(disponibleFactures)}</span>
-          <span><span class="dot seg-reserve-total"></span> Réservé ${formatCHF(totalReserves)}</span>
-          <span><strong>Total compte Factures : ${formatCHF(factures)}</strong></span>
-        </div>
-      </div>
-
-      <div class="finance-stat-item">
-        <strong>💰 Total global</strong><br>
-        ${formatCHF(totalGlobal)}
-
-        <div class="stacked-bar">
-          <div class="seg seg-factures" style="width:${pctFactures}%"></div>
-          <div class="seg seg-epargne" style="width:${pctEpargne}%"></div>
-          <div class="seg seg-vacances" style="width:${pctVacances}%"></div>
-        </div>
-
-        <div class="stacked-legend">
-          <span><span class="dot seg-factures"></span> Factures ${formatCHF(factures)}</span>
-          <span><span class="dot seg-epargne"></span> Épargne ${formatCHF(epargne)}</span>
-          <span><span class="dot seg-vacances"></span> Vacances ${formatCHF(vacances)}</span>
-        </div>
-      </div>
-
-    </div>
-  `;
-
-  // =========================
-  // DETAIL RESERVES (section en dessous)
-  // =========================
-  reservesEl.innerHTML = `
-    <div class="finance-stat-list">
-      ${reserveRows.length > 0
-        ? reserveRows.map(v => `
-          <div class="finance-stat-item">
-            <strong>${v["Libellé"]}</strong><br>
-            ${formatCHF(v["Valeur"])}
-          </div>
-        `).join("")
-        : `<div class="finance-stat-item">Aucune réserve détectée</div>`
-      }
-    </div>
-  `;
-}
-
-
-
 function renderFinanceHistory(movements) {
   const list = document.getElementById("financeList");
   if (!list) return;
 
   const currentMonth = getCurrentMonthKey();
 
-  // ✅ Filtrer uniquement le mois en cours
   const filtered = movements.filter(item =>
     getMonthKeyFromDate(item["Date"]) === currentMonth
   );
 
-  // ✅ Trier et limiter (optionnel)
   const sorted = [...filtered]
     .sort((a, b) => parseFrDate(b["Date"]) - parseFrDate(a["Date"]))
     .slice(0, 20);
@@ -907,60 +603,6 @@ function renderFinanceHistory(movements) {
     </div>
   `;
 }
-
-
-async function loadFinanceScreen() {
-  try {
-    const dashboard = await getFinanceDashboard();
-    const movements = await getFinanceMovements();
-    const epargne3 = await getEpargne3();
-
-    renderFinanceAccounts(dashboard);   // ✅ vue rapide des 3 comptes
-    renderFinanceStats(dashboard);      // ✅ vue générale avec barres
-    renderFinanceHistory(movements);    // ✅ historique du mois
-    renderEpargneLineChart(epargne3);   // ✅ courbe épargne 3
-
-  } catch (e) {
-    console.error(e);
-    document.getElementById("financeStats").innerHTML =
-      "Erreur chargement finances";
-  }
-}
-function renderFinanceAccounts(dashboardRows) {
-  const container = document.getElementById("financeChart");
-  if (!container) return;
-
-  const getValue = (labelPart) => {
-    const row = dashboardRows.find(r =>
-      normalizeLabel(r["Libellé"]).includes(labelPart)
-    );
-    return Number(row?.["Valeur"] || 0);
-  };
-
-  const factures = getValue("factures");
-  const epargne = getValue("epargne");
-  const vacances = getValue("vacances");
-
-  container.innerHTML = `
-    <div class="finance-stat-list">
-      <div class="finance-stat-item">
-        <strong>Factures</strong><br>
-        ${formatCHF(factures)}
-      </div>
-
-      <div class="finance-stat-item">
-        <strong>Epargne</strong><br>
-        ${formatCHF(epargne)}
-      </div>
-
-      <div class="finance-stat-item">
-        <strong>Vacances</strong><br>
-        ${formatCHF(vacances)}
-      </div>
-    </div>
-  `;
-}
-
 
 async function addFinanceMovementManual() {
   const date = document.getElementById("financeDate").value;
@@ -1041,85 +683,3 @@ async function prepareMonthlyTransfers() {
           <div class="finance-monthly-item">
             <div class="finance-monthly-top">
               <strong>${item.poste}</strong>
-              <span>${item.alreadyExists ? "Déjà ajouté ce mois" : "À prévoir"}</span>
-            </div>
-            <input
-              type="number"
-              step="0.01"
-              id="monthlyAmount_${index}"
-              value="${item.montant}"
-              ${item.alreadyExists ? "disabled" : ""}
-            />
-            <input
-              type="hidden"
-              id="monthlyPoste_${index}"
-              value="${item.poste}"
-            />
-          </div>
-        `).join("")}
-      </div>
-
-      <div class="finance-monthly-actions">
-        <button onclick="applyMonthlyTransfers(${proposals.length})">
-          ✅ Appliquer les virements du mois
-        </button>
-      </div>
-    `;
-
-  } catch (e) {
-    console.error("Erreur préparation virements", e);
-    container.innerHTML = "Erreur préparation virements";
-  }
-}
-
-async function applyMonthlyTransfers(count) {
-  const today = new Date();
-  const date = today.toISOString().slice(0, 10);
-
-  for (let i = 0; i < count; i++) {
-    const posteEl = document.getElementById(`monthlyPoste_${i}`);
-    const amountEl = document.getElementById(`monthlyAmount_${i}`);
-
-    if (!posteEl || !amountEl || amountEl.disabled) continue;
-
-    const poste = posteEl.value;
-    const montant = Number(amountEl.value || 0);
-
-    if (montant <= 0) continue;
-
-    await addFinanceMovementApi({
-      date,
-      compte: "Factures",
-      sens: "Entrée",
-      poste,
-      montant,
-      description: `Provision mensuelle ${poste}`
-    });
-  }
-
-  await loadFinanceScreen();
-  await loadFinanceResume();
-  alert("Virements mensuels ajoutés.");
-}
-
-window.toggleKptRemboursement = toggleKptRemboursement;
-window.showScreen = showScreen;
-window.toggleAssuraForm = toggleAssuraForm;
-window.toggleKptForm = toggleKptForm;
-window.toggleFinanceForm = toggleFinanceForm;
-
-window.addAssuraFacture = addAssuraFacture;
-window.addKptFacture = addKptFacture;
-
-/* IMPORTANT :
-   si ton HTML appelle onclick="addFinanceMovement()",
-   il faut exposer la fonction correcte */
-window.addFinanceMovement = addFinanceMovementManual;
-
-window.prepareMonthlyTransfers = prepareMonthlyTransfers;
-window.applyMonthlyTransfers = applyMonthlyTransfers;
-window.editKpt = editKpt;
-window.deleteKpt = deleteKpt;
-window.toggleHistory = toggleHistory;
-window.handleFinanceCompteChange = handleFinanceCompteChange;
-  
