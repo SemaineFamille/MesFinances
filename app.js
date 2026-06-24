@@ -494,38 +494,84 @@ function computeEvolution(data) {
   return byCompte;
 }
 
-function renderEpargneChart(data) {
+
+function renderEpargneLineChart(data) {
+
   const container = document.getElementById("epargneChart");
+  if (!container) return;
 
-  const comptes = computeEvolution(data);
+  const comptes = prepareLineData(data);
 
-  let html = "";
+  let max = 0;
+
+  Object.values(comptes).forEach(list => {
+    list.forEach(p => {
+      if (p.solde > max) max = p.solde;
+    });
+  });
+
+  if (max === 0) {
+    container.innerHTML = "Aucune donnée";
+    return;
+  }
+
+  const width = 600;
+  const height = 200;
+
+  let svg = `<svg width="${width}" height="${height}">`;
+
+  const colors = [
+    "#4f46e5",
+    "#16a34a",
+    "#f59e0b",
+    "#dc2626"
+  ];
+
+  let colorIndex = 0;
 
   Object.keys(comptes).forEach(compte => {
 
     const list = comptes[compte];
+    const stepX = width / (list.length - 1);
 
-    html += `<h4>${compte}</h4>`;
+    let path = "";
 
-    list.forEach(item => {
+    list.forEach((point, index) => {
 
-      const height = item.solde / 100; // ajustable
+      const x = index * stepX;
+      const y = height - (point.solde / max) * height;
 
-      html += `
-        <div class="bar-item">
-          <div class="bar" style="height:${height}px"></div>
-          <div class="bar-label">
-            ${new Date(item.date).getMonth()+1}<br>
-            ${formatCHF(item.solde)}
-          </div>
-        </div>
-      `;
+      if (index === 0) {
+        path += `M ${x} ${y}`;
+      } else {
+        path += ` L ${x} ${y}`;
+      }
+    });
+
+    const color = colors[colorIndex % colors.length];
+    colorIndex++;
+
+    svg += `<path d="${path}" stroke="${color}" fill="none" stroke-width="2"/>`;
+
+    // points
+    list.forEach((point, index) => {
+      const x = index * stepX;
+      const y = height - (point.solde / max) * height;
+
+      svg += `<circle cx="${x}" cy="${y}" r="3" fill="${color}" />`;
     });
 
   });
 
-  container.innerHTML = html;
+  svg += `</svg>`;
+
+  container.innerHTML = `
+    <div style="overflow-x:auto">
+      ${svg}
+    </div>
+  `;
 }
+
 function renderFinanceChartFromBalances(comptes) {
 
   const chart = document.getElementById("financeChart");
