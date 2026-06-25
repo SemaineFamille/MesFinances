@@ -793,7 +793,10 @@ async function prepareMonthlyTransfers() {
 
         <div class="monthly-line">
           <label>💳 Factures</label>
-          <input type="number" id="monthlyFactures" value="${totalFactures}">
+        
+<input type="number" id="monthlyFactures" value="${Math.round(totalFactures)}">
+<small>Recommandé : ${Math.round(totalFactures)} CHF</small>
+
         </div>
 
         <div class="monthly-line">
