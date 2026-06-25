@@ -581,3 +581,10 @@ input[type="checkbox"]:checked::after {
 #historyArrow {
   transition: transform 0.2s ease;
 }
+#epargneChart {
+  margin-top: 10px;
+}
+
+#epargneChart svg {
+  display: block;
+}
