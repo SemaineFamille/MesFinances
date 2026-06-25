@@ -588,3 +588,18 @@ input[type="checkbox"]:checked::after {
 #epargneChart svg {
   display: block;
 }
+.epargne-gains {
+  margin-top: 10px;
+  font-size: 12px;
+  text-align: center;
+}
+
+.epargne-gains-row {
+  margin-bottom: 5px;
+}
+
+.epargne-gains .gain {
+  display: inline-block;
+  width: 40px;
+  margin: 0 2px;
+}
