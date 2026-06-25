@@ -1,4 +1,4 @@
-console.log("APP VERSION 25-06-2026 17h45");
+console.log("APP VERSION 25-06-2026 18h00");
 
 /* =========================
    OUTILS GENERAUX
@@ -666,12 +666,12 @@ async function addFinanceMovementManual() {
   const postes = await getFinancePostes();
 
   const totalBudget = postes.reduce((sum, p) =>
-    sum + Number(p["Budget mensuel"] || 0), 0
+    sum + Number(p["Budget annuel"] || 0), 0
   );
 
   for (const p of postes) {
     const posteName = p["Poste"];
-    const budget = Number(p["Budget mensuel"] || 0);
+    const budget = Number(p["Budget annuel"] || 0);
 
     if (budget <= 0) continue;
 
@@ -778,7 +778,7 @@ async function prepareMonthlyTransfers() {
 
     // ✅ total budget = Factures
     const totalFactures = postes.reduce(
-      (sum, p) => sum + Number(p["Budget mensuel"] || 0),
+      (sum, p) => sum + Number(p["Budget annuel"] || 0),
       0
     );
 
@@ -830,12 +830,12 @@ async function applyMonthlyTransfersSimple() {
     const postes = await getFinancePostes();
 
     const totalBudget = postes.reduce(
-      (sum, p) => sum + Number(p["Budget mensuel"] || 0),
+      (sum, p) => sum + Number(p["Budget annuel"] || 0),
       0
     );
 
     for (const p of postes) {
-      const budget = Number(p["Budget mensuel"] || 0);
+      const budget = Number(p["Budget annuel"] || 0);
       if (budget <= 0) continue;
 
       const part = (budget / totalBudget) * factures;
