@@ -1,4 +1,4 @@
-console.log("APP VERSION 25-06-2026 18h00");
+console.log("APP VERSION 25-06-2026 20h00");
 
 /* =========================
    OUTILS GENERAUX
@@ -669,7 +669,9 @@ async function addFinanceMovementManual() {
     sum + Number(p["Budget annuel"] || 0), 0
   );
 
-  for (const p of postes) {
+ for (const p of postes) {
+
+  if (p["Type"] !== "Réserve") continue;
     const posteName = p["Poste"];
     const budget = Number(p["Budget annuel"] || 0);
 
