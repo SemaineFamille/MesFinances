@@ -1,4 +1,4 @@
-console.log("APP VERSION 24-06-2026 17h15");
+console.log("APP VERSION 25-06-2026 16h30");
 
 /* =========================
    OUTILS GENERAUX
@@ -868,6 +868,7 @@ function renderEpargneLineChart(data) {
   const comptes = prepareLineData(data);
 
   let max = 0;
+
   Object.values(comptes).forEach(list => {
     list.forEach(p => {
       if (p.solde > max) max = p.solde;
@@ -879,22 +880,30 @@ function renderEpargneLineChart(data) {
     return;
   }
 
-  const width = 600;
-  const height = 220;
-  let svg = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">`;
+  const width = 100; // ✅ on travaille en pourcentage
+  const height = 180;
 
-  const colors = ["#4f46e5", "#16a34a", "#f59e0b", "#dc2626"];
+  let svg = `<svg viewBox="0 0 ${width} ${height}" width="100%" height="180">`;
+
+  const colors = [
+    "#4f46e5",
+    "#16a34a"
+  ];
+
   let colorIndex = 0;
 
   Object.keys(comptes).forEach(compte => {
+
     const list = comptes[compte];
     if (list.length === 0) return;
 
-    const stepX = list.length > 1 ? width / (list.length - 1) : width / 2;
+    const stepX = width / (list.length - 1 || 1);
+
     let path = "";
 
     list.forEach((point, index) => {
-      const x = list.length > 1 ? index * stepX : width / 2;
+
+      const x = index * stepX;
       const y = height - (point.solde / max) * (height - 20);
 
       if (index === 0) {
@@ -907,24 +916,24 @@ function renderEpargneLineChart(data) {
     const color = colors[colorIndex % colors.length];
     colorIndex++;
 
-    svg += `<path d="${path}" stroke="${color}" fill="none" stroke-width="3" />`;
+    // ✅ ligne
+    svg += `<path d="${path}" stroke="${color}" fill="none" stroke-width="2" />`;
 
+    // ✅ points
     list.forEach((point, index) => {
-      const x = list.length > 1 ? index * stepX : width / 2;
+      const x = index * stepX;
       const y = height - (point.solde / max) * (height - 20);
 
-      svg += `<circle cx="${x}" cy="${y}" r="4" fill="${color}" />`;
+      svg += `<circle cx="${x}" cy="${y}" r="3" fill="${color}" />`;
     });
+
   });
 
   svg += `</svg>`;
 
-  container.innerHTML = `
-    <div style="overflow-x:auto">
-      ${svg}
-    </div>
-  `;
+  container.innerHTML = svg;
 }
+
 
 /* =========================
    CHARGEMENT FINANCES
