@@ -1,4 +1,4 @@
-console.log("APP VERSION 25-06-2026 16h45");
+console.log("APP VERSION 25-06-2026 17h15");
 
 /* =========================
    OUTILS GENERAUX
@@ -660,6 +660,37 @@ async function addFinanceMovementManual() {
     return;
   }
 
+ if (compte === "Factures" && sens === "Entrée") {
+
+  // 🔥 récupérer les postes depuis Google Sheets
+  const postes = await getFinancePostes();
+
+  const totalBudget = postes.reduce((sum, p) =>
+    sum + Number(p["Budget mensuel"] || 0), 0
+  );
+
+  for (const p of postes) {
+    const posteName = p["Poste"];
+    const budget = Number(p["Budget mensuel"] || 0);
+
+    if (budget <= 0) continue;
+
+    // ✅ calcul proportionnel
+    const part = (budget / totalBudget) * montant;
+
+    await addFinanceMovementApi({
+      date,
+      compte,
+      sens,
+      poste: posteName,
+      montant: part.toFixed(2),
+      description: `Répartition automatique`
+    });
+  }
+
+} else {
+
+  // ✅ comportement normal
   await addFinanceMovementApi({
     date,
     compte,
@@ -668,6 +699,8 @@ async function addFinanceMovementManual() {
     montant,
     description
   });
+
+}
 
   document.getElementById("financeDate").value = "";
   document.getElementById("financePoste").value = "";
