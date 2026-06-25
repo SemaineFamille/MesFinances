@@ -880,17 +880,15 @@ function renderEpargneLineChart(data) {
     return;
   }
 
-  const width = 100; // ✅ on travaille en pourcentage
+  const width = 100;
   const height = 180;
 
   let svg = `<svg viewBox="0 0 ${width} ${height}" width="100%" height="180">`;
 
-  const colors = [
-    "#4f46e5",
-    "#16a34a"
-  ];
-
+  const colors = ["#4f46e5", "#16a34a"];
   let colorIndex = 0;
+
+  let labelsHTML = "";
 
   Object.keys(comptes).forEach(compte => {
 
@@ -900,6 +898,7 @@ function renderEpargneLineChart(data) {
     const stepX = width / (list.length - 1 || 1);
 
     let path = "";
+    let gainsRow = `<div class="epargne-gains-row"><strong>${compte}</strong><br>`;
 
     list.forEach((point, index) => {
 
@@ -911,7 +910,25 @@ function renderEpargneLineChart(data) {
       } else {
         path += ` L ${x} ${y}`;
       }
+
+      // ✅ calcul gain
+      let gain = 0;
+      if (index > 0) {
+        gain = point.solde - list[index - 1].solde;
+      }
+
+      const gainColor = gain >= 0 ? "green" : "red";
+      const sign = gain > 0 ? "+" : "";
+
+      gainsRow += `
+        <span class="gain" style="color:${gainColor}">
+          ${index === 0 ? "-" : sign + gain.toFixed(0)}
+        </span>
+      `;
     });
+
+    gainsRow += `</div>`;
+    labelsHTML += gainsRow;
 
     const color = colors[colorIndex % colors.length];
     colorIndex++;
@@ -931,7 +948,12 @@ function renderEpargneLineChart(data) {
 
   svg += `</svg>`;
 
-  container.innerHTML = svg;
+  container.innerHTML = `
+    ${svg}
+    <div class="epargne-gains">
+      ${labelsHTML}
+    </div>
+  `;
 }
 
 
