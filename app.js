@@ -1,4 +1,4 @@
-console.log("APP VERSION 25-06-2026 20h25");
+console.log("APP VERSION 25-06-2026 21h20");
 
 /* =========================
    OUTILS GENERAUX
@@ -779,12 +779,14 @@ async function prepareMonthlyTransfers() {
     const postes = await getFinancePostes();
 
     // ✅ total budget = Factures
- const totalFactures = postes
-  .filter(p => p["Type"] === "Réserve")
-  .reduce(
-    (sum, p) => sum + (Number(p["Budget annuel"] || 0) / 12),
-    0
-  );
+
+const totalAnnuel = postes.reduce(
+  (sum, p) => sum + Number(p["Budget annuel"] || 0),
+  0
+);
+
+const totalMensuel = totalAnnuel / 12;
+
 
 
     // ✅ valeurs par défaut (tu peux adapter)
