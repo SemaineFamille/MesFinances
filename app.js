@@ -1,4 +1,4 @@
-console.log("APP VERSION 25-06-2026 17h15");
+console.log("APP VERSION 25-06-2026 17h30");
 
 /* =========================
    OUTILS GENERAUX
@@ -773,66 +773,112 @@ async function prepareMonthlyTransfers() {
   if (!container) return;
 
   try {
+
     const postes = await getFinancePostes();
-    const movements = await getFinanceMovements();
-    const monthKey = getCurrentMonthKey();
 
-    const activePostes = postes.filter(row =>
-      String(row["Budget mensuel"] || "").trim() !== "" &&
-      Number(row["Budget mensuel"] || 0) > 0
+    // ✅ total budget = Factures
+    const totalFactures = postes.reduce(
+      (sum, p) => sum + Number(p["Budget mensuel"] || 0),
+      0
     );
 
-    const existingThisMonth = movements.filter(m =>
-      getMonthKeyFromDate(m["Date"]) === monthKey &&
-      m["Compte"] === "Factures" &&
-      m["Sens"] === "Entrée"
-    );
-
-    const proposals = activePostes.map(poste => {
-      const posteName = poste["Poste"];
-      const alreadyExists = existingThisMonth.some(m => m["Poste"] === posteName);
-
-      return {
-        poste: posteName,
-        montant: Number(poste["Budget mensuel"] || 0),
-        alreadyExists
-      };
-    });
+    // ✅ valeurs par défaut (tu peux adapter)
+    const defaultEpargne = 500;
+    const defaultVacances = 80;
 
     container.innerHTML = `
-      <div class="finance-monthly-list">
-        ${proposals.map((item, index) => `
-          <div class="finance-monthly-item">
-            <div class="finance-monthly-top">
-              <strong>${item.poste}</strong>
-              <span>${item.alreadyExists ? "Déjà ajouté ce mois" : "À prévoir"}</span>
-            </div>
-            <input
-              type="number"
-              step="0.01"
-              id="monthlyAmount_${index}"
-              value="${item.montant}"
-              ${item.alreadyExists ? "disabled" : ""}
-            />
-            <input
-              type="hidden"
-              id="monthlyPoste_${index}"
-              value="${item.poste}"
-            />
-          </div>
-        `).join("")}
-      </div>
+      <div class="finance-monthly-simple">
 
-      <div class="finance-monthly-actions">
-        <button onclick="applyMonthlyTransfers(${proposals.length})">
-          ✅ Appliquer les virements du mois
+        <div class="monthly-line">
+          <label>💳 Factures</label>
+          <input type="number" id="monthlyFactures" value="${totalFactures}">
+        </div>
+
+        <div class="monthly-line">
+          <label>🏦 Epargne</label>
+          <input type="number" id="monthlyEpargne" value="${defaultEpargne}">
+        </div>
+
+        <div class="monthly-line">
+          <label>⛱️ Vacances</label>
+          <input type="number" id="monthlyVacances" value="${defaultVacances}">
+        </div>
+
+        <button onclick="applyMonthlyTransfersSimple()">
+          ✅ Appliquer les virements
         </button>
+
       </div>
     `;
+
   } catch (e) {
-    console.error("Erreur préparation virements", e);
+    console.error(e);
     container.innerHTML = "Erreur préparation virements";
   }
+}
+async function applyMonthlyTransfersSimple() {
+
+  const date = new Date().toISOString().slice(0, 10);
+
+  const factures = Number(document.getElementById("monthlyFactures").value || 0);
+  const epargne = Number(document.getElementById("monthlyEpargne").value || 0);
+  const vacances = Number(document.getElementById("monthlyVacances").value || 0);
+
+  // ✅ Factures → réparti automatiquement
+  if (factures > 0) {
+
+    const postes = await getFinancePostes();
+
+    const totalBudget = postes.reduce(
+      (sum, p) => sum + Number(p["Budget mensuel"] || 0),
+      0
+    );
+
+    for (const p of postes) {
+      const budget = Number(p["Budget mensuel"] || 0);
+      if (budget <= 0) continue;
+
+      const part = (budget / totalBudget) * factures;
+
+      await addFinanceMovementApi({
+        date,
+        compte: "Factures",
+        sens: "Entrée",
+        poste: p["Poste"],
+        montant: part.toFixed(2),
+        description: "Répartition mensuelle"
+      });
+    }
+  }
+
+  // ✅ Epargne (un seul mouvement)
+  if (epargne > 0) {
+    await addFinanceMovementApi({
+      date,
+      compte: "Epargne",
+      sens: "Entrée",
+      poste: "Versement mensuel",
+      montant: epargne,
+      description: "Versement mensuel"
+    });
+  }
+
+  // ✅ Vacances (un seul mouvement)
+  if (vacances > 0) {
+    await addFinanceMovementApi({
+      date,
+      compte: "Vacances",
+      sens: "Entrée",
+      poste: "Versement mensuel",
+      montant: vacances,
+      description: "Versement mensuel"
+    });
+  }
+
+  await loadFinanceScreen();
+  await loadFinanceResume();
+
+  alert("✅ Virements appliqués");
 }
 
 async function applyMonthlyTransfers(count) {
