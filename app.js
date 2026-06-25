@@ -881,7 +881,7 @@ function renderEpargneLineChart(data) {
   }
 
   const width = 100; // ✅ on travaille en pourcentage
-  const height = 140;
+  const height = 180;
 
   let svg = `<svg viewBox="0 0 ${width} ${height}" width="100%" height="180">`;
 
