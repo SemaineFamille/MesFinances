@@ -603,3 +603,19 @@ input[type="checkbox"]:checked::after {
   width: 40px;
   margin: 0 2px;
 }
+.finance-monthly-simple {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.monthly-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.monthly-line input {
+  width: 120px;
+}
+
