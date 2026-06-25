@@ -799,8 +799,9 @@ const totalMensuel = totalAnnuel / 12;
         <div class="monthly-line">
           <label>💳 Factures</label>
         
-<input type="number" id="monthlyFactures" value="${Math.round(totalFactures)}">
-<small>Recommandé : ${Math.round(totalFactures)} CHF</small>
+
+value="800"
+<small>Recommandé : ${Math.round(totalMensuel)} CHF</small>
 
         </div>
 
