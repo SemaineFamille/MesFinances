@@ -775,21 +775,19 @@ async function prepareMonthlyTransfers() {
   if (!container) return;
 
   try {
-
     const postes = await getFinancePostes();
 
-    // ✅ total budget = Factures
+    // Total annuel de tous les postes
+    const totalAnnuel = postes.reduce(
+      (sum, p) => sum + Number(p["Budget annuel"] || 0),
+      0
+    );
 
-const totalAnnuel = postes.reduce(
-  (sum, p) => sum + Number(p["Budget annuel"] || 0),
-  0
-);
+    // Recommandé mensuel
+    const totalMensuel = totalAnnuel / 12;
 
-const totalMensuel = totalAnnuel / 12;
-
-
-
-    // ✅ valeurs par défaut (tu peux adapter)
+    // Valeurs proposées
+    const defaultFactures = 800;
     const defaultEpargne = 500;
     const defaultVacances = 80;
 
@@ -798,12 +796,9 @@ const totalMensuel = totalAnnuel / 12;
 
         <div class="monthly-line">
           <label>💳 Factures</label>
-        
-
-value="800"
-<small>Recommandé : ${Math.round(totalMensuel)} CHF</small>
-
+          <input type="number" id="monthlyFactures" value="${defaultFactures}">
         </div>
+        <small>Recommandé : ${Math.round(totalMensuel)} CHF</small>
 
         <div class="monthly-line">
           <label>🏦 Epargne</label>
@@ -823,33 +818,32 @@ value="800"
     `;
 
   } catch (e) {
-    console.error(e);
+    console.error("Erreur préparation virements", e);
     container.innerHTML = "Erreur préparation virements";
   }
 }
 async function applyMonthlyTransfersSimple() {
-
   const date = new Date().toISOString().slice(0, 10);
 
   const factures = Number(document.getElementById("monthlyFactures").value || 0);
   const epargne = Number(document.getElementById("monthlyEpargne").value || 0);
   const vacances = Number(document.getElementById("monthlyVacances").value || 0);
 
-  // ✅ Factures → réparti automatiquement
+  // Factures : répartition automatique selon POSTES
   if (factures > 0) {
-
     const postes = await getFinancePostes();
 
-    const totalBudget = postes.reduce(
+    const totalAnnuel = postes.reduce(
       (sum, p) => sum + Number(p["Budget annuel"] || 0),
       0
     );
 
     for (const p of postes) {
-      const budget = Number(p["Budget annuel"] || 0);
-      if (budget <= 0) continue;
+      const budgetMensuel = Number(p["Budget annuel"] || 0) / 12;
 
-      const part = (budget / totalBudget) * factures;
+      if (budgetMensuel <= 0) continue;
+
+      const part = (budgetMensuel / (totalAnnuel / 12)) * factures;
 
       await addFinanceMovementApi({
         date,
@@ -862,7 +856,7 @@ async function applyMonthlyTransfersSimple() {
     }
   }
 
-  // ✅ Epargne (un seul mouvement)
+  // Epargne
   if (epargne > 0) {
     await addFinanceMovementApi({
       date,
@@ -874,7 +868,7 @@ async function applyMonthlyTransfersSimple() {
     });
   }
 
-  // ✅ Vacances (un seul mouvement)
+  // Vacances
   if (vacances > 0) {
     await addFinanceMovementApi({
       date,
@@ -891,7 +885,6 @@ async function applyMonthlyTransfersSimple() {
 
   alert("✅ Virements appliqués");
 }
-
 async function applyMonthlyTransfers(count) {
   const today = new Date();
   const date = today.toISOString().slice(0, 10);
@@ -1100,3 +1093,4 @@ window.applyMonthlyTransfers = applyMonthlyTransfers;
 window.toggleKptRemboursement = toggleKptRemboursement;
 window.editKpt = editKpt;
 window.deleteKpt = deleteKpt;
+window.applyMonthlyTransfersSimple = applyMonthlyTransfersSimple;
