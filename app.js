@@ -1,4 +1,4 @@
-console.log("APP VERSION 25-06-2026 20h00");
+console.log("APP VERSION 25-06-2026 20h15");
 
 /* =========================
    OUTILS GENERAUX
@@ -780,7 +780,7 @@ async function prepareMonthlyTransfers() {
 
     // ✅ total budget = Factures
     const totalFactures = postes.reduce(
-      (sum, p) => sum + Number(p["Budget annuel"] || 0),
+      (sum, p) => sum + Number(p["Budget annuel"] || 0/12),
       0
     );
 
