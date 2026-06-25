@@ -779,10 +779,13 @@ async function prepareMonthlyTransfers() {
     const postes = await getFinancePostes();
 
     // ✅ total budget = Factures
-    const totalFactures = postes.reduce(
-      (sum, p) => sum + Number(p["Budget annuel"] || 0/12),
-      0
-    );
+ const totalFactures = postes
+  .filter(p => p["Type"] === "Réserve")
+  .reduce(
+    (sum, p) => sum + (Number(p["Budget annuel"] || 0) / 12),
+    0
+  );
+
 
     // ✅ valeurs par défaut (tu peux adapter)
     const defaultEpargne = 500;
