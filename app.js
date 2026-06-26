@@ -1,4 +1,4 @@
-console.log("APP VERSION 25-06-2026 21h20");
+console.log("APP VERSION 26-06-2026 07h35");
 
 /* =========================
    OUTILS GENERAUX
@@ -660,39 +660,7 @@ async function addFinanceMovementManual() {
     return;
   }
 
- if (compte === "Factures" && sens === "Entrée") {
-
-  // 🔥 récupérer les postes depuis Google Sheets
-  const postes = await getFinancePostes();
-
-  const totalBudget = postes.reduce((sum, p) =>
-    sum + Number(p["Budget annuel"] || 0), 0
-  );
-
- for (const p of postes) {
-
-  if (p["Type"] !== "Réserve") continue;
-    const posteName = p["Poste"];
-    const budget = Number(p["Budget annuel"] || 0);
-
-    if (budget <= 0) continue;
-
-    // ✅ calcul proportionnel
-    const part = (budget / totalBudget) * montant;
-
-    await addFinanceMovementApi({
-      date,
-      compte,
-      sens,
-      poste: posteName,
-      montant: part.toFixed(2),
-      description: `Répartition automatique`
-    });
-  }
-
-} else {
-
-  // ✅ comportement normal
+  // ✅ UN SEUL mouvement manuel
   await addFinanceMovementApi({
     date,
     compte,
@@ -701,8 +669,6 @@ async function addFinanceMovementManual() {
     montant,
     description
   });
-
-}
 
   document.getElementById("financeDate").value = "";
   document.getElementById("financePoste").value = "";
@@ -716,6 +682,7 @@ async function addFinanceMovementManual() {
   await loadFinanceScreen();
   await loadFinanceResume();
 }
+
 async function addEpargne3Entry() {
 
   const compte = document.getElementById("epargneCompte").value;
@@ -777,16 +744,16 @@ async function prepareMonthlyTransfers() {
   try {
     const postes = await getFinancePostes();
 
-    // Total annuel de tous les postes
+    // ✅ total annuel de TOUS les postes Factures
     const totalAnnuel = postes.reduce(
       (sum, p) => sum + Number(p["Budget annuel"] || 0),
       0
     );
 
-    // Recommandé mensuel
+    // ✅ recommandé mensuel réel
     const totalMensuel = totalAnnuel / 12;
 
-    // Valeurs proposées
+    // ✅ valeurs proposées (modifiables)
     const defaultFactures = 800;
     const defaultEpargne = 500;
     const defaultVacances = 80;
@@ -829,34 +796,29 @@ async function applyMonthlyTransfersSimple() {
   const epargne = Number(document.getElementById("monthlyEpargne").value || 0);
   const vacances = Number(document.getElementById("monthlyVacances").value || 0);
 
-  // Factures : répartition automatique selon POSTES
+  // ✅ FACTURES :
+  // on ne répartit PAS proportionnellement à 800
+  // on ajoute EXACTEMENT Budget annuel / 12 pour chaque poste
   if (factures > 0) {
     const postes = await getFinancePostes();
-
-    const totalAnnuel = postes.reduce(
-      (sum, p) => sum + Number(p["Budget annuel"] || 0),
-      0
-    );
 
     for (const p of postes) {
       const budgetMensuel = Number(p["Budget annuel"] || 0) / 12;
 
       if (budgetMensuel <= 0) continue;
 
-      const part = (budgetMensuel / (totalAnnuel / 12)) * factures;
-
       await addFinanceMovementApi({
         date,
         compte: "Factures",
         sens: "Entrée",
         poste: p["Poste"],
-        montant: part.toFixed(2),
-        description: "Répartition mensuelle"
+        montant: budgetMensuel.toFixed(2),
+        description: "Provision mensuelle"
       });
     }
   }
 
-  // Epargne
+  // ✅ Epargne : un seul mouvement
   if (epargne > 0) {
     await addFinanceMovementApi({
       date,
@@ -868,7 +830,7 @@ async function applyMonthlyTransfersSimple() {
     });
   }
 
-  // Vacances
+  // ✅ Vacances : un seul mouvement
   if (vacances > 0) {
     await addFinanceMovementApi({
       date,
