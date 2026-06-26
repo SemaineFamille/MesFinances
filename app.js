@@ -1,4 +1,4 @@
-console.log("APP VERSION 26-06-2026 17h15");
+console.log("APP VERSION 26-06-2026 17h35");
 
 /* =========================
    OUTILS GENERAUX
@@ -530,6 +530,22 @@ function renderFinanceStats(dashboardRows) {
   const totalReserves = voiture + lunettes + cadeaux + impots;
   const disponibleFactures = factures - totalReserves;
 
+  // ✅ Calcul épargne libre / 13ème depuis les mouvements
+  // On lit directement la liste affichée dans la page actuelle
+  // pour éviter de dépendre du dashboard
+  // (si tu préfères, on peut aussi faire cet appel dans loadFinanceScreen)
+  const epargneLibre = window.__lastMovements
+    ? window.__lastMovements
+        .filter(m => m["Compte"] === "Epargne" && m["Poste"] === "Epargne libre")
+        .reduce((sum, m) => sum + (m["Sens"] === "Entrée" ? Number(m["Montant"] || 0) : -Number(m["Montant"] || 0)), 0)
+    : 0;
+
+  const epargne13 = window.__lastMovements
+    ? window.__lastMovements
+        .filter(m => m["Compte"] === "Epargne" && m["Poste"] === "13eme salaire")
+        .reduce((sum, m) => sum + (m["Sens"] === "Entrée" ? Number(m["Montant"] || 0) : -Number(m["Montant"] || 0)), 0)
+    : 0;
+
   const safePercent = (value, total) => {
     if (!total || total <= 0) return 0;
     return Math.max(0, Math.min(100, (value / total) * 100));
@@ -546,6 +562,9 @@ function renderFinanceStats(dashboardRows) {
   const pctFactures = safePercent(factures, totalGlobal);
   const pctEpargne = safePercent(epargne, totalGlobal);
   const pctVacances = safePercent(vacances, totalGlobal);
+
+  const pctEpargneLibre = safePercent(epargneLibre, epargne);
+  const pctEpargne13 = safePercent(epargne13, epargne);
 
   stats.innerHTML = `
     <div class="finance-stat-list">
@@ -582,6 +601,21 @@ function renderFinanceStats(dashboardRows) {
           <span><span class="dot seg-disponible"></span> Disponible ${formatCHF(disponibleFactures)}</span>
           <span><span class="dot seg-reserve-total"></span> Réservé ${formatCHF(totalReserves)}</span>
           <span><strong>Total compte Factures : ${formatCHF(factures)}</strong></span>
+        </div>
+      </div>
+
+      <div class="finance-stat-item">
+        <strong>🏦 Épargne</strong><br>
+        ${formatCHF(epargne)}
+
+        <div class="stacked-bar">
+          <div class="seg seg-epargne-libre" style="width:${pctEpargneLibre}%"></div>
+          <div class="seg seg-13eme" style="width:${pctEpargne13}%"></div>
+        </div>
+
+        <div class="stacked-legend">
+          <span><span class="dot seg-epargne-libre"></span> Épargne libre ${formatCHF(epargneLibre)}</span>
+          <span><span class="dot seg-13eme"></span> 13ème salaire ${formatCHF(epargne13)}</span>
         </div>
       </div>
 
@@ -763,19 +797,17 @@ async function prepareMonthlyTransfers() {
   try {
     const postes = await getFinancePostes();
 
-    // ✅ total annuel de TOUS les postes Factures
     const totalAnnuel = postes.reduce(
       (sum, p) => sum + Number(p["Budget annuel"] || 0),
       0
     );
 
-    // ✅ recommandé mensuel réel
     const totalMensuel = totalAnnuel / 12;
 
-    // ✅ valeurs proposées (modifiables)
     const defaultFactures = 800;
     const defaultEpargne = 500;
     const defaultVacances = 80;
+    const defaultEpargne13 = 500; // adapte cette valeur à ton besoin réel
 
     container.innerHTML = `
       <div class="finance-monthly-simple">
@@ -789,6 +821,11 @@ async function prepareMonthlyTransfers() {
         <div class="monthly-line">
           <label>🏦 Epargne</label>
           <input type="number" id="monthlyEpargne" value="${defaultEpargne}">
+        </div>
+
+        <div class="monthly-line">
+          <label>🎁 13ème salaire</label>
+          <input type="number" id="monthlyEpargne13" value="${defaultEpargne13}">
         </div>
 
         <div class="monthly-line">
@@ -808,65 +845,94 @@ async function prepareMonthlyTransfers() {
     container.innerHTML = "Erreur préparation virements";
   }
 }
+
 async function applyMonthlyTransfersSimple() {
   const date = new Date().toISOString().slice(0, 10);
 
   const factures = Number(document.getElementById("monthlyFactures").value || 0);
   const epargne = Number(document.getElementById("monthlyEpargne").value || 0);
+  const epargne13 = Number(document.getElementById("monthlyEpargne13").value || 0);
   const vacances = Number(document.getElementById("monthlyVacances").value || 0);
 
-  // ✅ FACTURES :
-  // on ne répartit PAS proportionnellement à 800
-  // on ajoute EXACTEMENT Budget annuel / 12 pour chaque poste
+  // =========================
+  // FACTURES = 1/12 exact de chaque poste
+  // + surplus éventuel
+  // =========================
   if (factures > 0) {
     const postes = await getFinancePostes();
 
-    for (const p of postes) {
-      const budgetMensuel = Number(p["Budget annuel"] || 0) / 12;
+    const monthlyItems = postes.map(p => ({
+      poste: p["Poste"],
+      mensuel: Number(p["Budget annuel"] || 0) / 12
+    })).filter(item => item.mensuel > 0);
 
-      if (budgetMensuel <= 0) continue;
+    const totalMensuelTheorique = monthlyItems.reduce((sum, item) => sum + item.mensuel, 0);
 
+    if (factures < totalMensuelTheorique) {
+      alert(
+        `Le montant Factures (${formatCHF(factures)}) est inférieur au besoin mensuel théorique (${formatCHF(totalMensuelTheorique)}).`
+      );
+      return;
+    }
+
+    // 1/12 exact pour chaque poste
+    for (const item of monthlyItems) {
       await addFinanceMovementApi({
         date,
         compte: "Factures",
         sens: "Entrée",
-        poste: p["Poste"],
-        montant: budgetMensuel.toFixed(2),
+        poste: item.poste,
+        montant: item.mensuel.toFixed(2),
         description: "Provision mensuelle"
+      });
+    }
+
+    // surplus éventuel
+    const surplus = factures - totalMensuelTheorique;
+
+    if (surplus > 0) {
+      await addFinanceMovementApi({
+        date,
+        compte: "Factures",
+        sens: "Entrée",
+        poste: "Disponible facture",
+        montant: surplus.toFixed(2),
+        description: "Surplus mensuel"
       });
     }
   }
 
-  // ✅ Epargne : un seul mouvement
- 
-// ✅ Epargne libre
-if (epargne > 0) {
-  await addFinanceMovementApi({
-    date,
-    compte: "Epargne",
-    sens: "Entrée",
-    poste: "Epargne libre",
-    montant: epargne,
-    description: "Epargne mensuelle"
-  });
-}
+  // =========================
+  // EPARGNE LIBRE
+  // =========================
+  if (epargne > 0) {
+    await addFinanceMovementApi({
+      date,
+      compte: "Epargne",
+      sens: "Entrée",
+      poste: "Epargne libre",
+      montant: epargne,
+      description: "Epargne mensuelle"
+    });
+  }
 
-// ✅ 13ème salaire
-const epargne13 = Number(document.getElementById("monthlyEpargne13")?.value || 0);
+  // =========================
+  // 13ÈME SALAIRE
+  // =========================
+  if (epargne13 > 0) {
+    await addFinanceMovementApi({
+      date,
+      compte: "Epargne",
+      sens: "Entrée",
+      poste: "13eme salaire",
+      montant: epargne13,
+      description: "Provision 13ème"
+    });
+  }
 
-if (epargne13 > 0) {
-  await addFinanceMovementApi({
-    date,
-    compte: "Epargne",
-    sens: "Entrée",
-    poste: "13eme salaire",
-    montant: epargne13,
-    description: "Provision 13e"
-  });
-}
-
-
-  // ✅ Vacances : un seul mouvement
+  // =========================
+  // VACANCES
+  // =========================
   if (vacances > 0) {
     await addFinanceMovementApi({
       date,
@@ -1046,38 +1112,19 @@ async function loadFinanceScreen() {
   try {
     const dashboard = await getFinanceDashboard();
     const movements = await getFinanceMovements();
-const epargneSplit = computeEpargneSplit(movements);
+
+    // ✅ on garde les mouvements en mémoire pour les graphiques/barres
+    window.__lastMovements = movements;
+
     renderFinancePieChart(dashboard);
     renderFinanceStats(dashboard);
     renderFinanceHistory(movements);
-const totalEpargne = epargneSplit.libre + epargneSplit.treize;
-
-document.getElementById("financeEpargneSplit").innerHTML = `
-  <div class="finance-stat-list">
-
-    <div class="finance-stat-item">
-      <strong>🏦 Épargne totale</strong><br>
-      ${formatCHF(totalEpargne)}
-    </div>
-
-    <div class="finance-stat-item">
-      Epargne libre<br>
-      ${formatCHF(epargneSplit.libre)}
-    </div>
-
-    <div class="finance-stat-item">
-      13ème salaire<br>
-      ${formatCHF(epargneSplit.treize)}
-    </div>
-
-  </div>
-`;
 
     try {
       const epargneChart = document.getElementById("epargneChart");
       if (epargneChart && typeof getEpargne3 === "function") {
         const epargne3 = await getEpargne3();
-         renderEpargneSummary(epargne3);
+        renderEpargneSummary(epargne3);
         renderEpargneLineChart(epargne3);
       }
     } catch (epargneErr) {
