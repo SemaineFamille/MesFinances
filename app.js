@@ -376,7 +376,26 @@ function formatCHF(value) {
     maximumFractionDigits: 2
   }) + " CHF";
 }
+function computeEpargneSplit(movements) {
 
+  let libre = 0;
+  let treize = 0;
+
+  movements.forEach(m => {
+
+    if (m["Compte"] !== "Epargne") return;
+
+    const montant = Number(m["Montant"] || 0);
+
+    if (m["Poste"] === "13eme salaire") {
+      treize += (m["Sens"] === "Entrée" ? montant : -montant);
+    } else if (m["Poste"] === "Epargne libre") {
+      libre += (m["Sens"] === "Entrée" ? montant : -montant);
+    }
+  });
+
+  return { libre, treize };
+}
 function parseFrDate(dateStr) {
   if (!dateStr) return new Date(0);
 
@@ -1027,10 +1046,32 @@ async function loadFinanceScreen() {
   try {
     const dashboard = await getFinanceDashboard();
     const movements = await getFinanceMovements();
-
+const epargneSplit = computeEpargneSplit(movements);
     renderFinancePieChart(dashboard);
     renderFinanceStats(dashboard);
     renderFinanceHistory(movements);
+const totalEpargne = epargneSplit.libre + epargneSplit.treize;
+
+document.getElementById("financeEpargneSplit").innerHTML = `
+  <div class="finance-stat-list">
+
+    <div class="finance-stat-item">
+      <strong>🏦 Épargne totale</strong><br>
+      ${formatCHF(totalEpargne)}
+    </div>
+
+    <div class="finance-stat-item">
+      Epargne libre<br>
+      ${formatCHF(epargneSplit.libre)}
+    </div>
+
+    <div class="finance-stat-item">
+      13ème salaire<br>
+      ${formatCHF(epargneSplit.treize)}
+    </div>
+
+  </div>
+`;
 
     try {
       const epargneChart = document.getElementById("epargneChart");
