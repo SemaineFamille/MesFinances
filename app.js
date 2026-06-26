@@ -1,4 +1,4 @@
-console.log("APP VERSION 26-06-2026 17h35");
+console.log("APP VERSION 26-06-2026 18h00");
 
 /* =========================
    OUTILS GENERAUX
@@ -534,17 +534,20 @@ function renderFinanceStats(dashboardRows) {
   // On lit directement la liste affichée dans la page actuelle
   // pour éviter de dépendre du dashboard
   // (si tu préfères, on peut aussi faire cet appel dans loadFinanceScreen)
-  const epargneLibre = window.__lastMovements
-    ? window.__lastMovements
-        .filter(m => m["Compte"] === "Epargne" && m["Poste"] === "Epargne libre")
-        .reduce((sum, m) => sum + (m["Sens"] === "Entrée" ? Number(m["Montant"] || 0) : -Number(m["Montant"] || 0)), 0)
-    : 0;
+const epargne13 = window.__lastMovements
+  ? window.__lastMovements
+      .filter(m =>
+        m["Compte"] === "Epargne" &&
+        normalizeLabel(m["Poste"]).includes("13eme")
+      )
+      .reduce((sum, m) => {
+        const montant = Number(m["Montant"] || 0);
+        return sum + (m["Sens"] === "Entrée" ? montant : -montant);
+      }, 0)
+  : 0;
 
-  const epargne13 = window.__lastMovements
-    ? window.__lastMovements
-        .filter(m => m["Compte"] === "Epargne" && m["Poste"] === "13eme salaire")
-        .reduce((sum, m) => sum + (m["Sens"] === "Entrée" ? Number(m["Montant"] || 0) : -Number(m["Montant"] || 0)), 0)
-    : 0;
+// ✅ L'épargne libre = total épargne - 13ème
+const epargneLibre = epargne - epargne13;
 
   const safePercent = (value, total) => {
     if (!total || total <= 0) return 0;
