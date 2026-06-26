@@ -619,3 +619,6 @@ input[type="checkbox"]:checked::after {
   width: 120px;
 }
 
+.seg-epargne-libre { background: #0ea5e9; }
+.seg-13eme { background: #8b5cf6; }
+
