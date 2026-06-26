@@ -1,4 +1,4 @@
-console.log("APP VERSION 26-06-2026 07h35");
+console.log("APP VERSION 26-06-2026 17h15");
 
 /* =========================
    OUTILS GENERAUX
@@ -819,16 +819,33 @@ async function applyMonthlyTransfersSimple() {
   }
 
   // ✅ Epargne : un seul mouvement
-  if (epargne > 0) {
-    await addFinanceMovementApi({
-      date,
-      compte: "Epargne",
-      sens: "Entrée",
-      poste: "Versement mensuel",
-      montant: epargne,
-      description: "Versement mensuel"
-    });
-  }
+ 
+// ✅ Epargne libre
+if (epargne > 0) {
+  await addFinanceMovementApi({
+    date,
+    compte: "Epargne",
+    sens: "Entrée",
+    poste: "Epargne libre",
+    montant: epargne,
+    description: "Epargne mensuelle"
+  });
+}
+
+// ✅ 13ème salaire
+const epargne13 = Number(document.getElementById("monthlyEpargne13")?.value || 0);
+
+if (epargne13 > 0) {
+  await addFinanceMovementApi({
+    date,
+    compte: "Epargne",
+    sens: "Entrée",
+    poste: "13eme salaire",
+    montant: epargne13,
+    description: "Provision 13e"
+  });
+}
+
 
   // ✅ Vacances : un seul mouvement
   if (vacances > 0) {
