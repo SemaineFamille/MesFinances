@@ -827,7 +827,7 @@ async function prepareMonthlyTransfers() {
 
     const totalMensuel = totalAnnuel / 12;
 
-    const defaultFactures = 800;
+    const defaultFactures = 815;
     const defaultEpargne = 500;
     const defaultVacances = 80;
     const defaultEpargne13 = 500; // adapte cette valeur à ton besoin réel
