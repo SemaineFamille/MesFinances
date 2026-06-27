@@ -368,6 +368,25 @@ async function toggleKptRemboursement(index, value) {
 /* =========================
 FINANCES
 ========================= */
+function updateMonthlyCalc() {
+
+  const salaire = Number(document.getElementById("calcSalaire").value || 0);
+  const depenses = Number(document.getElementById("calcDepenses").value || 0);
+
+  const reste = salaire - depenses;
+
+  const container = document.getElementById("calcResult");
+
+  let color = "black";
+  if (reste > 0) color = "green";
+  if (reste < 0) color = "red";
+
+  container.innerHTML = `
+    Résultat : <span style="color:${color}; font-weight:bold;">
+      ${formatCHF(reste)}
+    </span>
+  `;
+}
 
 function formatCHF(value) {
   const number = Number(value || 0);
