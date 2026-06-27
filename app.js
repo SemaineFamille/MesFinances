@@ -1,4 +1,4 @@
-console.log("APP VERSION 27-06-2026 10h10");
+console.log("APP VERSION 27-06-2026 10h25");
 
 /* =========================
    OUTILS GENERAUX
@@ -370,8 +370,8 @@ FINANCES
 ========================= */
 function updateMonthlyCalc() {
 
-  const salaire = Number(document.getElementById("calcSalaire").value || 0);
-  const depenses = Number(document.getElementById("calcDepenses").value || 0);
+  const salaire = Number(document.getElementById("calcSalaire")?.value || 0);
+  const depenses = Number(document.getElementById("calcDepenses")?.value || 0);
 
   const reste = salaire - depenses;
 
@@ -382,7 +382,8 @@ function updateMonthlyCalc() {
   if (reste < 0) color = "red";
 
   container.innerHTML = `
-    Résultat : <span style="color:${color}; font-weight:bold;">
+    Résultat : 
+    <span style="color:${color}; font-weight:bold;">
       ${formatCHF(reste)}
     </span>
   `;
