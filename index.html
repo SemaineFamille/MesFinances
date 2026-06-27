@@ -264,7 +264,24 @@
   </button>
 
 </div>
+<!-- ✅ Calcul du reste du mois -->
+<div class="finance-block">
+  <h3>🧮 Reste du mois</h3>
 
+  <div class="monthly-line">
+    <label>💰 Salaire</label>
+    <input type="number" id="calcSalaire" placeholder="ex: 6500" onchange="updateMonthlyCalc()">
+  </div>
+
+  <div class="monthly-line">
+    <label>📉 Dépenses prévues</label>
+    <input type="number" id="calcDepenses" placeholder="ex: 3200" onchange="updateMonthlyCalc()">
+  </div>
+
+  <div id="calcResult" class="finance-result">
+    Résultat : -
+  </div>
+</div>
   <!-- Historique -->
  
 <div class="collapsible-header" onclick="toggleHistory()">
