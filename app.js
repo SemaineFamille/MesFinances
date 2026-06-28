@@ -1277,6 +1277,5 @@ window.toggleKptRemboursement = toggleKptRemboursement;
 window.editKpt = editKpt;
 window.deleteKpt = deleteKpt;
 window.applyMonthlyTransfersSimple = applyMonthlyTransfersSimple;
-window.togglePostesPreview = togglePostesPreview;
 window.toggleReservesPreview = toggleReservesPreview;
 window.toggleReservesCard = toggleReservesCard;
