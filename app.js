@@ -629,21 +629,23 @@ const epargneLibre = epargne - epargne13;
         </div>
       </div>
 
-      <div class="finance-stat-item">
-        <strong>💸 Disponible réel (Factures)</strong><br>
-        ${formatCHF(disponibleFactures)}
+  <div class="finance-stat-item clickable-card" onclick="togglePostesPreview()">
+  <strong>💸 Disponible réel (Factures)</strong><br>
+  ${formatCHF(disponibleFactures)}
 
-        <div class="stacked-bar">
-          <div class="seg seg-disponible" style="width:${pctDisponible}%"></div>
-          <div class="seg seg-reserve-total" style="width:${pctReserveDansFactures}%"></div>
-        </div>
+  <div class="stacked-bar">
+    <div class="seg seg-disponible" style="width:${pctDisponible}%"></div>
+    <div class="seg seg-reserve-total" style="width:${pctReserveDansFactures}%"></div>
+  </div>
 
-        <div class="stacked-legend">
-          <span><span class="dot seg-disponible"></span> Disponible ${formatCHF(disponibleFactures)}</span>
-          <span><span class="dot seg-reserve-total"></span> Réservé ${formatCHF(totalReserves)}</span>
-          <span><strong>Total compte Factures : ${formatCHF(factures)}</strong></span>
-        </div>
-      </div>
+  <div class="stacked-legend">
+    <span><span class="dot seg-disponible"></span> Disponible ${formatCHF(disponibleFactures)}</span>
+    <span><span class="dot seg-reserve-total"></span> Réservé ${formatCHF(totalReserves)}</span>
+    <span><strong>Total compte Factures : ${formatCHF(factures)}</strong></span>
+  </div>
+
+  <div class="small-hint">👆 Voir le détail des postes</div>
+</div>
 
       <div class="finance-stat-item">
         <strong>🏦 Épargne</strong><br>
@@ -694,7 +696,60 @@ const epargneLibre = epargne - epargne13;
     </div>
   `;
 }
+async function togglePostesPreview() {
+  let container = document.getElementById("postesPreview");
 
+  if (!container) {
+    container = document.createElement("div");
+    container.id = "postesPreview";
+    container.className = "finance-block postes-preview";
+
+    const statsBlock = document.getElementById("financeStats");
+    statsBlock.parentNode.insertBefore(container, statsBlock.nextSibling);
+  }
+
+  const isVisible = container.style.display === "block";
+
+  if (isVisible) {
+    container.style.display = "none";
+    return;
+  }
+
+  try {
+    const postes = await getFinancePostes();
+
+    container.innerHTML = `
+      <h3>📋 Détail des postes</h3>
+
+      <div class="postes-table">
+        <div class="postes-row postes-header">
+          <div>Poste</div>
+          <div>Budget annuel</div>
+          <div>Mensuel</div>
+        </div>
+
+        ${postes.map(p => `
+          <div class="postes-row">
+            <div>${p["Poste"] || ""}</div>
+            <div>${formatCHF(p["Budget annuel"] || 0)}</div>
+            <div>${formatCHF(p["Montant mensuel"] || 0)}</div>
+          </div>
+        `).join("")}
+      </div>
+    `;
+
+    container.style.display = "block";
+
+  } catch (e) {
+    console.error("Erreur chargement postes", e);
+    container.innerHTML = `
+      <div class="finance-stat-item">
+        Erreur lors du chargement des postes.
+      </div>
+    `;
+    container.style.display = "block";
+  }
+}
 function renderFinanceHistory(movements) {
   const list = document.getElementById("financeList");
   if (!list) return;
@@ -1202,3 +1257,4 @@ window.toggleKptRemboursement = toggleKptRemboursement;
 window.editKpt = editKpt;
 window.deleteKpt = deleteKpt;
 window.applyMonthlyTransfersSimple = applyMonthlyTransfersSimple;
+window.togglePostesPreview = togglePostesPreview;
