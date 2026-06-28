@@ -1,4 +1,4 @@
-console.log("APP VERSION 28-06-2026 17h30");
+console.log("APP VERSION 28-06-2026 17h35");
 
 /* =========================
    OUTILS GENERAUX
@@ -676,7 +676,7 @@ const epargneLibre = epargne - epargne13;
         </div>
       </div>
 
-  <div class="finance-stat-item clickable-card" onclick="togglePostesPreview()">
+ <div class="finance-stat-item clickable-card" onclick="toggleDisponibleCard()">
   <strong>💸 Disponible réel (Factures)</strong><br>
   ${formatCHF(disponibleFactures)}
 
@@ -1320,3 +1320,4 @@ window.applyMonthlyTransfersSimple = applyMonthlyTransfersSimple;
 window.toggleReservesPreview = toggleReservesPreview;
 window.toggleReservesCard = toggleReservesCard;
 window.toggleDisponibleCard = toggleDisponibleCard;
+window.togglePostesPreview = togglePostesPreview;
