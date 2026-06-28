@@ -680,4 +680,12 @@ input[type="checkbox"]:checked::after {
 .postes-row:nth-child(even) {
   background: #fafafa;
 }
+#financeReserves {
+  margin-top: 10px;
+}
+
+#financeReserves:empty {
+  display: none !important;
+}
+
 
