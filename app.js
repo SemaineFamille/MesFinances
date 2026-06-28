@@ -610,9 +610,9 @@ const epargneLibre = epargne - epargne13;
   stats.innerHTML = `
     <div class="finance-stat-list">
 
-      <div class="finance-stat-item">
-        <strong>🔒 Total réserves</strong><br>
-        ${formatCHF(totalReserves)}
+    <div class="finance-stat-item clickable-card" onclick="toggleReservesPreview()">
+  <strong>🔒 Total réserves</strong><br>
+  <div class="small-hint">👆 Voir le détail des réserves</div>
 
         <div class="stacked-bar">
           <div class="seg seg-voiture" style="width:${pctVoiture}%"></div>
@@ -695,6 +695,65 @@ const epargneLibre = epargne - epargne13;
       }
     </div>
   `;
+}
+async function toggleReservesPreview() {
+  let container = document.getElementById("reservesPreview");
+
+  if (!container) {
+    container = document.createElement("div");
+    container.id = "reservesPreview";
+    container.className = "finance-block postes-preview";
+
+    const statsBlock = document.getElementById("financeStats");
+    statsBlock.parentNode.insertBefore(container, statsBlock.nextSibling);
+  }
+
+  const isVisible = container.style.display === "block";
+
+  if (isVisible) {
+    container.style.display = "none";
+    return;
+  }
+
+  try {
+    const postes = await getFinancePostes();
+
+    // ✅ filtrer uniquement les réserves
+    const reserves = postes.filter(p =>
+      normalizeLabel(p["Type"]).includes("réserve")
+    );
+
+    container.innerHTML = `
+      <h3>🔒 Détail des réserves</h3>
+
+      <div class="postes-table">
+        <div class="postes-row postes-header">
+          <div>Poste</div>
+          <div>Budget annuel</div>
+          <div>Mensuel</div>
+        </div>
+
+        ${reserves.map(p => `
+          <div class="postes-row">
+            <div>${p["Poste"] || ""}</div>
+            <div>${formatCHF(p["Budget annuel"] || 0)}</div>
+            <div>${formatCHF(p["Montant mensuel"] || 0)}</div>
+          </div>
+        `).join("")}
+      </div>
+    `;
+
+    container.style.display = "block";
+
+  } catch (e) {
+    console.error("Erreur chargement réserves", e);
+    container.innerHTML = `
+      <div class="finance-stat-item">
+        Erreur chargement réserves
+      </div>
+    `;
+    container.style.display = "block";
+  }
 }
 async function togglePostesPreview() {
   let container = document.getElementById("postesPreview");
@@ -1258,3 +1317,4 @@ window.editKpt = editKpt;
 window.deleteKpt = deleteKpt;
 window.applyMonthlyTransfersSimple = applyMonthlyTransfersSimple;
 window.togglePostesPreview = togglePostesPreview;
+window.toggleReservesPreview = toggleReservesPreview;
