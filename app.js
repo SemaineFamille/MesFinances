@@ -754,22 +754,15 @@ async function toggleReservesPreview() {
   }
 }
 function toggleReservesCard() {
-  const container = document.getElementById("financeReserves");
+  const block = document.getElementById("financeReservesBlock");
 
-  if (!container) return;
+  if (!block) return;
 
-  const isVisible = container.style.display === "block";
+  const isVisible = block.style.display === "block";
 
-  if (isVisible) {
-    // ✅ on cache
-    container.style.display = "none";
-  } else {
-    // ✅ on affiche seulement si contenu
-    if (container.innerHTML.trim() !== "") {
-      container.style.display = "block";
-    }
-  }
+  block.style.display = isVisible ? "none" : "block";
 }
+``
 function renderFinanceHistory(movements) {
   const list = document.getElementById("financeList");
   if (!list) return;
