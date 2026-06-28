@@ -718,13 +718,11 @@ async function toggleReservesPreview() {
   try {
     const postes = await getFinancePostes();
 
-    // ✅ Filtre robuste : Réserve / Reserve / réserves / RESERVE
-   const reserves = postes;
-      normalizeLabel(p["Type"]).includes("reserv")
-    );
+    // ✅ maintenant on affiche TOUT
+    const allPostes = postes;
 
     container.innerHTML = `
-      <h3>🔒 Détail des réserves</h3>
+      <h3>📋 Tous les postes</h3>
 
       <div class="postes-table">
         <div class="postes-row postes-header">
@@ -733,32 +731,23 @@ async function toggleReservesPreview() {
           <div>Montant mensuel</div>
         </div>
 
-        ${reserves.length > 0
-          ? reserves.map(p => `
-            <div class="postes-row">
-              <div>${p["Poste"] || ""}</div>
-              <div>${formatCHF(p["Budget annuel"] || 0)}</div>
-              <div>${formatCHF(p["Montant mensuel"] || 0)}</div>
-            </div>
-          `).join("")
-          : `
-            <div class="postes-row">
-              <div>Aucune réserve trouvée</div>
-              <div>-</div>
-              <div>-</div>
-            </div>
-          `
-        }
+        ${allPostes.map(p => `
+          <div class="postes-row">
+            <div>${p["Poste"] || ""}</div>
+            <div>${formatCHF(p["Budget annuel"] || 0)}</div>
+            <div>${formatCHF(p["Montant mensuel"] || 0)}</div>
+          </div>
+        `).join("")}
       </div>
     `;
 
     container.style.display = "block";
 
   } catch (e) {
-    console.error("Erreur chargement réserves", e);
+    console.error("Erreur chargement postes", e);
     container.innerHTML = `
       <div class="finance-stat-item">
-        Erreur chargement réserves
+        Erreur chargement postes
       </div>
     `;
     container.style.display = "block";
