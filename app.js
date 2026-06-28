@@ -760,60 +760,14 @@ function toggleReservesCard() {
 
   const isVisible = container.style.display === "block";
 
-  container.style.display = isVisible ? "none" : "block";
-}
-async function togglePostesPreview() {
-  let container = document.getElementById("postesPreview");
-
-  if (!container) {
-    container = document.createElement("div");
-    container.id = "postesPreview";
-    container.className = "finance-block postes-preview";
-
-    const statsBlock = document.getElementById("financeStats");
-    statsBlock.parentNode.insertBefore(container, statsBlock.nextSibling);
-  }
-
-  const isVisible = container.style.display === "block";
-
   if (isVisible) {
+    // ✅ on cache
     container.style.display = "none";
-    return;
-  }
-
-  try {
-    const postes = await getFinancePostes();
-
-    container.innerHTML = `
-      <h3>📋 Détail des postes</h3>
-
-      <div class="postes-table">
-        <div class="postes-row postes-header">
-          <div>Poste</div>
-          <div>Budget annuel</div>
-          <div>Mensuel</div>
-        </div>
-
-        ${postes.map(p => `
-          <div class="postes-row">
-            <div>${p["Poste"] || ""}</div>
-            <div>${formatCHF(p["Budget annuel"] || 0)}</div>
-            <div>${formatCHF(p["Montant mensuel"] || 0)}</div>
-          </div>
-        `).join("")}
-      </div>
-    `;
-
-    container.style.display = "block";
-
-  } catch (e) {
-    console.error("Erreur chargement postes", e);
-    container.innerHTML = `
-      <div class="finance-stat-item">
-        Erreur lors du chargement des postes.
-      </div>
-    `;
-    container.style.display = "block";
+  } else {
+    // ✅ on affiche seulement si contenu
+    if (container.innerHTML.trim() !== "") {
+      container.style.display = "block";
+    }
   }
 }
 function renderFinanceHistory(movements) {
