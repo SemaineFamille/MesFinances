@@ -1,4 +1,4 @@
-console.log("APP VERSION 28-06-2026 16h30");
+console.log("APP VERSION 28-06-2026 16h40");
 
 /* =========================
    OUTILS GENERAUX
@@ -719,7 +719,7 @@ async function toggleReservesPreview() {
     const postes = await getFinancePostes();
 
     // ✅ Filtre robuste : Réserve / Reserve / réserves / RESERVE
-    const reserves = postes.filter(p =>
+   const reserves = postes;
       normalizeLabel(p["Type"]).includes("reserv")
     );
 
