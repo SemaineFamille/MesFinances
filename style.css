@@ -654,16 +654,30 @@ input[type="checkbox"]:checked::after {
 
 .postes-row {
   display: grid;
-  grid-template-columns: 1.5fr 1fr 1fr;
-  gap: 8px;
-  background: #fff;
-  border-radius: 10px;
-  padding: 8px;
-  font-size: 13px;
+  grid-template-columns: 2fr 1fr 1fr;
+  border-bottom: 1px solid #eee;
+  padding: 6px 4px;
+  align-items: center;
 }
+
+.postes-row div {
+  padding: 4px 6px;
+}
+
 
 .postes-header {
   font-weight: bold;
-  background: #fff4e8;
-  border-left: 4px solid #f39c12;
+  background: #f5f5f5;
+  border-bottom: 2px solid #ddd;
 }
+.postes-table {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  font-size: 13px;
+}
+
+.postes-row:nth-child(even) {
+  background: #fafafa;
+}
+
