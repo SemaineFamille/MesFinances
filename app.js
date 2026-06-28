@@ -1,4 +1,4 @@
-console.log("APP VERSION 28-06-2026 17h20");
+console.log("APP VERSION 28-06-2026 17h30");
 
 /* =========================
    OUTILS GENERAUX
@@ -484,7 +484,54 @@ async function loadFinanceResume() {
     console.error(e);
   }
 }
+async function toggleDisponibleCard() {
+  const block = document.getElementById("financeDisponibleBlock");
+  const container = document.getElementById("financeDisponibleDetails");
 
+  if (!block || !container) return;
+
+  const isVisible = block.style.display === "block";
+
+  if (isVisible) {
+    block.style.display = "none";
+    return;
+  }
+
+  try {
+    const postes = await getFinancePostes();
+
+    container.innerHTML = `
+      <div class="postes-table">
+        <div class="postes-row postes-header">
+          <div>Poste</div>
+          <div>Budget annuel</div>
+          <div>Montant mensuel</div>
+        </div>
+
+        ${postes.map(p => `
+          <div class="postes-row">
+            <div>${p["Poste"] || ""}</div>
+            <div>${formatCHF(p["Budget annuel"] || 0)}</div>
+            <div>${formatCHF(p["Montant mensuel"] || 0)}</div>
+          </div>
+        `).join("")}
+      </div>
+    `;
+
+    block.style.display = "block";
+
+  } catch (e) {
+    console.error("Erreur chargement postes", e);
+
+    container.innerHTML = `
+      <div class="finance-stat-item">
+        Erreur lors du chargement des postes.
+      </div>
+    `;
+
+    block.style.display = "block";
+  }
+}
 function renderFinancePieChart(dashboardRows) {
   const chart = document.getElementById("financeChart");
   if (!chart) return;
@@ -1272,3 +1319,4 @@ window.deleteKpt = deleteKpt;
 window.applyMonthlyTransfersSimple = applyMonthlyTransfersSimple;
 window.toggleReservesPreview = toggleReservesPreview;
 window.toggleReservesCard = toggleReservesCard;
+window.toggleDisponibleCard = toggleDisponibleCard;
