@@ -1,4 +1,4 @@
-console.log("APP VERSION 27-06-2026 10h25");
+console.log("APP VERSION 28-06-2026 09h30");
 
 /* =========================
    OUTILS GENERAUX
@@ -137,6 +137,20 @@ window.onload = async () => {
   await loadKpt();
   await loadFinanceResume();
   handleFinanceCompteChange();
+   // ✅ Restaurer les valeurs sauvegardées
+const savedSalaire = localStorage.getItem("calcSalaire");
+const savedDepenses = localStorage.getItem("calcDepenses");
+
+if (savedSalaire !== null) {
+  document.getElementById("calcSalaire").value = savedSalaire;
+}
+
+if (savedDepenses !== null) {
+  document.getElementById("calcDepenses").value = savedDepenses;
+}
+
+// ✅ recalcul automatique
+updateMonthlyCalc();
 };
 
 /* =========================
@@ -372,6 +386,10 @@ function updateMonthlyCalc() {
 
   const salaire = Number(document.getElementById("calcSalaire")?.value || 0);
   const depenses = Number(document.getElementById("calcDepenses")?.value || 0);
+
+  // ✅ Sauvegarde locale
+  localStorage.setItem("calcSalaire", salaire);
+  localStorage.setItem("calcDepenses", depenses);
 
   const reste = salaire - depenses;
 
