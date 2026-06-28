@@ -610,7 +610,7 @@ const epargneLibre = epargne - epargne13;
   stats.innerHTML = `
     <div class="finance-stat-list">
 
-    <div class="finance-stat-item clickable-card" onclick="toggleReservesPreview()">
+<div class="finance-stat-item clickable-card" onclick="toggleReservesCard()">
   <strong>🔒 Total réserves</strong><br>
   <div class="small-hint">👆 Voir le détail des réserves</div>
 
@@ -752,6 +752,15 @@ async function toggleReservesPreview() {
     `;
     container.style.display = "block";
   }
+}
+function toggleReservesCard() {
+  const container = document.getElementById("financeReserves");
+
+  if (!container) return;
+
+  const isVisible = container.style.display === "block";
+
+  container.style.display = isVisible ? "none" : "block";
 }
 async function togglePostesPreview() {
   let container = document.getElementById("postesPreview");
@@ -1316,3 +1325,4 @@ window.deleteKpt = deleteKpt;
 window.applyMonthlyTransfersSimple = applyMonthlyTransfersSimple;
 window.togglePostesPreview = togglePostesPreview;
 window.toggleReservesPreview = toggleReservesPreview;
+window.toggleReservesCard = toggleReservesCard;
