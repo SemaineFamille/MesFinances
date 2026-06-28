@@ -1,4 +1,4 @@
-console.log("APP VERSION 28-06-2026 09h30");
+console.log("APP VERSION 28-06-2026 16h30");
 
 /* =========================
    OUTILS GENERAUX
@@ -718,9 +718,9 @@ async function toggleReservesPreview() {
   try {
     const postes = await getFinancePostes();
 
-    // ✅ filtrer uniquement les réserves
+    // ✅ Filtre robuste : Réserve / Reserve / réserves / RESERVE
     const reserves = postes.filter(p =>
-      normalizeLabel(p["Type"]).includes("réserve")
+      normalizeLabel(p["Type"]).includes("reserv")
     );
 
     container.innerHTML = `
@@ -733,13 +733,22 @@ async function toggleReservesPreview() {
           <div>Montant mensuel</div>
         </div>
 
-        ${reserves.map(p => `
-          <div class="postes-row">
-            <div>${p["Poste"] || ""}</div>
-            <div>${formatCHF(p["Budget annuel"] || 0)}</div>
-            <div>${formatCHF(p["Montant mensuel"] || 0)}</div>
-          </div>
-        `).join("")}
+        ${reserves.length > 0
+          ? reserves.map(p => `
+            <div class="postes-row">
+              <div>${p["Poste"] || ""}</div>
+              <div>${formatCHF(p["Budget annuel"] || 0)}</div>
+              <div>${formatCHF(p["Montant mensuel"] || 0)}</div>
+            </div>
+          `).join("")
+          : `
+            <div class="postes-row">
+              <div>Aucune réserve trouvée</div>
+              <div>-</div>
+              <div>-</div>
+            </div>
+          `
+        }
       </div>
     `;
 
