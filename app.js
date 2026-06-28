@@ -730,7 +730,7 @@ async function toggleReservesPreview() {
         <div class="postes-row postes-header">
           <div>Poste</div>
           <div>Budget annuel</div>
-          <div>Mensuel</div>
+          <div>Montant mensuel</div>
         </div>
 
         ${reserves.map(p => `
