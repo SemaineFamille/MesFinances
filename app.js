@@ -1324,4 +1324,13 @@ window.applyMonthlyTransfersSimple = applyMonthlyTransfersSimple;
 window.toggleReservesPreview = toggleReservesPreview;
 window.toggleReservesCard = toggleReservesCard;
 window.toggleDisponibleCard = toggleDisponibleCard;
+window.addEventListener("click", function(event) {
+
+  const modal = document.getElementById("financeModal");
+
+  if (event.target === modal) {
+    closeFinanceModal();
+  }
+
+});
 
