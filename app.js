@@ -1,4 +1,4 @@
-console.log("APP VERSION 18-08-2026 18h20");
+console.log("APP VERSION 18-08-2026 18h30");
 
 /* =========================
    OUTILS GENERAUX
@@ -11,7 +11,20 @@ function normalizeLabel(label) {
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "");
 }
+function openFinanceModal(title, content) {
 
+  document.getElementById("financeModalTitle").innerHTML = title;
+
+  document.getElementById("financeModalBody").innerHTML = content;
+
+  document.getElementById("financeModal").style.display = "flex";
+}
+
+function closeFinanceModal() {
+  document.getElementById("financeModal").style.display = "none";
+}
+
+window.closeFinanceModal = closeFinanceModal;
 function formatDate(dateString) {
   if (!dateString) return "";
 
