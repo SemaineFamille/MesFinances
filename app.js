@@ -498,39 +498,42 @@ async function loadFinanceResume() {
   }
 }
 async function toggleDisponibleCard() {
- openFinanceModal(
-  "💸 Détail des postes",
-  `
-  <div class="postes-table">
 
-    <div class="postes-row postes-header">
-      <div>Poste</div>
-      <div>Budget annuel</div>
-      <div>Montant mensuel</div>
-    </div>
+  try {
 
-    ${postes.map(p => `
-      <div class="postes-row">
-        <div>${p["Poste"] || ""}</div>
-        <div>${formatCHF(p["Budget annuel"] || 0)}</div>
-        <div>${formatCHF(p["Montant mensuel"] || 0)}</div>
+    const postes = await getFinancePostes();
+
+    openFinanceModal(
+      "💸 Détail des postes",
+      `
+      <div class="postes-table">
+
+        <div class="postes-row postes-header">
+          <div>Poste</div>
+          <div>Budget annuel</div>
+          <div>Montant mensuel</div>
+        </div>
+
+        ${postes.map(p => `
+          <div class="postes-row">
+            <div>${p["Poste"] || ""}</div>
+            <div>${formatCHF(p["Budget annuel"] || 0)}</div>
+            <div>${formatCHF(p["Montant mensuel"] || 0)}</div>
+          </div>
+        `).join("")}
+
       </div>
-    `).join("")}
-
-  </div>
-  `
-);
+      `
+    );
 
   } catch (e) {
+
     console.error("Erreur chargement postes", e);
 
-    container.innerHTML = `
-      <div class="finance-stat-item">
-        Erreur lors du chargement des postes.
-      </div>
-    `;
-
-    block.style.display = "block";
+    openFinanceModal(
+      "Erreur",
+      "<div>Impossible de charger les postes.</div>"
+    );
   }
 }
 function renderFinancePieChart(dashboardRows) {
@@ -1321,4 +1324,4 @@ window.applyMonthlyTransfersSimple = applyMonthlyTransfersSimple;
 window.toggleReservesPreview = toggleReservesPreview;
 window.toggleReservesCard = toggleReservesCard;
 window.toggleDisponibleCard = toggleDisponibleCard;
-window.togglePostesPreview = togglePostesPreview;
+
