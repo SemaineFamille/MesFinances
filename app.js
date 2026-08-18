@@ -1175,105 +1175,135 @@ data = data.filter(row =>
 }
 
 function renderEpargneLineChart(data) {
-  const container = document.getElementById("epargneChart");
-  if (!container) return;
 
-  const comptes = prepareLineData(data);
+  const canvas =
+    document.getElementById("epargneChart");
 
-  let max = 0;
+  if (!canvas) return;
+
+  const oneYearAgo = new Date();
+  oneYearAgo.setMonth(oneYearAgo.getMonth() - 12);
+
+  const comptes = {};
+
+  data.forEach(row => {
+
+    const date = new Date(row.Date);
+
+    if (date < oneYearAgo) return;
+
+    if (!comptes[row.Compte]) {
+      comptes[row.Compte] = [];
+    }
+
+    comptes[row.Compte].push({
+      date,
+      solde: Number(row.Solde || 0)
+    });
+
+  });
 
   Object.values(comptes).forEach(list => {
-    list.forEach(p => {
-      if (p.solde > max) max = p.solde;
-    });
+    list.sort((a,b) => a.date - b.date);
   });
 
-  if (max === 0) {
-    container.innerHTML = `<div class="finance-stat-item">Aucune donnée</div>`;
-    return;
+  const datasets = [];
+
+  const couleurs = [
+    "#2563eb", // bleu
+    "#16a34a"  // vert
+  ];
+
+  Object.keys(comptes).forEach((compte,index) => {
+
+    datasets.push({
+
+      label: compte,
+
+      data: comptes[compte].map(item => ({
+        x: item.date,
+        y: item.solde
+      })),
+
+      borderColor: couleurs[index],
+
+      backgroundColor: couleurs[index],
+
+      tension: 0.3,
+
+      pointRadius: 5,
+
+      pointHoverRadius: 7,
+
+      fill: false
+
+    });
+
+  });
+
+  if (window.epargneChartInstance) {
+    window.epargneChartInstance.destroy();
   }
 
-  const width = 100;
-  const height = 180;
+  window.epargneChartInstance =
+    new Chart(canvas, {
 
-  let svg = `<svg viewBox="0 0 ${width} ${height}" width="100%" height="180">`;
+      type: "line",
 
-  const colors = ["#4f46e5", "#16a34a"];
-  let colorIndex = 0;
+      data: {
+        datasets: datasets
+      },
 
-  let labelsHTML = "";
+      options: {
 
-  Object.keys(comptes).forEach(compte => {
+        responsive: true,
 
-    const list = comptes[compte];
-    if (list.length === 0) return;
+        maintainAspectRatio: false,
 
-    const stepX = width / (list.length - 1 || 1);
+        interaction: {
+          mode: "nearest",
+          intersect: false
+        },
 
-    let path = "";
-    let gainsRow = `<div class="epargne-gains-row"><strong>${compte}</strong><br>`;
+        plugins: {
 
-    list.forEach((point, index) => {
+          legend: {
+            display: true,
+            position: "bottom"
+          }
 
-      const x = index * stepX;
-      const y = height - (point.solde / max) * (height - 20);
+        },
 
-    if (index === 0) {
-  path += `M ${x} ${y}`;
-} else {
-  path += ` L ${x} ${y}`;
-}
+        scales: {
 
-      // ✅ calcul gain
-      let gain = 0;
-      if (index > 0) {
-        gain = point.solde - list[index - 1].solde;
+          x: {
+
+            type: "time",
+
+            time: {
+              unit: "month"
+            }
+
+          },
+
+          y: {
+
+            ticks: {
+
+              callback: function(value){
+                return value.toLocaleString("fr-CH") + " CHF";
+              }
+
+            }
+
+          }
+
+        }
+
       }
 
-      const gainColor = gain >= 0 ? "green" : "red";
-      const sign = gain > 0 ? "+" : "";
-
-      gainsRow += `
-        <span class="gain" style="color:${gainColor}">
-          ${index === 0 ? "-" : sign + gain.toFixed(0)}
-        </span>
-      `;
     });
 
-    gainsRow += `</div>`;
-    labelsHTML += gainsRow;
-
-    const color = colors[colorIndex % colors.length];
-    colorIndex++;
-
-    // ✅ ligne
-    svg += `<path d="${path}" stroke="${color}" fill="none" stroke-width="2" />`;
-
-    // ✅ points
-    list.forEach((point, index) => {
-      const x = index * stepX;
-      const y = height - (point.solde / max) * (height - 20);
-
-      svg += `<circle
-  cx="${x}"
-  cy="${y}"
-  r="5"
-  fill="${color}"
-  stroke="white"
-  stroke-width="2"
-/>`;
-    });
-
-  });
-
-  svg += `</svg>`;
-
-  container.innerHTML = `
-    ${svg}
-    <div class="epargne-gains">
-      ${labelsHTML}
-    </div>
-  `;
 }
 
 
