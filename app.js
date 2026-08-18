@@ -1181,63 +1181,34 @@ function renderEpargneLineChart(data) {
 
   if (!canvas) return;
 
-  const oneYearAgo = new Date();
-  oneYearAgo.setMonth(oneYearAgo.getMonth() - 12);
+  const limite = new Date();
+  limite.setMonth(
+    limite.getMonth() - 12
+  );
 
   const comptes = {};
 
   data.forEach(row => {
 
-    const date = new Date(row.Date);
+    const date =
+      new Date(row.Date);
 
-    if (date < oneYearAgo) return;
+    if (date < limite) return;
 
     if (!comptes[row.Compte]) {
-      comptes[row.Compte] = [];
+      comptes[row.Compte] = {
+        labels: [],
+        soldes: []
+      };
     }
 
-    comptes[row.Compte].push({
-      date,
-      solde: Number(row.Solde || 0)
-    });
+    comptes[row.Compte].labels.push(
+      date.toLocaleDateString("fr-CH")
+    );
 
-  });
-
-  Object.values(comptes).forEach(list => {
-    list.sort((a,b) => a.date - b.date);
-  });
-
-  const datasets = [];
-
-  const couleurs = [
-    "#2563eb", // bleu
-    "#16a34a"  // vert
-  ];
-
-  Object.keys(comptes).forEach((compte,index) => {
-
-    datasets.push({
-
-      label: compte,
-
-      data: comptes[compte].map(item => ({
-        x: item.date,
-        y: item.solde
-      })),
-
-      borderColor: couleurs[index],
-
-      backgroundColor: couleurs[index],
-
-      tension: 0.3,
-
-      pointRadius: 5,
-
-      pointHoverRadius: 7,
-
-      fill: false
-
-    });
+    comptes[row.Compte].soldes.push(
+      Number(row.Solde || 0)
+    );
 
   });
 
@@ -1245,13 +1216,51 @@ function renderEpargneLineChart(data) {
     window.epargneChartInstance.destroy();
   }
 
+  const nomsComptes =
+    Object.keys(comptes);
+
+  if (nomsComptes.length === 0) return;
+
+  const labels =
+    comptes[nomsComptes[0]].labels;
+
+  const couleurs = [
+    "#2563eb",
+    "#16a34a"
+  ];
+
+  const datasets =
+    nomsComptes.map((compte,index) => ({
+
+      label: compte,
+
+      data:
+        comptes[compte].soldes,
+
+      borderColor:
+        couleurs[index],
+
+      backgroundColor:
+        couleurs[index] + "33",
+
+      fill: false,
+
+      tension: 0.3,
+
+      pointRadius: 4,
+
+      pointHoverRadius: 7
+
+    }));
+
   window.epargneChartInstance =
     new Chart(canvas, {
 
       type: "line",
 
       data: {
-        datasets: datasets
+        labels,
+        datasets
       },
 
       options: {
@@ -1260,41 +1269,13 @@ function renderEpargneLineChart(data) {
 
         maintainAspectRatio: false,
 
-        interaction: {
-          mode: "nearest",
-          intersect: false
-        },
-
         plugins: {
 
           legend: {
+
             display: true,
+
             position: "bottom"
-          }
-
-        },
-
-        scales: {
-
-          x: {
-
-            type: "time",
-
-            time: {
-              unit: "month"
-            }
-
-          },
-
-          y: {
-
-            ticks: {
-
-              callback: function(value){
-                return value.toLocaleString("fr-CH") + " CHF";
-              }
-
-            }
 
           }
 
@@ -1305,6 +1286,7 @@ function renderEpargneLineChart(data) {
     });
 
 }
+
 
 
 /* =========================
