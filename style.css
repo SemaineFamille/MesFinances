@@ -47,6 +47,12 @@ main {
   transform: translateY(-4px);
   box-shadow: 0 15px 30px rgba(0,0,0,0.2);
 }
+.epargne-chart-card {
+  background: white;
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: 0 4px 15px rgba(0,0,0,.08);
+}
 .card.rembourse {
 
   opacity: 0.7;
