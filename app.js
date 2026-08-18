@@ -1181,6 +1181,11 @@ function renderEpargneLineChart(data) {
 
   if (!canvas) return;
 
+  canvas.style.border = "2px solid #4f46e5";
+  canvas.style.background = "#eef2ff";
+
+}
+
   const limite = new Date();
   limite.setMonth(
     limite.getMonth() - 12
