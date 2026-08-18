@@ -1218,18 +1218,10 @@ function renderEpargneLineChart(data) {
       const x = index * stepX;
       const y = height - (point.solde / max) * (height - 20);
 
-      if (index === 0) {
-       for (let i = 0; i < points.length - 1; i++) {
-
-  const current = points[i];
-  const next = points[i + 1];
-
-  const cx = (current.x + next.x) / 2;
-
-  path += `
-    Q ${cx} ${current.y}
-      ${next.x} ${next.y}
-  `;
+    if (index === 0) {
+  path += `M ${x} ${y}`;
+} else {
+  path += ` L ${x} ${y}`;
 }
 
       // ✅ calcul gain
