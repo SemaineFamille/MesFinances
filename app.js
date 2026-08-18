@@ -1,4 +1,4 @@
-console.log("APP VERSION 19-08-2026 00h45");
+console.log("APP VERSION 19-08-2026 00h56");
 
 /* =========================
    OUTILS GENERAUX
@@ -1174,35 +1174,13 @@ data = data.filter(row =>
   return byCompte;
 }
 
-function renderEpargneLineChart(data) {
-
-  const canvas =
-    document.getElementById("epargneChart");
-
-  if (!canvas) return;
-
-  const ctx = canvas.getContext("2d");
-
-  canvas.width = 900;
-  canvas.height = 350;
-
-  const padding = {
-    left: 70,
-    right: 30,
-    top: 30,
-    bottom: 50
-  };
-
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  ctx.fillStyle = "#ffffff";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+function renderEpargneLineChart(data){
 
   const comptes = {};
 
   data.forEach(row => {
 
-    if (!comptes[row.Compte]) {
+    if(!comptes[row.Compte]){
       comptes[row.Compte] = [];
     }
 
@@ -1213,86 +1191,27 @@ function renderEpargneLineChart(data) {
 
   });
 
-  Object.values(comptes).forEach(list => {
-    list.sort((a,b) => a.date - b.date);
-  });
-
-  const allValues = [];
-
-  Object.values(comptes).forEach(list => {
-    list.forEach(item => {
-      allValues.push(item.solde);
-    });
-  });
-
-  if (allValues.length === 0) return;
-
-  const minY = Math.min(...allValues);
-  const maxY = Math.max(...allValues);
-
-  const chartWidth =
-    canvas.width - padding.left - padding.right;
-
-  const chartHeight =
-    canvas.height - padding.top - padding.bottom;
-
-  // Axe Y
-  ctx.strokeStyle = "#777";
-  ctx.lineWidth = 1;
-
-  ctx.beginPath();
-  ctx.moveTo(padding.left, padding.top);
-  ctx.lineTo(
-    padding.left,
-    canvas.height - padding.bottom
-  );
-  ctx.stroke();
-
-  // Axe X
-  ctx.beginPath();
-  ctx.moveTo(
-    padding.left,
-    canvas.height - padding.bottom
-  );
-
-  ctx.lineTo(
-    canvas.width - padding.right,
-    canvas.height - padding.bottom
-  );
-
-  ctx.stroke();
-
-  // Graduations Y
-  for (let i = 0; i <= 5; i++) {
-
-    const y =
-      padding.top +
-      chartHeight -
-      (i / 5) * chartHeight;
-
-    const value =
-      minY +
-      ((maxY - minY) * i / 5);
-
-    ctx.fillStyle = "#555";
-    ctx.font = "12px Arial";
-
-    ctx.fillText(
-      Math.round(value).toLocaleString("fr-CH"),
-      5,
-      y + 4
+  Object.values(comptes)
+    .forEach(list =>
+      list.sort((a,b)=>a.date-b.date)
     );
 
-    ctx.strokeStyle = "#eeeeee";
+  const labels =
+    comptes[
+      Object.keys(comptes)[0]
+    ]?.map(v =>
+      v.date.toLocaleDateString("fr-CH")
+    ) || [];
 
-    ctx.beginPath();
-    ctx.moveTo(padding.left, y);
-    ctx.lineTo(
-      canvas.width - padding.right,
-      y
+  const ctx =
+    document.getElementById(
+      "epargneChart"
     );
-    ctx.stroke();
 
+  if(!ctx) return;
+
+  if(window.epargneGraph){
+    window.epargneGraph.destroy();
   }
 
   const couleurs = [
@@ -1300,99 +1219,49 @@ function renderEpargneLineChart(data) {
     "#16a34a"
   ];
 
-  Object.keys(comptes).forEach((compte,index) => {
+  window.epargneGraph =
+    new Chart(ctx,{
 
-    const points = comptes[compte];
+      type:"line",
 
-    ctx.strokeStyle = couleurs[index];
-    ctx.lineWidth = 3;
+      data:{
 
-    ctx.beginPath();
+        labels,
 
-    points.forEach((point,i) => {
+        datasets:
+          Object.keys(comptes)
+          .map((compte,index)=>({
 
-      const x =
-        padding.left +
-        (i / (points.length - 1 || 1)) *
-        chartWidth;
+            label: compte,
 
-      const y =
-        padding.top +
-        chartHeight -
-        ((point.solde - minY) /
-        (maxY - minY || 1)) *
-        chartHeight;
+            data:
+              comptes[compte]
+              .map(v=>v.solde),
 
-      if (i === 0) {
-        ctx.moveTo(x,y);
-      } else {
-        ctx.lineTo(x,y);
-      }
+            borderColor:
+              couleurs[index],
 
-      ctx.fillStyle = couleurs[index];
+            backgroundColor:
+              couleurs[index] + "20",
 
-      ctx.beginPath();
-      ctx.arc(x,y,4,0,Math.PI*2);
-      ctx.fill();
+            fill:false,
 
-    });
+            tension:0.3,
 
-    ctx.beginPath();
+            pointRadius:4
 
-    points.forEach((point,i) => {
+          }))
 
-      const x =
-        padding.left +
-        (i / (points.length - 1 || 1)) *
-        chartWidth;
+      },
 
-      const y =
-        padding.top +
-        chartHeight -
-        ((point.solde - minY) /
-        (maxY - minY || 1)) *
-        chartHeight;
-
-      if (i === 0) {
-        ctx.moveTo(x,y);
-      } else {
-        ctx.lineTo(x,y);
+      options:{
+        responsive:true,
+        maintainAspectRatio:false
       }
 
     });
-
-    ctx.stroke();
-
-  });
-
-  // Légende
-  ctx.fillStyle = "#2563eb";
-  ctx.fillRect(650,20,14,14);
-
-  ctx.fillStyle = "#000";
-  ctx.fillText(
-    Object.keys(comptes)[0] || "",
-    670,
-    32
-  );
-
-  if (Object.keys(comptes)[1]) {
-
-    ctx.fillStyle = "#16a34a";
-    ctx.fillRect(650,45,14,14);
-
-    ctx.fillStyle = "#000";
-
-    ctx.fillText(
-      Object.keys(comptes)[1],
-      670,
-      57
-    );
-
-  }
 
 }
-
 /* =========================
    CHARGEMENT FINANCES
 ========================= */
