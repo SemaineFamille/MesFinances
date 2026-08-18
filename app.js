@@ -498,40 +498,28 @@ async function loadFinanceResume() {
   }
 }
 async function toggleDisponibleCard() {
-  const block = document.getElementById("financeDisponibleBlock");
-  const container = document.getElementById("financeDisponibleDetails");
+ openFinanceModal(
+  "💸 Détail des postes",
+  `
+  <div class="postes-table">
 
-  if (!block || !container) return;
+    <div class="postes-row postes-header">
+      <div>Poste</div>
+      <div>Budget annuel</div>
+      <div>Montant mensuel</div>
+    </div>
 
-  const isVisible = block.style.display === "block";
-
-  if (isVisible) {
-    block.style.display = "none";
-    return;
-  }
-
-  try {
-    const postes = await getFinancePostes();
-
-    container.innerHTML = `
-      <div class="postes-table">
-        <div class="postes-row postes-header">
-          <div>Poste</div>
-          <div>Budget annuel</div>
-          <div>Montant mensuel</div>
-        </div>
-
-        ${postes.map(p => `
-          <div class="postes-row">
-            <div>${p["Poste"] || ""}</div>
-            <div>${formatCHF(p["Budget annuel"] || 0)}</div>
-            <div>${formatCHF(p["Montant mensuel"] || 0)}</div>
-          </div>
-        `).join("")}
+    ${postes.map(p => `
+      <div class="postes-row">
+        <div>${p["Poste"] || ""}</div>
+        <div>${formatCHF(p["Budget annuel"] || 0)}</div>
+        <div>${formatCHF(p["Montant mensuel"] || 0)}</div>
       </div>
-    `;
+    `).join("")}
 
-    block.style.display = "block";
+  </div>
+  `
+);
 
   } catch (e) {
     console.error("Erreur chargement postes", e);
@@ -814,15 +802,15 @@ async function toggleReservesPreview() {
   }
 }
 function toggleReservesCard() {
-  const block = document.getElementById("financeReservesBlock");
 
-  if (!block) return;
+  const content =
+    document.getElementById("financeReserves").innerHTML;
 
-  const isVisible = block.style.display === "block";
-
-  block.style.display = isVisible ? "none" : "block";
+  openFinanceModal(
+    "🔒 Détail des réserves",
+    content
+  );
 }
-``
 function renderFinanceHistory(movements) {
   const list = document.getElementById("financeList");
   if (!list) return;
