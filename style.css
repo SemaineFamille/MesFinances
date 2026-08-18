@@ -94,7 +94,7 @@ main {
 
 .finance-modal-back{
   border:none;
-  background:#f3f4f6;
+  background:#ebc0ff;
   padding:8px 12px;
   border-radius:10px;
   cursor:pointer;
@@ -102,7 +102,7 @@ main {
 }
 
 .finance-modal-back:hover{
-  background:#e5e7eb;
+  background:#ebc0ff;
 }
 
 .finance-modal-close {
