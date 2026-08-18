@@ -1144,6 +1144,12 @@ async function applyMonthlyTransfers(count) {
 ========================= */
 
 function prepareLineData(data) {
+   const oneYearAgo = new Date();
+oneYearAgo.setMonth(oneYearAgo.getMonth() - 12);
+
+data = data.filter(row =>
+  new Date(row.Date) >= oneYearAgo
+);
   let byCompte = {};
 
   data.forEach(row => {
@@ -1213,10 +1219,18 @@ function renderEpargneLineChart(data) {
       const y = height - (point.solde / max) * (height - 20);
 
       if (index === 0) {
-        path += `M ${x} ${y}`;
-      } else {
-        path += ` L ${x} ${y}`;
-      }
+       for (let i = 0; i < points.length - 1; i++) {
+
+  const current = points[i];
+  const next = points[i + 1];
+
+  const cx = (current.x + next.x) / 2;
+
+  path += `
+    Q ${cx} ${current.y}
+      ${next.x} ${next.y}
+  `;
+}
 
       // ✅ calcul gain
       let gain = 0;
@@ -1248,7 +1262,14 @@ function renderEpargneLineChart(data) {
       const x = index * stepX;
       const y = height - (point.solde / max) * (height - 20);
 
-      svg += `<circle cx="${x}" cy="${y}" r="3" fill="${color}" />`;
+      svg += `<circle
+  cx="${x}"
+  cy="${y}"
+  r="5"
+  fill="${color}"
+  stroke="white"
+  stroke-width="2"
+/>`;
     });
 
   });
