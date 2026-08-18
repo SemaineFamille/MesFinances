@@ -1181,10 +1181,33 @@ function renderEpargneLineChart(data) {
 
   if (!canvas) return;
 
-  canvas.style.border = "2px solid #4f46e5";
-  canvas.style.background = "#eef2ff";
-  canvas.style.width = "100%";
-  canvas.style.height = "300px";
+  const ctx =
+    canvas.getContext("2d");
+
+  canvas.width = 800;
+  canvas.height = 300;
+
+  ctx.fillStyle = "#eef2ff";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.strokeStyle = "#2563eb";
+  ctx.lineWidth = 3;
+
+  ctx.beginPath();
+  ctx.moveTo(50, 250);
+  ctx.lineTo(250, 180);
+  ctx.lineTo(450, 120);
+  ctx.lineTo(750, 70);
+  ctx.stroke();
+
+  ctx.strokeStyle = "#16a34a";
+
+  ctx.beginPath();
+  ctx.moveTo(50, 220);
+  ctx.lineTo(250, 200);
+  ctx.lineTo(450, 150);
+  ctx.lineTo(750, 100);
+  ctx.stroke();
 
 }
 
