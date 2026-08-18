@@ -1,4 +1,4 @@
-console.log("APP VERSION 19-08-2026 00h39");
+console.log("APP VERSION 19-08-2026 00h45");
 
 /* =========================
    OUTILS GENERAUX
@@ -1181,36 +1181,217 @@ function renderEpargneLineChart(data) {
 
   if (!canvas) return;
 
-  const ctx =
-    canvas.getContext("2d");
+  const ctx = canvas.getContext("2d");
 
-  canvas.width = 800;
-  canvas.height = 300;
+  canvas.width = 900;
+  canvas.height = 350;
 
-  ctx.fillStyle = "#eef2ff";
+  const padding = {
+    left: 70,
+    right: 30,
+    top: 30,
+    bottom: 50
+  };
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  ctx.strokeStyle = "#2563eb";
-  ctx.lineWidth = 3;
+  const comptes = {};
+
+  data.forEach(row => {
+
+    if (!comptes[row.Compte]) {
+      comptes[row.Compte] = [];
+    }
+
+    comptes[row.Compte].push({
+      date: new Date(row.Date),
+      solde: Number(row.Solde || 0)
+    });
+
+  });
+
+  Object.values(comptes).forEach(list => {
+    list.sort((a,b) => a.date - b.date);
+  });
+
+  const allValues = [];
+
+  Object.values(comptes).forEach(list => {
+    list.forEach(item => {
+      allValues.push(item.solde);
+    });
+  });
+
+  if (allValues.length === 0) return;
+
+  const minY = Math.min(...allValues);
+  const maxY = Math.max(...allValues);
+
+  const chartWidth =
+    canvas.width - padding.left - padding.right;
+
+  const chartHeight =
+    canvas.height - padding.top - padding.bottom;
+
+  // Axe Y
+  ctx.strokeStyle = "#777";
+  ctx.lineWidth = 1;
 
   ctx.beginPath();
-  ctx.moveTo(50, 250);
-  ctx.lineTo(250, 180);
-  ctx.lineTo(450, 120);
-  ctx.lineTo(750, 70);
+  ctx.moveTo(padding.left, padding.top);
+  ctx.lineTo(
+    padding.left,
+    canvas.height - padding.bottom
+  );
   ctx.stroke();
 
-  ctx.strokeStyle = "#16a34a";
-
+  // Axe X
   ctx.beginPath();
-  ctx.moveTo(50, 220);
-  ctx.lineTo(250, 200);
-  ctx.lineTo(450, 150);
-  ctx.lineTo(750, 100);
+  ctx.moveTo(
+    padding.left,
+    canvas.height - padding.bottom
+  );
+
+  ctx.lineTo(
+    canvas.width - padding.right,
+    canvas.height - padding.bottom
+  );
+
   ctx.stroke();
+
+  // Graduations Y
+  for (let i = 0; i <= 5; i++) {
+
+    const y =
+      padding.top +
+      chartHeight -
+      (i / 5) * chartHeight;
+
+    const value =
+      minY +
+      ((maxY - minY) * i / 5);
+
+    ctx.fillStyle = "#555";
+    ctx.font = "12px Arial";
+
+    ctx.fillText(
+      Math.round(value).toLocaleString("fr-CH"),
+      5,
+      y + 4
+    );
+
+    ctx.strokeStyle = "#eeeeee";
+
+    ctx.beginPath();
+    ctx.moveTo(padding.left, y);
+    ctx.lineTo(
+      canvas.width - padding.right,
+      y
+    );
+    ctx.stroke();
+
+  }
+
+  const couleurs = [
+    "#2563eb",
+    "#16a34a"
+  ];
+
+  Object.keys(comptes).forEach((compte,index) => {
+
+    const points = comptes[compte];
+
+    ctx.strokeStyle = couleurs[index];
+    ctx.lineWidth = 3;
+
+    ctx.beginPath();
+
+    points.forEach((point,i) => {
+
+      const x =
+        padding.left +
+        (i / (points.length - 1 || 1)) *
+        chartWidth;
+
+      const y =
+        padding.top +
+        chartHeight -
+        ((point.solde - minY) /
+        (maxY - minY || 1)) *
+        chartHeight;
+
+      if (i === 0) {
+        ctx.moveTo(x,y);
+      } else {
+        ctx.lineTo(x,y);
+      }
+
+      ctx.fillStyle = couleurs[index];
+
+      ctx.beginPath();
+      ctx.arc(x,y,4,0,Math.PI*2);
+      ctx.fill();
+
+    });
+
+    ctx.beginPath();
+
+    points.forEach((point,i) => {
+
+      const x =
+        padding.left +
+        (i / (points.length - 1 || 1)) *
+        chartWidth;
+
+      const y =
+        padding.top +
+        chartHeight -
+        ((point.solde - minY) /
+        (maxY - minY || 1)) *
+        chartHeight;
+
+      if (i === 0) {
+        ctx.moveTo(x,y);
+      } else {
+        ctx.lineTo(x,y);
+      }
+
+    });
+
+    ctx.stroke();
+
+  });
+
+  // Légende
+  ctx.fillStyle = "#2563eb";
+  ctx.fillRect(650,20,14,14);
+
+  ctx.fillStyle = "#000";
+  ctx.fillText(
+    Object.keys(comptes)[0] || "",
+    670,
+    32
+  );
+
+  if (Object.keys(comptes)[1]) {
+
+    ctx.fillStyle = "#16a34a";
+    ctx.fillRect(650,45,14,14);
+
+    ctx.fillStyle = "#000";
+
+    ctx.fillText(
+      Object.keys(comptes)[1],
+      670,
+      57
+    );
+
+  }
 
 }
-
 
 /* =========================
    CHARGEMENT FINANCES
