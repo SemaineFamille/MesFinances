@@ -60,7 +60,43 @@ main {
   color: #111827;
 }
 /* ✅ COULEURS FORTES & LISIBLES */
+.finance-modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
 
+  justify-content: center;
+  align-items: center;
+}
+
+.finance-modal-content {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+
+  width: 90%;
+  max-width: 700px;
+
+  max-height: 80vh;
+  overflow-y: auto;
+
+  box-shadow: 0 0 25px rgba(0,0,0,0.25);
+}
+
+.finance-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.finance-modal-close {
+  border: none;
+  background: none;
+  font-size: 20px;
+  cursor: pointer;
+}
 /* ASSURA → bleu */
 
 .card.assura {
