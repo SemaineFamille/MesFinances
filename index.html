@@ -166,36 +166,20 @@
   <div id="financeDisponibleDetails"></div>
 </div>
 
+<!-- ÉPARGNE LONG TERME -->
 <div class="finance-block">
+
   <h3>📈 Épargne long terme</h3>
 
   <div id="epargneSummary"></div>
 
-  <canvas
-    id="epargneChart"
-    style="
-      width:100%;
-      height:350px;
-      background:white;
-      border:1px solid #e5e7eb;
-      border-radius:12px;
-      margin-top:12px;
-    ">
-  </canvas>
-
-</div>
-
-  <!-- ✅ Résumé du solde -->
-  <div id="epargneSummary"></div>
-
-  <!-- ✅ Bouton -->
   <button onclick="toggleEpargneForm()">
     ✏️ Mettre à jour le solde
   </button>
 
-  <!-- ✅ Formulaire -->
-  <div id="epargneForm" style="display:none; margin-top:10px;">
-    
+  <div id="epargneForm"
+       style="display:none;margin-top:10px;">
+
     <label>Compte</label>
     <select id="epargneCompte">
       <option value="Compte A">Compte A</option>
@@ -214,12 +198,11 @@
 
   </div>
 
-  <!-- ✅ Courbe -->
- <div style="height:300px;">
-  <canvas id="epargneChart"></canvas>
+  <div style="width:100%;height:250px;margin-top:15px;">
+    <canvas id="epargneChart"></canvas>
+  </div>
+
 </div>
-
-
   
   <!-- Virements mensuels -->
   <div class="finance-block">
@@ -323,6 +306,8 @@
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="google.js"></script>
+<script src="app.js"></script>
 
 <div id="financeModal" class="finance-modal">
   <div class="finance-modal-content">
