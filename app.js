@@ -1,4 +1,4 @@
-console.log("APP VERSION 20-08-2026 21h11");
+console.log("APP VERSION 20-08-2026 21h21");
 
 /* =========================
    OUTILS GENERAUX
@@ -752,54 +752,69 @@ const epargneLibre = epargne - epargne13;
 }
 function renderFacturesChart(movements){
 
-  const comptes = {};
+const limite = new Date();
+limite.setMonth(
+  limite.getMonth() - 12
+);
 
-  comptes["Disponible"] = [];
-  comptes["Réserves"] = [];
+const labels = [];
 
-  let disponible = 0;
-  let reserve = 0;
+comptes["Disponible"] = [];
+comptes["Réserves"] = [];
 
-  movements
-    .sort((a,b) =>
-      parseFrDate(a.Date) - parseFrDate(b.Date)
-    )
-    .forEach(m => {
+let disponible = 0;
+let reserve = 0;
 
-      const montant =
-        Number(m.Montant || 0);
+movements
+  .filter(m =>
+    parseFrDate(m.Date) >= limite &&
+    m.Compte === "Factures"
+  )
+  .sort(
+    (a,b) =>
+      parseFrDate(a.Date) -
+      parseFrDate(b.Date)
+  )
+  .forEach(m => {
 
-      if(m.Compte === "Factures"){
+    const montant =
+      Number(m.Montant || 0);
 
-        if(
-          m.Poste &&
-          (
-            m.Poste.includes("Voiture") ||
-            m.Poste.includes("Lunettes") ||
-            m.Poste.includes("Cadeaux") ||
-            m.Poste.includes("Impôts")
-          )
-        ){
+    if(
+      m.Poste &&
+      (
+        m.Poste.includes("Voiture") ||
+        m.Poste.includes("Lunettes") ||
+        m.Poste.includes("Cadeaux") ||
+        m.Poste.includes("Impôts")
+      )
+    ){
 
-          reserve +=
-            m.Sens === "Entrée"
-              ? montant
-              : -montant;
+      reserve +=
+        m.Sens === "Entrée"
+        ? montant
+        : -montant;
 
-        } else {
+    }else{
 
-          disponible +=
-            m.Sens === "Entrée"
-              ? montant
-              : -montant;
-        }
+      disponible +=
+        m.Sens === "Entrée"
+        ? montant
+        : -montant;
 
-        comptes["Disponible"].push(disponible);
-        comptes["Réserves"].push(reserve);
+    }
 
-      }
+    labels.push(
+      formatDate(m.Date)
+    );
 
-    });
+    comptes["Disponible"]
+      .push(disponible);
+
+    comptes["Réserves"]
+      .push(reserve);
+
+  });
 
   const labels =
     comptes["Disponible"]
