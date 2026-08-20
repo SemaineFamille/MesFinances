@@ -829,46 +829,72 @@ movements
     window.facturesGraph.destroy();
   }
 
-  window.facturesGraph =
-    new Chart(ctx,{
+ window.facturesGraph =
+  new Chart(ctx, {
 
-      type:"line",
+    type: "line",
 
-      data:{
-        labels,
+    data: {
 
-        datasets:[
-          {
-            label:"Disponible",
-            data: comptes["Disponible"],
-            borderColor:"#16a34a",
-            backgroundColor:"rgba(22,163,74,.15)",
-            tension:0.3,
-            pointRadius:3
-          },
-          {
-            label:"Réserves",
-            data: comptes["Réserves"],
-            borderColor:"#f59e0b",
-            backgroundColor:"rgba(245,158,11,.15)",
-            tension:0.3,
-            pointRadius:3
-          }
-        ]
+      labels: labels,
+
+      datasets: [
+
+        {
+          label: "Disponible",
+          data: comptes["Disponible"],
+          borderColor: "#16a34a",
+          backgroundColor: "rgba(22,163,74,.15)",
+          tension: 0.35,
+          pointRadius: 3,
+          fill: false
+        },
+
+        {
+          label: "Réserves",
+          data: comptes["Réserves"],
+          borderColor: "#f59e0b",
+          backgroundColor: "rgba(245,158,11,.15)",
+          tension: 0.35,
+          pointRadius: 3,
+          fill: false
+        }
+
+      ]
+    },
+
+    options: {
+
+      responsive: true,
+      maintainAspectRatio: false,
+
+      plugins: {
+        legend: {
+          position: "bottom"
+        }
       },
 
-      options:{
-        responsive:true,
-        maintainAspectRatio:false,
+      scales: {
 
-        plugins:{
-          legend:{
-            position:"bottom"
+        x: {
+          ticks: {
+            maxTicksLimit: 6
+          }
+        },
+
+        y: {
+          ticks: {
+            callback: value =>
+              value.toLocaleString("fr-CH")
+              + " CHF"
           }
         }
+
       }
 
-    });
+    }
+
+  });
 
 }
 async function toggleReservesPreview() {
