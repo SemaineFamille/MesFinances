@@ -751,7 +751,11 @@ const epargneLibre = epargne - epargne13;
   `;
 }
 function renderFacturesChart(movements){
-
+const comptes = {
+  "Disponible": [],
+  "Réserves": []
+};
+   
 const limite = new Date();
 limite.setMonth(
   limite.getMonth() - 12
@@ -759,8 +763,6 @@ limite.setMonth(
 
 const labels = [];
 
-comptes["Disponible"] = [];
-comptes["Réserves"] = [];
 
 let disponible = 0;
 let reserve = 0;
@@ -816,9 +818,6 @@ movements
 
   });
 
-  const labels =
-    comptes["Disponible"]
-      .map((_,i) => i + 1);
 
   const ctx =
     document.getElementById("facturesChart");
@@ -1425,9 +1424,12 @@ async function loadFinanceScreen() {
     window.__lastMovements = movements;
 
     renderFinancePieChart(dashboard);
-    renderFinanceStats(dashboard);
-    renderFinanceHistory(movements);
-     renderFacturesChart(movements);
+  renderFinanceStats(dashboard);
+renderFinanceHistory(movements);
+
+setTimeout(() => {
+  renderFacturesChart(movements);
+}, 100);
 
     try {
       const epargneChart = document.getElementById("epargneChart");
