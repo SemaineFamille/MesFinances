@@ -696,6 +696,9 @@ const epargneLibre = epargne - epargne13;
   </div>
 
   <div class="small-hint">👆 Voir le détail des postes</div>
+  <div style="width:100%;height:220px;margin-top:12px;">
+  <canvas id="facturesChart"></canvas>
+</div>
 </div>
 
       <div class="finance-stat-item">
@@ -746,6 +749,112 @@ const epargneLibre = epargne - epargne13;
       }
     </div>
   `;
+}
+function renderFacturesChart(movements){
+
+  const comptes = {};
+
+  comptes["Disponible"] = [];
+  comptes["Réserves"] = [];
+
+  let disponible = 0;
+  let reserve = 0;
+
+  movements
+    .sort((a,b) =>
+      parseFrDate(a.Date) - parseFrDate(b.Date)
+    )
+    .forEach(m => {
+
+      const montant =
+        Number(m.Montant || 0);
+
+      if(m.Compte === "Factures"){
+
+        if(
+          m.Poste &&
+          (
+            m.Poste.includes("Voiture") ||
+            m.Poste.includes("Lunettes") ||
+            m.Poste.includes("Cadeaux") ||
+            m.Poste.includes("Impôts")
+          )
+        ){
+
+          reserve +=
+            m.Sens === "Entrée"
+              ? montant
+              : -montant;
+
+        } else {
+
+          disponible +=
+            m.Sens === "Entrée"
+              ? montant
+              : -montant;
+        }
+
+        comptes["Disponible"].push(disponible);
+        comptes["Réserves"].push(reserve);
+
+      }
+
+    });
+
+  const labels =
+    comptes["Disponible"]
+      .map((_,i) => i + 1);
+
+  const ctx =
+    document.getElementById("facturesChart");
+
+  if(!ctx) return;
+
+  if(window.facturesGraph){
+    window.facturesGraph.destroy();
+  }
+
+  window.facturesGraph =
+    new Chart(ctx,{
+
+      type:"line",
+
+      data:{
+        labels,
+
+        datasets:[
+          {
+            label:"Disponible",
+            data: comptes["Disponible"],
+            borderColor:"#16a34a",
+            backgroundColor:"rgba(22,163,74,.15)",
+            tension:0.3,
+            pointRadius:3
+          },
+          {
+            label:"Réserves",
+            data: comptes["Réserves"],
+            borderColor:"#f59e0b",
+            backgroundColor:"rgba(245,158,11,.15)",
+            tension:0.3,
+            pointRadius:3
+          }
+        ]
+      },
+
+      options:{
+        responsive:true,
+        maintainAspectRatio:false,
+
+        plugins:{
+          legend:{
+            position:"bottom"
+          }
+        }
+      }
+
+    });
+
 }
 async function toggleReservesPreview() {
   let container = document.getElementById("reservesPreview");
@@ -1277,6 +1386,7 @@ async function loadFinanceScreen() {
     renderFinancePieChart(dashboard);
     renderFinanceStats(dashboard);
     renderFinanceHistory(movements);
+     renderFacturesChart(movements);
 
     try {
       const epargneChart = document.getElementById("epargneChart");
