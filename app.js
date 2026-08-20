@@ -751,94 +751,72 @@ const epargneLibre = epargne - epargne13;
   `;
 }
 function renderFacturesChart(movements){
-const monthlySnapshots = {};
-   
-const comptes = {
-  "Disponible": [],
-  "Réserves": []
-};
-   
-const limite = new Date();
-limite.setMonth(
-  limite.getMonth() - 12
-);
 
-const labels = [];
+  const limite = new Date();
+  limite.setMonth(limite.getMonth() - 12);
 
+  let disponible = 0;
+  let reserve = 0;
 
-let disponible = 0;
-let reserve = 0;
+  const monthlySnapshots = {};
 
-movements
-  .filter(m =>
-    parseFrDate(m.Date) >= limite &&
-    m.Compte === "Factures"
-  )
-  .sort(
-    (a,b) =>
-      parseFrDate(a.Date) -
-      parseFrDate(b.Date)
-  )
-  .forEach(m => {
-     const monthKey =
-  parseFrDate(m.Date)
-    .toISOString()
-    .slice(0, 7);
+  movements
+    .filter(m =>
+      parseFrDate(m.Date) >= limite &&
+      m.Compte === "Factures"
+    )
+    .sort(
+      (a,b) =>
+        parseFrDate(a.Date) -
+        parseFrDate(b.Date)
+    )
+    .forEach(m => {
 
-monthlySnapshots[monthKey] = {
-  disponible,
-  reserve
-};
+      const montant = Number(m.Montant || 0);
 
-    const montant =
-      Number(m.Montant || 0);
+      const isReserve =
+        m.Poste &&
+        (
+          m.Poste.includes("Voiture") ||
+          m.Poste.includes("Lunettes") ||
+          m.Poste.includes("Cadeaux") ||
+          m.Poste.includes("Impôts")
+        );
 
-    if(
-      m.Poste &&
-      (
-        m.Poste.includes("Voiture") ||
-        m.Poste.includes("Lunettes") ||
-        m.Poste.includes("Cadeaux") ||
-        m.Poste.includes("Impôts")
-      )
-    ){
+      if(isReserve){
+        reserve +=
+          m.Sens === "Entrée"
+            ? montant
+            : -montant;
+      }else{
+        disponible +=
+          m.Sens === "Entrée"
+            ? montant
+            : -montant;
+      }
 
-      reserve +=
-        m.Sens === "Entrée"
-        ? montant
-        : -montant;
+      const monthKey =
+        parseFrDate(m.Date)
+          .toISOString()
+          .slice(0,7);
 
-    }else{
+      monthlySnapshots[monthKey] = {
+        disponible,
+        reserve
+      };
 
-      disponible +=
-        m.Sens === "Entrée"
-        ? montant
-        : -montant;
+    });
 
-    }
+  const labels =
+    Object.keys(monthlySnapshots);
 
-    labels.push(
-      formatDate(m.Date)
-    );
+  const dispoData =
+    Object.values(monthlySnapshots)
+      .map(v => v.disponible);
 
-    comptes["Disponible"]
-      .push(disponible);
-
-    comptes["Réserves"]
-      .push(reserve);
-
-     const labels = Object.keys(monthlySnapshots);
-
-const dispoData =
-  Object.values(monthlySnapshots)
-    .map(v => v.disponible);
-
-const reserveData =
-  Object.values(monthlySnapshots)
-    .map(v => v.reserve);
-
-  });
-
+  const reserveData =
+    Object.values(monthlySnapshots)
+      .map(v => v.reserve);
 
   const ctx =
     document.getElementById("facturesChart");
@@ -849,72 +827,69 @@ const reserveData =
     window.facturesGraph.destroy();
   }
 
- window.facturesGraph =
-  new Chart(ctx, {
+  window.facturesGraph =
+    new Chart(ctx,{
 
-    type: "line",
+      type:"line",
 
-    data: {
+      data:{
 
-      labels: labels,
+        labels,
 
-      datasets: [
+        datasets:[
 
-        {
-          label: "Disponible",
-          data: dispoData,
-          borderColor: "#16a34a",
-          backgroundColor: "rgba(22,163,74,.15)",
-          tension: 0.35,
-          pointRadius: 3,
-          fill: false
-        },
+          {
+            label:"Disponible",
+            data:dispoData,
+            borderColor:"#16a34a",
+            backgroundColor:"rgba(22,163,74,.15)",
+            tension:0.35,
+            pointRadius:4,
+            fill:false
+          },
 
-        {
-          label: "Réserves",
-          data: reseerveData,
-          borderColor: "#f59e0b",
-          backgroundColor: "rgba(245,158,11,.15)",
-          tension: 0.35,
-          pointRadius: 3,
-          fill: false
-        }
+          {
+            label:"Réserves",
+            data:reserveData,
+            borderColor:"#f59e0b",
+            backgroundColor:"rgba(245,158,11,.15)",
+            tension:0.35,
+            pointRadius:4,
+            fill:false
+          }
 
-      ]
-    },
+        ]
 
-    options: {
-
-      responsive: true,
-      maintainAspectRatio: false,
-
-      plugins: {
-        legend: {
-          position: "bottom"
-        }
       },
 
-      scales: {
+      options:{
+        responsive:true,
+        maintainAspectRatio:false,
 
-        x: {
-          ticks: {
-            maxTicksLimit: 6
+        plugins:{
+          legend:{
+            position:"bottom"
           }
         },
 
-        y: {
-          ticks: {
-            callback: value =>
-              value.toLocaleString("fr-CH")
-              + " CHF"
+        scales:{
+          x:{
+            ticks:{
+              maxTicksLimit:12
+            }
+          },
+
+          y:{
+            ticks:{
+              callback:(value) =>
+                value.toLocaleString("fr-CH") +
+                " CHF"
+            }
           }
         }
-
       }
 
-    }
-
-  });
+    });
 
 }
 async function toggleReservesPreview() {
