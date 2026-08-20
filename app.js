@@ -751,6 +751,8 @@ const epargneLibre = epargne - epargne13;
   `;
 }
 function renderFacturesChart(movements){
+const monthlySnapshots = {};
+   
 const comptes = {
   "Disponible": [],
   "Réserves": []
@@ -778,6 +780,15 @@ movements
       parseFrDate(b.Date)
   )
   .forEach(m => {
+     const monthKey =
+  parseFrDate(m.Date)
+    .toISOString()
+    .slice(0, 7);
+
+monthlySnapshots[monthKey] = {
+  disponible,
+  reserve
+};
 
     const montant =
       Number(m.Montant || 0);
@@ -816,6 +827,16 @@ movements
     comptes["Réserves"]
       .push(reserve);
 
+     const labels = Object.keys(monthlySnapshots);
+
+const dispoData =
+  Object.values(monthlySnapshots)
+    .map(v => v.disponible);
+
+const reserveData =
+  Object.values(monthlySnapshots)
+    .map(v => v.reserve);
+
   });
 
 
@@ -841,7 +862,7 @@ movements
 
         {
           label: "Disponible",
-          data: comptes["Disponible"],
+          data: dispoData,
           borderColor: "#16a34a",
           backgroundColor: "rgba(22,163,74,.15)",
           tension: 0.35,
@@ -851,7 +872,7 @@ movements
 
         {
           label: "Réserves",
-          data: comptes["Réserves"],
+          data: reseerveData,
           borderColor: "#f59e0b",
           backgroundColor: "rgba(245,158,11,.15)",
           tension: 0.35,
