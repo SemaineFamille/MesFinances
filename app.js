@@ -1,4 +1,4 @@
-console.log("APP VERSION 21-08-2026 14h09");
+console.log("APP VERSION 21-08-2026 14h35");
 
 /* =========================
    OUTILS GENERAUX
@@ -755,8 +755,11 @@ function renderFacturesChart(movements){
   const limite = new Date();
   limite.setMonth(limite.getMonth() - 12);
 
-  let disponible = 0;
-  let reserve = 0;
+const SOLDE_INITIAL_DISPONIBLE = 2209.73;
+const SOLDE_INITIAL_RESERVE = 1718;
+
+let disponible = SOLDE_INITIAL_DISPONIBLE;
+let reserve = SOLDE_INITIAL_RESERVE;
 
   const monthlySnapshots = {};
 
