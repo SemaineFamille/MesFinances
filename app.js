@@ -1,4 +1,4 @@
-console.log("APP VERSION 20-08-2026 21h49");
+console.log("APP VERSION 21-08-2026 14h09");
 
 /* =========================
    OUTILS GENERAUX
@@ -800,24 +800,38 @@ function renderFacturesChart(movements){
           .toISOString()
           .slice(0,7);
 
-      monthlySnapshots[monthKey] = {
-        disponible,
-        reserve
-      };
+    monthlySnapshots[monthKey] = {
+  reserve,
+  disponibleReel: disponible - reserve
+};
 
     });
 
-  const labels =
-    Object.keys(monthlySnapshots);
+ const labels =
+  Object.keys(monthlySnapshots)
+    .map(m => {
+      const [annee, mois] = m.split("-");
+      return `${mois}/${annee}`;
+    });
 
-  const dispoData =
-    Object.values(monthlySnapshots)
-      .map(v => v.disponible);
+ const dispoData =
+  Object.values(monthlySnapshots)
+    .map(v => v.disponibleReel);
 
   const reserveData =
     Object.values(monthlySnapshots)
       .map(v => v.reserve);
 
+console.log(
+  "Dernier disponible réel :",
+  dispoData[dispoData.length - 1]
+);
+
+console.log(
+  "Dernière réserve :",
+  reserveData[reserveData.length - 1]
+);
+   
   const ctx =
     document.getElementById("facturesChart");
 
