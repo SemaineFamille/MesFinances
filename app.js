@@ -1,4 +1,4 @@
-console.log("APP VERSION 10-09-2026 20h05");
+console.log("APP VERSION 10-09-2026 20h10");
 
 /* =========================
    OUTILS GENERAUX
@@ -398,6 +398,13 @@ async function toggleDisponibleCard() {
 
     const postes = await getFinancePostes();
 
+     const postesFactures =
+  postes.filter(p =>
+    (p["Compte"] || "")
+      .toLowerCase()
+      .includes("facture")
+  );
+
     openFinanceModal(
       "💸 Détail des postes",
       `
@@ -409,7 +416,7 @@ async function toggleDisponibleCard() {
           <div>Montant mensuel</div>
         </div>
 
-        ${postes.map(p => `
+       ${postesFactures.map(p => `
           <div class="postes-row">
             <div>${p["Poste"] || ""}</div>
             <div>${formatCHF(p["Budget annuel"] || 0)}</div>
