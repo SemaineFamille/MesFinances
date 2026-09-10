@@ -872,15 +872,67 @@ async function toggleReservesPreview() {
     container.style.display = "block";
   }
 }
-function toggleReservesCard() {
+async function toggleReservesCard() {
 
-  const content =
-    document.getElementById("financeReserves").innerHTML;
+  try {
 
-  openFinanceModal(
-    "🔒 Détail des réserves",
-    content
-  );
+    const postes =
+      await getFinancePostes();
+
+    const postesVacances =
+      postes.filter(p =>
+        (p["Compte"] || "")
+          .toLowerCase()
+          .includes("vacances")
+      );
+
+    openFinanceModal(
+      "🏖️ Vacances & Réserves",
+
+      `
+      <div class="postes-table">
+
+        <div class="postes-row postes-header">
+          <div>Poste</div>
+          <div>Budget annuel</div>
+          <div>Montant mensuel</div>
+        </div>
+
+        ${postesVacances.map(p => `
+
+          <div class="postes-row">
+
+            <div>${p["Poste"] || ""}</div>
+
+            <div>
+              ${formatCHF(
+                p["Budget annuel"] || 0
+              )}
+            </div>
+
+            <div>
+              ${formatCHF(
+                p["Montant mensuel"] || 0
+              )}
+            </div>
+
+          </div>
+
+        `).join("")}
+
+      </div>
+      `
+    );
+
+  } catch (e) {
+
+    console.error(e);
+
+    openFinanceModal(
+      "Erreur",
+      "Impossible de charger les réserves."
+    );
+  }
 }
 function renderFinanceHistory(movements) {
   const list = document.getElementById("financeList");
