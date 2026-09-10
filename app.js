@@ -410,11 +410,12 @@ async function toggleDisponibleCard() {
       `
       <div class="postes-table">
 
-        <div class="postes-row postes-header">
-          <div>Poste</div>
-          <div>Budget annuel</div>
-          <div>Montant mensuel</div>
-        </div>
+       <div class="postes-row postes-header">
+  <div>Poste</div>
+  <div>Budget annuel</div>
+  <div>Montant mensuel</div>
+  <div>Solde actuel</div>
+</div>
 
        ${postesFactures.map(p => `
           <div class="postes-row">
@@ -886,6 +887,57 @@ async function toggleReservesCard() {
           .includes("vacances")
       );
 
+const movements = await getFinanceMovements();
+
+let voiture = 0;
+let lunettes = 0;
+let cadeaux = 0;
+let impots = 0;
+let vacances = 0;
+
+movements
+  .filter(m => m["Compte"] === "Vacances")
+  .forEach(m => {
+
+    const montant =
+      Number(m["Montant"] || 0);
+
+    const valeur =
+      m["Sens"] === "Entrée"
+        ? montant
+        : -montant;
+
+    const poste =
+      normalizeLabel(m["Poste"]);
+
+    if (poste.includes("voiture")) {
+      voiture += valeur;
+    }
+    else if (poste.includes("lunette")) {
+      lunettes += valeur;
+    }
+    else if (poste.includes("cadeau")) {
+      cadeaux += valeur;
+    }
+    else if (poste.includes("impot")) {
+      impots += valeur;
+    }
+    else {
+      vacances += valeur;
+    }
+
+  });
+
+const totalReserves =
+  voiture +
+  lunettes +
+  cadeaux +
+  impots;
+
+const soldeCompte =
+  totalReserves +
+  vacances;
+     
     openFinanceModal(
       "🏖️ Vacances & Réserves",
 
