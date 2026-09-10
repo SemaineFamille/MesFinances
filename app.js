@@ -653,177 +653,72 @@ function renderFinancePieChart(dashboardRows) {
 }
 
 function renderFinanceStats(dashboardRows) {
-  const stats = document.getElementById("financeStats");
-  const reservesEl = document.getElementById("financeReserves");
-  if (!stats || !reservesEl) return;
+
+  const stats =
+    document.getElementById("financeStats");
+
+  if (!stats) return;
 
   const getValue = (labelPart) => {
     const row = dashboardRows.find(r =>
-      normalizeLabel(r["Libellé"]).includes(labelPart)
+      normalizeLabel(r["Libellé"])
+        .includes(labelPart)
     );
-    return Number(row?.["Valeur"] || 0);
+
+    return Number(
+      row?.["Valeur"] || 0
+    );
   };
 
-  const factures = getValue("solde factures");
-  const epargne = getValue("solde epargne");
-  const vacances = getValue("solde vacances");
-  const totalGlobal = factures + epargne + vacances;
+  const factures =
+    getValue("solde factures");
 
- 
-  // ✅ Calcul épargne libre / 13ème depuis les mouvements
-  // On lit directement la liste affichée dans la page actuelle
-  // pour éviter de dépendre du dashboard
-  // (si tu préfères, on peut aussi faire cet appel dans loadFinanceScreen)
-const epargne13 = window.__lastMovements
-  ? window.__lastMovements
-      .filter(m =>
-        m["Compte"] === "Epargne" &&
-        normalizeLabel(m["Poste"]).includes("13eme")
-      )
-      .reduce((sum, m) => {
-        const montant = Number(m["Montant"] || 0);
-        return sum + (m["Sens"] === "Entrée" ? montant : -montant);
-      }, 0)
-  : 0;
+  const epargne =
+    getValue("solde epargne");
 
-// ✅ L'épargne libre = total épargne - 13ème
-const epargneLibre = epargne - epargne13;
+  const vacances =
+    getValue("solde vacances");
 
-   const mouvementsVacances =
-  (window.__lastMovements || [])
-    .filter(m => m["Compte"] === "Vacances");
-
-let voiture = 0;
-let lunettes = 0;
-let cadeaux = 0;
-let impots = 0;
-let vacancesReserve = 0;
-let tattoo = 0;
-
-mouvementsVacances.forEach(m => {
-
-  const montant =
-    Number(m["Montant"] || 0);
-
-  const valeur =
-    m["Sens"] === "Entrée"
-      ? montant
-      : -montant;
-
-  const poste =
-    normalizeLabel(m["Poste"]);
-
-  if(poste.includes("voiture")){
-    voiture += valeur;
-  }
-  else if(poste.includes("lunette")){
-    lunettes += valeur;
-  }
-  else if(poste.includes("cadeau")){
-    cadeaux += valeur;
-  }
-  else if(poste.includes("impot")){
-    impots += valeur;
-  }
-  else if(poste.includes("tatto")){
-    tattoo += valeur;
-  }
-  else{
-    vacancesReserve += valeur;
-  }
-
-});
-
-  const safePercent = (value, total) => {
-    if (!total || total <= 0) return 0;
-    return Math.max(0, Math.min(100, (value / total) * 100));
-  };
-
-  
-  const pctFactures = safePercent(factures, totalGlobal);
-  const pctEpargne = safePercent(epargne, totalGlobal);
-  const pctVacances = safePercent(vacances, totalGlobal);
-
-  const pctEpargneLibre = safePercent(epargneLibre, epargne);
-  const pctEpargne13 = safePercent(epargne13, epargne);
+  const totalGlobal =
+    factures +
+    epargne +
+    vacances;
 
   stats.innerHTML = `
+
     <div class="finance-stat-list">
 
-<div class="finance-stat-item clickable-card" onclick="toggleReservesCard()">
-  <strong>🔒 Total réserves</strong><br>
-  <div class="small-hint">👆 Voir le détail des réserves</div>
+      <div
+        class="finance-stat-item clickable-card"
+        onclick="toggleDisponibleCard()">
 
-        <div class="stacked-bar">
-          <div class="seg seg-voiture" style="width:${pctVoiture}%"></div>
-          <div class="seg seg-lunettes" style="width:${pctLunettes}%"></div>
-          <div class="seg seg-cadeaux" style="width:${pctCadeaux}%"></div>
-          <div class="seg seg-impots" style="width:${pctImpots}%"></div>
+        <strong>💳 Factures</strong><br>
+        ${formatCHF(factures)}
+
+        <div class="small-hint">
+          👆 Voir le détail
         </div>
 
-        <div class="stacked-legend">
-          <span><span class="dot seg-voiture"></span> Voiture ${formatCHF(voiture)}</span>
-          <span><span class="dot seg-lunettes"></span> Lunettes ${formatCHF(lunettes)}</span>
-          <span><span class="dot seg-cadeaux"></span> Cadeaux ${formatCHF(cadeaux)}</span>
-          <span><span class="dot seg-impots"></span> Impôts ${formatCHF(impots)}</span>
-        </div>
       </div>
 
- <div class="finance-stat-item clickable-card" onclick="toggleDisponibleCard()">
-  <strong>💸 Disponible réel (Factures)</strong><br>
-  ${formatCHF(disponibleFactures)}
-
-  <div class="stacked-bar">
-    <div class="seg seg-disponible" style="width:${pctDisponible}%"></div>
-    <div class="seg seg-reserve-total" style="width:${pctReserveDansFactures}%"></div>
-  </div>
-
-  <div class="stacked-legend">
-    <span><span class="dot seg-disponible"></span> Disponible ${formatCHF(disponibleFactures)}</span>
-    <span><span class="dot seg-reserve-total"></span> Réservé ${formatCHF(totalReserves)}</span>
-    <span><strong>Total compte Factures : ${formatCHF(factures)}</strong></span>
-  </div>
-
-  <div class="small-hint">👆 Voir le détail des postes</div>
-  <div style="width:100%;height:220px;margin-top:12px;">
-  <canvas id="facturesChart"></canvas>
-</div>
-</div>
-
       <div class="finance-stat-item">
+
         <strong>🏦 Épargne</strong><br>
         ${formatCHF(epargne)}
 
-        <div class="stacked-bar">
-          <div class="seg seg-epargne-libre" style="width:${pctEpargneLibre}%"></div>
-          <div class="seg seg-13eme" style="width:${pctEpargne13}%"></div>
-        </div>
-
-        <div class="stacked-legend">
-          <span><span class="dot seg-epargne-libre"></span> Épargne libre ${formatCHF(epargneLibre)}</span>
-          <span><span class="dot seg-13eme"></span> 13ème salaire ${formatCHF(epargne13)}</span>
-        </div>
       </div>
 
       <div class="finance-stat-item">
+
         <strong>💰 Total global</strong><br>
         ${formatCHF(totalGlobal)}
 
-        <div class="stacked-bar">
-          <div class="seg seg-factures" style="width:${pctFactures}%"></div>
-          <div class="seg seg-epargne" style="width:${pctEpargne}%"></div>
-          <div class="seg seg-vacances" style="width:${pctVacances}%"></div>
-        </div>
-
-        <div class="stacked-legend">
-          <span><span class="dot seg-factures"></span> Factures ${formatCHF(factures)}</span>
-          <span><span class="dot seg-epargne"></span> Épargne ${formatCHF(epargne)}</span>
-          <span><span class="dot seg-vacances"></span> Vacances ${formatCHF(vacances)}</span>
-        </div>
       </div>
 
     </div>
+
   `;
+}
 
   reservesEl.innerHTML = `
     <div class="finance-stat-list">
@@ -839,7 +734,82 @@ mouvementsVacances.forEach(m => {
     </div>
   `;
 }
+function renderVacancesStats(movements) {
 
+  const container =
+    document.getElementById("vacancesStats");
+
+  if (!container) return;
+
+  let voiture = 0;
+  let lunettes = 0;
+  let cadeaux = 0;
+  let impots = 0;
+  let tattoo = 0;
+  let vacances = 0;
+
+  movements
+    .filter(m => m.Compte === "Vacances")
+    .forEach(m => {
+
+      const montant =
+        Number(m.Montant || 0);
+
+      const valeur =
+        m.Sens === "Entrée"
+          ? montant
+          : -montant;
+
+      const poste =
+        normalizeLabel(m.Poste);
+
+      if (poste.includes("voiture")) {
+        voiture += valeur;
+      }
+      else if (poste.includes("lunette")) {
+        lunettes += valeur;
+      }
+      else if (poste.includes("cadeau")) {
+        cadeaux += valeur;
+      }
+      else if (poste.includes("impot")) {
+        impots += valeur;
+      }
+      else if (poste.includes("tatto")) {
+        tattoo += valeur;
+      }
+      else {
+        vacances += valeur;
+      }
+
+    });
+
+  const total =
+    voiture +
+    lunettes +
+    cadeaux +
+    impots +
+    tattoo +
+    vacances;
+
+  container.innerHTML = `
+
+    <div
+      class="finance-stat-item clickable-card"
+      onclick="toggleReservesCard()">
+
+      <strong>🏖️ Vacances & Réserves</strong><br>
+
+      ${formatCHF(total)}
+
+      <div class="small-hint">
+        👆 Voir le détail
+      </div>
+
+    </div>
+
+  `;
+}
 async function toggleReservesPreview() {
   let container = document.getElementById("reservesPreview");
 
@@ -1370,7 +1340,8 @@ async function loadFinanceScreen() {
     window.__lastMovements = movements;
 
     renderFinancePieChart(dashboard);
-  renderFinanceStats(dashboard);
+ renderFinanceStats(dashboard);
+renderVacancesStats(movements);
 renderFinanceHistory(movements);
 
 
