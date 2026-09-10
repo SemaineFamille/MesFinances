@@ -231,31 +231,100 @@ function renderAssura(data) {
   const franchisePct = Math.min((franchiseAtteinte / franchise) * 100, 100);
   const quotePartPct = Math.min((quotePartAtteinte / quotePartMax) * 100, 100);
 
-  stats.innerHTML = `
-    <div class="progress-card">
-      <div class="progress-header">Franchise</div>
-      <div class="progress-bar">
-        <div style="width:${franchisePct}%"></div>
-      </div>
-      <div>${franchiseAtteinte.toFixed(2)} / ${franchise} CHF</div>
+ stats.innerHTML = `
+
+<div class="finance-stat-list">
+
+  <div class="finance-stat-item">
+    <strong>💳 Factures</strong><br>
+    ${formatCHF(factures)}
+  </div>
+
+  <div class="finance-stat-item">
+    <strong>🏦 Épargne</strong><br>
+    ${formatCHF(epargne)}
+
+    <div class="stacked-bar">
+      <div class="seg seg-epargne-libre" style="width:${pctEpargneLibre}%"></div>
+      <div class="seg seg-13eme" style="width:${pctEpargne13}%"></div>
     </div>
 
-    <div class="progress-card">
-      <div class="progress-header">Quote-part</div>
-      <div class="progress-bar">
-        <div style="width:${quotePartPct}%"></div>
-      </div>
-      <div>${quotePartAtteinte.toFixed(2)} / ${quotePartMax} CHF</div>
+    <div class="stacked-legend">
+      <span>
+        <span class="dot seg-epargne-libre"></span>
+        Épargne libre ${formatCHF(epargneLibre)}
+      </span>
+
+      <span>
+        <span class="dot seg-13eme"></span>
+        13ème salaire ${formatCHF(epargne13)}
+      </span>
     </div>
 
-    <div class="progress-card">
-      💳 Total à votre charge : ${totalVotrePart.toFixed(2)} CHF
+  </div>
+
+  <div class="finance-stat-item">
+    <strong>🏖️ Vacances & Réserves</strong><br>
+
+    <div class="stacked-legend">
+
+      <span>🚗 Voiture ${formatCHF(voiture)}</span>
+      <span>👓 Lunettes ${formatCHF(lunettes)}</span>
+      <span>🎁 Cadeaux ${formatCHF(cadeaux)}</span>
+      <span>💰 Impôts ${formatCHF(impots)}</span>
+      <span>💄 Tattoo ${formatCHF(tattoo)}</span>
+      <span>⛱️ Vacances ${formatCHF(vacancesReserve)}</span>
+
     </div>
 
-    <div class="progress-card">
-      🏥 Total remboursé par Assura : ${totalRembourse.toFixed(2)} CHF
+    <hr>
+
+    <strong>
+      Total :
+      ${formatCHF(
+        voiture +
+        lunettes +
+        cadeaux +
+        impots +
+        tattoo +
+        vacancesReserve
+      )}
+    </strong>
+
+  </div>
+
+  <div class="finance-stat-item">
+
+    <strong>💰 Total global</strong><br>
+    ${formatCHF(totalGlobal)}
+
+    <div class="stacked-bar">
+      <div class="seg seg-factures" style="width:${pctFactures}%"></div>
+      <div class="seg seg-epargne" style="width:${pctEpargne}%"></div>
+      <div class="seg seg-vacances" style="width:${pctVacances}%"></div>
     </div>
-  `;
+
+    <div class="stacked-legend">
+      <span>
+        <span class="dot seg-factures"></span>
+        Factures ${formatCHF(factures)}
+      </span>
+
+      <span>
+        <span class="dot seg-epargne"></span>
+        Épargne ${formatCHF(epargne)}
+      </span>
+
+      <span>
+        <span class="dot seg-vacances"></span>
+        Vacances ${formatCHF(vacances)}
+      </span>
+    </div>
+
+  </div>
+
+</div>
+`;
 
   data.forEach(item => {
     container.innerHTML += `
