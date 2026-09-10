@@ -619,6 +619,51 @@ const epargne13 = window.__lastMovements
 // ✅ L'épargne libre = total épargne - 13ème
 const epargneLibre = epargne - epargne13;
 
+   const mouvementsVacances =
+  (window.__lastMovements || [])
+    .filter(m => m["Compte"] === "Vacances");
+
+let voiture = 0;
+let lunettes = 0;
+let cadeaux = 0;
+let impots = 0;
+let vacancesReserve = 0;
+let tattoo = 0;
+
+mouvementsVacances.forEach(m => {
+
+  const montant =
+    Number(m["Montant"] || 0);
+
+  const valeur =
+    m["Sens"] === "Entrée"
+      ? montant
+      : -montant;
+
+  const poste =
+    normalizeLabel(m["Poste"]);
+
+  if(poste.includes("voiture")){
+    voiture += valeur;
+  }
+  else if(poste.includes("lunette")){
+    lunettes += valeur;
+  }
+  else if(poste.includes("cadeau")){
+    cadeaux += valeur;
+  }
+  else if(poste.includes("impot")){
+    impots += valeur;
+  }
+  else if(poste.includes("tatto")){
+    tattoo += valeur;
+  }
+  else{
+    vacancesReserve += valeur;
+  }
+
+});
+
   const safePercent = (value, total) => {
     if (!total || total <= 0) return 0;
     return Math.max(0, Math.min(100, (value / total) * 100));
