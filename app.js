@@ -1473,7 +1473,6 @@ async function loadFinanceScreen() {
 
     renderFinancePieChart(dashboard);
  renderFinanceStats(dashboard);
-renderVacancesStats(movements);
 renderFinanceHistory(movements);
 
 
