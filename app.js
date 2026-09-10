@@ -959,7 +959,6 @@ async function toggleReservesCard() {
       vacances;
 
     openFinanceModal(
-
       "🏖️ Vacances & Réserves",
 
       `
@@ -983,16 +982,16 @@ async function toggleReservesCard() {
 
           let solde = 0;
 
-          if(p["Poste"]?.includes("Voiture")){
+          if ((p["Poste"] || "").includes("Voiture")) {
             solde = voiture;
           }
-          else if(p["Poste"]?.includes("Lunettes")){
+          else if ((p["Poste"] || "").includes("Lunettes")) {
             solde = lunettes;
           }
-          else if(p["Poste"]?.includes("Cadeaux")){
+          else if ((p["Poste"] || "").includes("Cadeaux")) {
             solde = cadeaux;
           }
-          else if(p["Poste"]?.includes("Impôts")){
+          else if ((p["Poste"] || "").includes("Impôts")) {
             solde = impots;
           }
 
@@ -1002,19 +1001,54 @@ async function toggleReservesCard() {
               <div>${p["Poste"] || ""}</div>
 
               <div>
-                ${formatCHF(
-                  p["Budget annuel"] || 0
-                )}
+                ${formatCHF(p["Budget annuel"] || 0)}
               </div>
 
               <div>
-                ${formatCHF(
-                  p["Montant mensuel"] || 0
-                )}
+                ${formatCHF(p["Montant mensuel"] || 0)}
               </div>
 
               <div>
-                ${
+                ${formatCHF(solde)}
+              </div>
+
+            </div>
+          `;
+
+        }).join("")}
+
+      </div>
+
+      <div style="margin-top:20px;">
+
+        <strong>
+          🔒 Total réserves :
+          ${formatCHF(totalReserves)}
+        </strong>
+
+        <br><br>
+
+        <strong>
+          ⛱️ Vacances disponibles :
+          ${formatCHF(vacances)}
+        </strong>
+
+      </div>
+      `
+    );
+
+  } catch (e) {
+
+    console.error(e);
+
+    openFinanceModal(
+      "Erreur",
+      "Impossible de charger les réserves."
+    );
+
+  }
+
+}
 async function addFinanceMovementManual() {
   const date = document.getElementById("financeDate").value;
   const compte = document.getElementById("financeCompte").value;
