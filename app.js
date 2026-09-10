@@ -1,4 +1,4 @@
-console.log("APP VERSION 10-09-2026 20h57");
+console.log("APP VERSION 10-09-2026 21h00");
 
 /* =========================
    OUTILS GENERAUX
@@ -398,51 +398,45 @@ async function toggleDisponibleCard() {
 
     const postes = await getFinancePostes();
 
-     const postesFactures =
-  postes.filter(p =>
-    (p["Compte"] || "")
-      .toLowerCase()
-      .includes("facture")
-  );
+    const postesFactures =
+      postes.filter(p =>
+        (p["Compte"] || "")
+          .toLowerCase()
+          .includes("facture")
+      );
 
     openFinanceModal(
       "💸 Détail des postes",
+
       `
       <div class="postes-table">
 
-       <div class="postes-row postes-header">
-  <div>${p["Poste"] || ""}</div>
-  <div>${formatCHF(p["Budget annuel"] || 0)}</div>
- <div>${formatCHF(p["Montant mensuel"] || 0)}</div>
- <div>${p["Poste"]?.includes("Voiture")? formatCHF(voiture): p["Poste"]?.includes("Lunettes")
+        <div class="postes-row postes-header">
+          <div>Poste</div>
+          <div>Budget annuel</div>
+          <div>Montant mensuel</div>
+        </div>
 
-? formatCHF(lunettes)
+        ${postesFactures.map(p => `
 
-: p["Poste"]?.includes("Cadeaux")
-
-? formatCHF(cadeaux)
-
-: p["Poste"]?.includes("Impôts")
-
-? formatCHF(impots)
-
-: p["Poste"]?.includes("Tatto")
-
-? formatCHF(tattoo)
-
-: "-"
-
-}
-
-</div>
- </div>
-
-       ${postesFactures.map(p => `
           <div class="postes-row">
+
             <div>${p["Poste"] || ""}</div>
-            <div>${formatCHF(p["Budget annuel"] || 0)}</div>
-            <div>${formatCHF(p["Montant mensuel"] || 0)}</div>
+
+            <div>
+              ${formatCHF(
+                p["Budget annuel"] || 0
+              )}
+            </div>
+
+            <div>
+              ${formatCHF(
+                p["Montant mensuel"] || 0
+              )}
+            </div>
+
           </div>
+
         `).join("")}
 
       </div>
@@ -451,13 +445,18 @@ async function toggleDisponibleCard() {
 
   } catch (e) {
 
-    console.error("Erreur chargement postes", e);
+    console.error(
+      "Erreur chargement postes",
+      e
+    );
 
     openFinanceModal(
       "Erreur",
       "<div>Impossible de charger les postes.</div>"
     );
+
   }
+
 }
 function renderFinancePieChart(dashboardRows) {
   const chart = document.getElementById("financeChart");
