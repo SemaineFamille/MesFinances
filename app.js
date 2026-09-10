@@ -599,26 +599,7 @@ function renderFinanceStats(dashboardRows) {
   const vacances = getValue("solde vacances");
   const totalGlobal = factures + epargne + vacances;
 
-  const reserveRows = dashboardRows.filter(r =>
-    normalizeLabel(r["Bloc"]).includes("reserv")
-  );
-
-  const voiture = Number(
-    reserveRows.find(r => normalizeLabel(r["Libellé"]).includes("voiture"))?.["Valeur"] || 0
-  );
-  const lunettes = Number(
-    reserveRows.find(r => normalizeLabel(r["Libellé"]).includes("lunette"))?.["Valeur"] || 0
-  );
-  const cadeaux = Number(
-    reserveRows.find(r => normalizeLabel(r["Libellé"]).includes("cadeau"))?.["Valeur"] || 0
-  );
-  const impots = Number(
-    reserveRows.find(r => normalizeLabel(r["Libellé"]).includes("impot"))?.["Valeur"] || 0
-  );
-
-  const totalReserves = voiture + lunettes + cadeaux + impots;
-  const disponibleFactures = factures - totalReserves;
-
+ 
   // ✅ Calcul épargne libre / 13ème depuis les mouvements
   // On lit directement la liste affichée dans la page actuelle
   // pour éviter de dépendre du dashboard
@@ -643,14 +624,7 @@ const epargneLibre = epargne - epargne13;
     return Math.max(0, Math.min(100, (value / total) * 100));
   };
 
-  const pctVoiture = safePercent(voiture, totalReserves);
-  const pctLunettes = safePercent(lunettes, totalReserves);
-  const pctCadeaux = safePercent(cadeaux, totalReserves);
-  const pctImpots = safePercent(impots, totalReserves);
-
-  const pctDisponible = safePercent(disponibleFactures, factures);
-  const pctReserveDansFactures = safePercent(totalReserves, factures);
-
+  
   const pctFactures = safePercent(factures, totalGlobal);
   const pctEpargne = safePercent(epargne, totalGlobal);
   const pctVacances = safePercent(vacances, totalGlobal);
