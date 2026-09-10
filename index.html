@@ -156,14 +156,35 @@
 
   <!-- Réserves -->
 
-  <div id="financeReservesBlock" class="finance-block" style="display:none;">
-  <h3>Réserves</h3>
-  <div id="financeReserves"></div>
-</div>
+ <div class="finance-stat-item">
 
-<div id="financeDisponibleBlock" class="finance-block" style="display:none;">
-  <h3>💸 Détail du compte Factures</h3>
-  <div id="financeDisponibleDetails"></div>
+  <strong>🏖️ Vacances & Réserves</strong><br>
+
+  <div class="stacked-legend">
+
+    <span>🚗 Voiture ${formatCHF(voiture)}</span>
+    <span>👓 Lunettes ${formatCHF(lunettes)}</span>
+    <span>🎁 Cadeaux ${formatCHF(cadeaux)}</span>
+    <span>💰 Impôts ${formatCHF(impots)}</span>
+    <span>💄 Tattoo ${formatCHF(tattoo)}</span>
+    <span>⛱️ Vacances ${formatCHF(vacancesReserve)}</span>
+
+  </div>
+
+  <hr>
+
+  <strong>
+    Total :
+    ${formatCHF(
+      voiture +
+      lunettes +
+      cadeaux +
+      impots +
+      tattoo +
+      vacancesReserve
+    )}
+  </strong>
+
 </div>
 
 <!-- ÉPARGNE LONG TERME -->
