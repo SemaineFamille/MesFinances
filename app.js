@@ -1,4 +1,4 @@
-console.log("APP VERSION 10-09-2026 20h00");
+console.log("APP VERSION 10-09-2026 20h05");
 
 /* =========================
    OUTILS GENERAUX
@@ -536,7 +536,58 @@ const pctEpargne13 =
   epargne > 0
     ? (epargne13 / epargne) * 100
     : 0;
-  stats.innerHTML = `
+ 
+   const mouvementsVacances =
+  window.__lastMovements
+    ? window.__lastMovements.filter(
+        m => m["Compte"] === "Vacances"
+      )
+    : [];
+
+let totalReserves = 0;
+let totalVacances = 0;
+
+mouvementsVacances.forEach(m => {
+
+  const montant =
+    Number(m["Montant"] || 0);
+
+  const valeur =
+    m["Sens"] === "Entrée"
+      ? montant
+      : -montant;
+
+  const poste =
+    normalizeLabel(m["Poste"]);
+
+  if (
+    poste.includes("voiture") ||
+    poste.includes("lunette") ||
+    poste.includes("cadeau") ||
+    poste.includes("impot") ||
+    poste.includes("tatto")
+  ) {
+    totalReserves += valeur;
+  } else {
+    totalVacances += valeur;
+  }
+
+});
+
+const totalVacancesGlobal =
+  totalVacances + totalReserves;
+
+const pctVacances =
+  totalVacancesGlobal > 0
+    ? (totalVacances / totalVacancesGlobal) * 100
+    : 0;
+
+const pctReserves =
+  totalVacancesGlobal > 0
+    ? (totalReserves / totalVacancesGlobal) * 100
+    : 0;
+   
+   stats.innerHTML = `
 
     <div class="finance-stat-list">
 
@@ -588,10 +639,45 @@ const pctEpargne13 =
 
 </div>
 
-     <div class="finance-stat-item">
+    <div
+  class="finance-stat-item clickable-card"
+  onclick="toggleReservesCard()">
 
   <strong>🏖️ Vacances & Réserves</strong><br>
-  ${formatCHF(vacances)}
+
+  ${formatCHF(totalVacancesGlobal)}
+
+  <div class="stacked-bar">
+
+    <div
+      class="seg seg-vacances"
+      style="width:${pctVacances}%">
+    </div>
+
+    <div
+      class="seg seg-impots"
+      style="width:${pctReserves}%">
+    </div>
+
+  </div>
+
+  <div class="stacked-legend">
+
+    <span>
+      <span class="dot seg-vacances"></span>
+      Vacances ${formatCHF(totalVacances)}
+    </span>
+
+    <span>
+      <span class="dot seg-impots"></span>
+      Réserves ${formatCHF(totalReserves)}
+    </span>
+
+  </div>
+
+  <div class="small-hint">
+    👆 Voir le détail
+  </div>
 
 </div>
 
