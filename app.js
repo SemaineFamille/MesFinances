@@ -720,20 +720,7 @@ function renderFinanceStats(dashboardRows) {
   `;
 }
 
-  reservesEl.innerHTML = `
-    <div class="finance-stat-list">
-      ${reserveRows.length > 0
-        ? reserveRows.map(v => `
-          <div class="finance-stat-item">
-            <strong>${v["Libellé"]}</strong><br>
-            ${formatCHF(v["Valeur"])}
-          </div>
-        `).join("")
-        : `<div class="finance-stat-item">Aucune réserve détectée</div>`
-      }
-    </div>
-  `;
-}
+
 function renderVacancesStats(movements) {
 
   const container =
