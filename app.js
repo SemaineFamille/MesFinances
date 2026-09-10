@@ -1,4 +1,4 @@
-console.log("APP VERSION 10-09-2026 18h40");
+console.log("APP VERSION 10-09-2026 19h10");
 
 /* =========================
    OUTILS GENERAUX
@@ -533,12 +533,12 @@ function renderFinanceStats(dashboardRows) {
 
       </div>
 
-      <div class="finance-stat-item">
+     <div class="finance-stat-item">
 
-        <strong>💰 Total global</strong><br>
-        ${formatCHF(totalGlobal)}
+  <strong>🏖️ Vacances & Réserves</strong><br>
+  ${formatCHF(vacances)}
 
-      </div>
+</div>
 
     </div>
 
