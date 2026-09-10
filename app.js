@@ -1,4 +1,4 @@
-console.log("APP VERSION 10-09-2026 20h45");
+console.log("APP VERSION 10-09-2026 20h50");
 
 /* =========================
    OUTILS GENERAUX
@@ -897,8 +897,7 @@ async function toggleReservesCard() {
 
   try {
 
-    const postes =
-      await getFinancePostes();
+    const postes = await getFinancePostes();
 
     const postesVacances =
       postes.filter(p =>
@@ -907,190 +906,115 @@ async function toggleReservesCard() {
           .includes("vacances")
       );
 
-const movements = await getFinanceMovements();
+    const movements =
+      await getFinanceMovements();
 
-let voiture = 0;
-let lunettes = 0;
-let cadeaux = 0;
-let impots = 0;
-let vacances = 0;
+    let voiture = 0;
+    let lunettes = 0;
+    let cadeaux = 0;
+    let impots = 0;
+    let vacances = 0;
 
-movements
-  .filter(m => m["Compte"] === "Vacances")
-  .forEach(m => {
+    movements
+      .filter(m => m["Compte"] === "Vacances")
+      .forEach(m => {
 
-    const montant =
-      Number(m["Montant"] || 0);
+        const montant =
+          Number(m["Montant"] || 0);
 
-    const valeur =
-      m["Sens"] === "Entrée"
-        ? montant
-        : -montant;
+        const valeur =
+          m["Sens"] === "Entrée"
+            ? montant
+            : -montant;
 
-    const poste =
-      normalizeLabel(m["Poste"]);
+        const poste =
+          normalizeLabel(m["Poste"]);
 
-    if (poste.includes("voiture")) {
-      voiture += valeur;
-    }
-    else if (poste.includes("lunette")) {
-      lunettes += valeur;
-    }
-    else if (poste.includes("cadeau")) {
-      cadeaux += valeur;
-    }
-    else if (poste.includes("impot")) {
-      impots += valeur;
-    }
-    else {
-      vacances += valeur;
-    }
+        if (poste.includes("voiture")) {
+          voiture += valeur;
+        }
+        else if (poste.includes("lunette")) {
+          lunettes += valeur;
+        }
+        else if (poste.includes("cadeau")) {
+          cadeaux += valeur;
+        }
+        else if (poste.includes("impot")) {
+          impots += valeur;
+        }
+        else {
+          vacances += valeur;
+        }
 
-  });
+      });
 
-const totalReserves =
-  voiture +
-  lunettes +
-  cadeaux +
-  impots;
+    const totalReserves =
+      voiture +
+      lunettes +
+      cadeaux +
+      impots;
 
-const soldeCompte =
-  totalReserves +
-  vacances;
-     
+    const soldeCompte =
+      totalReserves +
+      vacances;
+
     openFinanceModal(
+
       "🏖️ Vacances & Réserves",
 
       `
+      <div style="margin-bottom:15px;">
+        <strong>
+          💰 Solde du compte Vacances :
+          ${formatCHF(soldeCompte)}
+        </strong>
+      </div>
+
       <div class="postes-table">
 
         <div class="postes-row postes-header">
           <div>Poste</div>
           <div>Budget annuel</div>
           <div>Montant mensuel</div>
+          <div>Solde actuel</div>
         </div>
 
-        ${postesVacances.map(p => `
+        ${postesVacances.map(p => {
 
-          <div class="postes-row">
+          let solde = 0;
 
-            <div>${p["Poste"] || ""}</div>
+          if(p["Poste"]?.includes("Voiture")){
+            solde = voiture;
+          }
+          else if(p["Poste"]?.includes("Lunettes")){
+            solde = lunettes;
+          }
+          else if(p["Poste"]?.includes("Cadeaux")){
+            solde = cadeaux;
+          }
+          else if(p["Poste"]?.includes("Impôts")){
+            solde = impots;
+          }
 
-            <div>
-              ${formatCHF(
-                p["Budget annuel"] || 0
-              )}
-            </div>
+          return `
+            <div class="postes-row">
 
-            <div>
-              ${formatCHF(
-                p["Montant mensuel"] || 0
-              )}
-            </div>
+              <div>${p["Poste"] || ""}</div>
 
-          </div>
-
-        `).join("")}
-
-      </div>
-      `
-openFinanceModal(
-  "🏖️ Vacances & Réserves",
-
-  `
-
-  <div style="margin-bottom:15px;">
-    <strong>
-      💰 Solde du compte Vacances :
-      ${formatCHF(soldeCompte)}
-    </strong>
-  </div>
-
-  <div class="postes-table">
-
-    <div class="postes-row postes-header">
-      <div>Poste</div>
-      <div>Budget annuel</div>
-      <div>Montant mensuel</div>
-      <div>Solde actuel</div>
-    </div>
-
-    ${postesVacances.map(p => `
-      ...
-    `).join("")}
-
-  </div>
-
-  <div style="margin-top:20px">
-
-    <strong>
-      🔒 Total réserves :
-      ${formatCHF(totalReserves)}
-    </strong>
-
-    <br><br>
-
-    <strong>
-      ⛱️ Vacances disponibles :
-      ${formatCHF(vacances)}
-    </strong>
-
-  </div>
-
-  `
-);       
-       
-    );
-
-  } catch (e) {
-
-    console.error(e);
-
-    openFinanceModal(
-      "Erreur",
-      "Impossible de charger les réserves."
-    );
-  }
-}
-function renderFinanceHistory(movements) {
-  const list = document.getElementById("financeList");
-  if (!list) return;
-
-  const currentMonth = getCurrentMonthKey();
-
-  const filtered = movements.filter(item =>
-    getMonthKeyFromDate(item["Date"]) === currentMonth
-  );
-
-  const sorted = [...filtered]
-    .sort((a, b) => parseFrDate(b["Date"]) - parseFrDate(a["Date"]))
-    .slice(0, 20);
-
-  list.innerHTML = `
-    <div class="finance-history-list">
-      ${sorted.length > 0
-        ? sorted.map(item => {
-            const isEntry = item["Sens"] === "Entrée";
-            return `
-              <div class="finance-history-item">
-                <div class="finance-history-top">
-                  <strong>${formatDate(item["Date"])}</strong>
-                  <span class="${isEntry ? "finance-positive" : "finance-negative"}">
-                    ${isEntry ? "+" : "-"} ${formatCHF(item["Montant"])}
-                  </span>
-                </div>
-                <div><strong>Compte :</strong> ${item["Compte"] || ""}</div>
-                <div><strong>Poste :</strong> ${item["Poste"] || "-"}</div>
-                <div><strong>Description :</strong> ${item["Description"] || "-"}</div>
+              <div>
+                ${formatCHF(
+                  p["Budget annuel"] || 0
+                )}
               </div>
-            `;
-          }).join("")
-        : `<div class="finance-history-item">Aucun mouvement ce mois</div>`
-      }
-    </div>
-  `;
-}
 
+              <div>
+                ${formatCHF(
+                  p["Montant mensuel"] || 0
+                )}
+              </div>
+
+              <div>
+                ${
 async function addFinanceMovementManual() {
   const date = document.getElementById("financeDate").value;
   const compte = document.getElementById("financeCompte").value;
