@@ -1,4 +1,4 @@
-console.log("APP VERSION 10-09-2026 19h10");
+console.log("APP VERSION 10-09-2026 19h15");
 
 /* =========================
    OUTILS GENERAUX
@@ -508,7 +508,34 @@ function renderFinanceStats(dashboardRows) {
     factures +
     epargne +
     vacances;
+const epargne13 = window.__lastMovements
+  ? window.__lastMovements
+      .filter(m =>
+        m["Compte"] === "Epargne" &&
+        normalizeLabel(m["Poste"]).includes("13eme")
+      )
+      .reduce((sum, m) => {
+        const montant = Number(m["Montant"] || 0);
 
+        return sum +
+          (m["Sens"] === "Entrée"
+            ? montant
+            : -montant);
+      }, 0)
+  : 0;
+
+const epargneLibre =
+  epargne - epargne13;
+
+const pctEpargneLibre =
+  epargne > 0
+    ? (epargneLibre / epargne) * 100
+    : 0;
+
+const pctEpargne13 =
+  epargne > 0
+    ? (epargne13 / epargne) * 100
+    : 0;
   stats.innerHTML = `
 
     <div class="finance-stat-list">
@@ -526,12 +553,40 @@ function renderFinanceStats(dashboardRows) {
 
       </div>
 
-      <div class="finance-stat-item">
+     <div class="finance-stat-item">
 
-        <strong>🏦 Épargne</strong><br>
-        ${formatCHF(epargne)}
+  <strong>🏦 Épargne</strong><br>
+  ${formatCHF(epargne)}
 
-      </div>
+  <div class="stacked-bar">
+
+    <div
+      class="seg seg-epargne-libre"
+      style="width:${pctEpargneLibre}%">
+    </div>
+
+    <div
+      class="seg seg-13eme"
+      style="width:${pctEpargne13}%">
+    </div>
+
+  </div>
+
+  <div class="stacked-legend">
+
+    <span>
+      <span class="dot seg-epargne-libre"></span>
+      Épargne libre ${formatCHF(epargneLibre)}
+    </span>
+
+    <span>
+      <span class="dot seg-13eme"></span>
+      13ème salaire ${formatCHF(epargne13)}
+    </span>
+
+  </div>
+
+</div>
 
      <div class="finance-stat-item">
 
