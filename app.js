@@ -1,4 +1,4 @@
-console.log("APP VERSION 10-09-2026 18h15");
+console.log("APP VERSION 10-09-2026 18h25");
 
 /* =========================
    OUTILS GENERAUX
@@ -516,44 +516,7 @@ function computeEpargneSplit(movements) {
 
   return { libre, treize };
 }
-function renderVacancesStats() {
 
-  const container =
-    document.getElementById("vacancesStats");
-
-  if(!container) return;
-
-  container.innerHTML = `
-    <div class="finance-stat-list">
-
-      <div class="finance-stat-item">
-        🚗 Voiture<br>
-        ${formatCHF(1200)}
-      </div>
-
-      <div class="finance-stat-item">
-        👓 Lunettes<br>
-        ${formatCHF(500)}
-      </div>
-
-      <div class="finance-stat-item">
-        🎁 Cadeaux<br>
-        ${formatCHF(300)}
-      </div>
-
-      <div class="finance-stat-item">
-        💰 Impôts<br>
-        ${formatCHF(1500)}
-      </div>
-
-      <div class="finance-stat-item">
-        ⛱️ Vacances<br>
-        ${formatCHF(900)}
-      </div>
-
-    </div>
-  `;
-}
 function parseFrDate(dateStr) {
   if (!dateStr) return new Date(0);
 
@@ -1408,7 +1371,6 @@ async function loadFinanceScreen() {
 
     renderFinancePieChart(dashboard);
   renderFinanceStats(dashboard);
-     renderVacancesStats();
 renderFinanceHistory(movements);
 
 
