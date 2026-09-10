@@ -614,6 +614,10 @@ function renderVacancesStats(movements) {
   let impots = 0;
   let tattoo = 0;
   let vacances = 0;
+
+    movements
+    .filter(m => m.Compte === "Vacances")
+    .forEach(m => {
    
 const totalReserves =
   voiture +
@@ -628,9 +632,7 @@ const totalVacances =
 const total =
   totalReserves +
   totalVacances;
-  movements
-    .filter(m => m.Compte === "Vacances")
-    .forEach(m => {
+ 
 
       const montant =
         Number(m.Montant || 0);
@@ -664,14 +666,6 @@ const total =
 
     });
 
-  const total =
-    voiture +
-    lunettes +
-    cadeaux +
-    impots +
-    tattoo +
-    vacances;
-   
    const pctVacances =
   total > 0
     ? (totalVacances / total) * 100
