@@ -1,4 +1,4 @@
-console.log("APP VERSION 10-09-2026 20h40");
+console.log("APP VERSION 10-09-2026 20h45");
 
 /* =========================
    OUTILS GENERAUX
@@ -994,6 +994,52 @@ const soldeCompte =
 
       </div>
       `
+openFinanceModal(
+  "🏖️ Vacances & Réserves",
+
+  `
+
+  <div style="margin-bottom:15px;">
+    <strong>
+      💰 Solde du compte Vacances :
+      ${formatCHF(soldeCompte)}
+    </strong>
+  </div>
+
+  <div class="postes-table">
+
+    <div class="postes-row postes-header">
+      <div>Poste</div>
+      <div>Budget annuel</div>
+      <div>Montant mensuel</div>
+      <div>Solde actuel</div>
+    </div>
+
+    ${postesVacances.map(p => `
+      ...
+    `).join("")}
+
+  </div>
+
+  <div style="margin-top:20px">
+
+    <strong>
+      🔒 Total réserves :
+      ${formatCHF(totalReserves)}
+    </strong>
+
+    <br><br>
+
+    <strong>
+      ⛱️ Vacances disponibles :
+      ${formatCHF(vacances)}
+    </strong>
+
+  </div>
+
+  `
+);       
+       
     );
 
   } catch (e) {
