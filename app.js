@@ -1,4 +1,4 @@
-console.log("APP VERSION 10-09-2026 19h15");
+console.log("APP VERSION 10-09-2026 19h50");
 
 /* =========================
    OUTILS GENERAUX
@@ -614,7 +614,20 @@ function renderVacancesStats(movements) {
   let impots = 0;
   let tattoo = 0;
   let vacances = 0;
+   
+const totalReserves =
+  voiture +
+  lunettes +
+  cadeaux +
+  impots +
+  tattoo;
 
+const totalVacances =
+  vacances;
+
+const total =
+  totalReserves +
+  totalVacances;
   movements
     .filter(m => m.Compte === "Vacances")
     .forEach(m => {
@@ -658,6 +671,16 @@ function renderVacancesStats(movements) {
     impots +
     tattoo +
     vacances;
+   
+   const pctVacances =
+  total > 0
+    ? (totalVacances / total) * 100
+    : 0;
+
+const pctReserves =
+  total > 0
+    ? (totalReserves / total) * 100
+    : 0;
 
   container.innerHTML = `
 
@@ -665,13 +688,41 @@ function renderVacancesStats(movements) {
       class="finance-stat-item clickable-card"
       onclick="toggleReservesCard()">
 
-      <strong>🏖️ Vacances & Réserves</strong><br>
+     <strong>🏖️ Vacances & Réserves</strong><br>
 
-      ${formatCHF(total)}
+${formatCHF(total)}
 
-      <div class="small-hint">
-        👆 Voir le détail
-      </div>
+<div class="stacked-bar">
+
+  <div
+    class="seg seg-vacances"
+    style="width:${pctVacances}%">
+  </div>
+
+  <div
+    class="seg seg-impots"
+    style="width:${pctReserves}%">
+  </div>
+
+</div>
+
+<div class="stacked-legend">
+
+  <span>
+    <span class="dot seg-vacances"></span>
+    Vacances ${formatCHF(totalVacances)}
+  </span>
+
+  <span>
+    <span class="dot seg-impots"></span>
+    Réserves ${formatCHF(totalReserves)}
+  </span>
+
+</div>
+
+<div class="small-hint">
+  👆 Voir le détail
+</div>
 
     </div>
 
