@@ -1,4 +1,4 @@
-console.log("APP VERSION 10-09-2026 20h11");
+console.log("APP VERSION 10-09-2026 20h40");
 
 /* =========================
    OUTILS GENERAUX
@@ -411,11 +411,31 @@ async function toggleDisponibleCard() {
       <div class="postes-table">
 
        <div class="postes-row postes-header">
-  <div>Poste</div>
-  <div>Budget annuel</div>
-  <div>Montant mensuel</div>
-  <div>Solde actuel</div>
+  <div>${p["Poste"] || ""}</div>
+  <div>${formatCHF(p["Budget annuel"] || 0)}</div>
+ <div>${formatCHF(p["Montant mensuel"] || 0)}</div>
+ <div>${p["Poste"]?.includes("Voiture")? formatCHF(voiture): p["Poste"]?.includes("Lunettes")
+
+? formatCHF(lunettes)
+
+: p["Poste"]?.includes("Cadeaux")
+
+? formatCHF(cadeaux)
+
+: p["Poste"]?.includes("Impôts")
+
+? formatCHF(impots)
+
+: p["Poste"]?.includes("Tatto")
+
+? formatCHF(tattoo)
+
+: "-"
+
+}
+
 </div>
+ </div>
 
        ${postesFactures.map(p => `
           <div class="postes-row">
