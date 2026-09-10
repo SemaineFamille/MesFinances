@@ -1183,10 +1183,12 @@ async function applyMonthlyTransfersSimple() {
   if (factures > 0) {
     const postes = await getFinancePostes();
 
-    const monthlyItems = postes.map(p => ({
-      poste: p["Poste"],
-      mensuel: Number(p["Budget annuel"] || 0) / 12
-    })).filter(item => item.mensuel > 0);
+  const monthlyItems = postes.map(p => ({
+  poste: p["Poste"],
+  compte: p["Compte"] || "Factures",
+  mensuel: Number(p["Budget annuel"] || 0) / 12
+})).filter(item => item.mensuel > 0);
+
 
     const totalMensuelTheorique = monthlyItems.reduce((sum, item) => sum + item.mensuel, 0);
 
@@ -1199,14 +1201,14 @@ async function applyMonthlyTransfersSimple() {
 
     // 1/12 exact pour chaque poste
     for (const item of monthlyItems) {
-      await addFinanceMovementApi({
-        date,
-        compte: "Factures",
-        sens: "Entrée",
-        poste: item.poste,
-        montant: item.mensuel.toFixed(2),
-        description: "Provision mensuelle"
-      });
+     await addFinanceMovementApi({
+  date,
+  compte: item.compte,
+  sens: "Entrée",
+  poste: item.poste,
+  montant: item.mensuel.toFixed(2),
+  description: "Provision mensuelle"
+});
     }
 
     // surplus éventuel
