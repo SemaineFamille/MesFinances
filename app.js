@@ -1,4 +1,4 @@
-console.log("APP VERSION 11-09-2026 18h05");
+console.log("APP VERSION 11-09-2026 18h50");
 
 /* =========================
    OUTILS GENERAUX
@@ -540,44 +540,43 @@ async function toggleReservesCard() {
     let impots = 0;
     let vacances = 0;
 
-    movements
-      .filter(m => m["Compte"] === "Vacances")
-      .forEach(m => {
+    const dashboard =
+      await getFinanceDashboard();
 
-        const montant =
-          Number(m["Montant"] || 0);
+    const getDashboardValue = (label) => {
 
-        const valeur =
-          m["Sens"] === "Entrée"
-            ? montant
-            : -montant;
+      const row = dashboard.find(r =>
+        normalizeLabel(r["Libellé"])
+          .includes(normalizeLabel(label))
+      );
 
-        const poste =
-          normalizeLabel(m["Poste"]);
+      const valeur = String(
+        row?.["Valeur"] || "0"
+      )
+        .replace("Fr. ", "")
+        .replace(/'/g, "");
 
-        if (poste.includes("voiture")) {
-          voiture += valeur;
-        }
-        else if (poste.includes("lunette")) {
-          lunettes += valeur;
-        }
-        else if (poste.includes("cadeau")) {
-          cadeaux += valeur;
-        }
-        else if (poste.includes("impot")) {
-          impots += valeur;
-        }
-        else {
-          vacances += valeur;
-        }
+      return Number(valeur);
+    };
 
-      });
+    const voiture =
+      getDashboardValue("voiture");
+
+    const lunettes =
+      getDashboardValue("lunettes");
+
+    const cadeaux =
+      getDashboardValue("cadeaux");
+
+    const impots =
+      getDashboardValue("impôts");
 
     const totalReserves =
-      voiture +
-      lunettes +
-      cadeaux +
-      impots;
+      getDashboardValue("total réserves");
+
+    const vacances =
+      getDashboardValue("solde vacances") -
+      totalReserves;
 
     const soldeCompte =
       totalReserves +
