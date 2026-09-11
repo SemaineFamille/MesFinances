@@ -1252,7 +1252,7 @@ renderFinanceHistory(movements);
   document.getElementById("financeStats").innerHTML =
     "Erreur : " + e.message;
 }
-`
+
 }
 
 /* =========================
