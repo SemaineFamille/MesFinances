@@ -115,3 +115,7 @@ async function toggleKptRemboursement(index, value) {
   await updateKptRemboursement(index, value);
   loadKpt();
 }
+window.addKptFacture = addKptFacture;
+window.toggleKptRemboursement = toggleKptRemboursement;
+window.editKpt = editKpt;
+window.deleteKpt = deleteKpt;
