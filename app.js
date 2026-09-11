@@ -1365,11 +1365,13 @@ renderFinanceHistory(movements);
       console.error("Erreur chargement Epargne 3", epargneErr);
     }
 
-  } catch (e) {
-    console.error(e);
-    document.getElementById("financeStats").innerHTML =
-      "Erreur chargement finances";
-  }
+ } catch (e) {
+  console.error("LOAD FINANCE ERROR", e);
+
+  document.getElementById("financeStats").innerHTML =
+    "Erreur : " + e.message;
+}
+`
 }
 
 /* =========================
