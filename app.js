@@ -1,4 +1,4 @@
-console.log("APP VERSION 11-09-2026 17h00");
+console.log("APP VERSION 11-09-2026 17h10");
 
 /* =========================
    OUTILS GENERAUX
@@ -92,7 +92,17 @@ function showScreen(screenId) {
     loadFinanceScreen();
   }
 }
+catch (e) {
+  console.error("ERREUR FINANCES", e);
 
+  alert(
+    "ERREUR FINANCES : " +
+    e.message
+  );
+
+  document.getElementById("financeStats").innerHTML =
+    "Erreur chargement finances";
+}
 function toggleAssuraForm() {
   const form = document.getElementById("assuraForm");
   form.style.display = form.style.display === "none" ? "block" : "none";
