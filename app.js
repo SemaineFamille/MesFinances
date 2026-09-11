@@ -1,4 +1,4 @@
-console.log("APP VERSION 11-09-2026 17h28");
+console.log("APP VERSION 11-09-2026 17h30");
 
 /* =========================
    OUTILS GENERAUX
@@ -214,35 +214,6 @@ function computeEpargneSplit(movements) {
   });
 
   return { libre, treize };
-}
-
-function parseFrDate(dateStr) {
-  if (!dateStr) return new Date(0);
-
-  if (dateStr.includes("-")) {
-    return new Date(dateStr);
-  }
-
-  const parts = dateStr.split("/");
-  if (parts.length === 3) {
-    return new Date(parts[2], parts[1] - 1, parts[0]);
-  }
-
-  return new Date(dateStr);
-}
-
-function getCurrentMonthKey() {
-  const now = new Date();
-  const y = now.getFullYear();
-  const m = String(now.getMonth() + 1).padStart(2, "0");
-  return `${y}-${m}`;
-}
-
-function getMonthKeyFromDate(dateStr) {
-  const d = parseFrDate(dateStr);
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  return `${y}-${m}`;
 }
 
 function toggleFinanceForm() {
