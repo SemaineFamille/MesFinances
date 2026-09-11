@@ -531,15 +531,7 @@ async function toggleReservesCard() {
           .includes("vacances")
       );
 
-    const movements =
-      await getFinanceMovements();
-
-    let voiture = 0;
-    let lunettes = 0;
-    let cadeaux = 0;
-    let impots = 0;
-    let vacances = 0;
-
+   
     const dashboard =
       await getFinanceDashboard();
 
