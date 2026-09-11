@@ -1,4 +1,4 @@
-console.log("APP VERSION 11-09-2026 17h20");
+console.log("APP VERSION 11-09-2026 17h28");
 
 /* =========================
    OUTILS GENERAUX
@@ -195,13 +195,6 @@ function updateMonthlyCalc() {
   `;
 }
 
-function formatCHF(value) {
-  const number = Number(value || 0);
-  return number.toLocaleString("fr-CH", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  }) + " CHF";
-}
 function computeEpargneSplit(movements) {
 
   let libre = 0;
