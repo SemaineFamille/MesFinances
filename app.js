@@ -1,4 +1,4 @@
-console.log("APP VERSION 11-09-2026 17h40");
+console.log("APP VERSION 11-09-2026 17h45");
 
 /* =========================
    OUTILS GENERAUX
@@ -196,12 +196,6 @@ function updateMonthlyCalc() {
 }
 
 
-function toggleFinanceForm() {
-  const form = document.getElementById("financeForm");
-  form.style.display =
-    form.style.display === "none" ? "block" : "none";
-}
-
 async function loadFinanceResume() {
   try {
     const data = await getFinanceDashboard();
@@ -232,8 +226,6 @@ async function toggleDisponibleCard() {
 
     openFinanceModal(
       "💸 Détail des postes",
-
-      `
       <div class="postes-table">
 
         <div class="postes-row postes-header">
@@ -241,28 +233,17 @@ async function toggleDisponibleCard() {
           <div>Budget annuel</div>
           <div>Montant mensuel</div>
         </div>
-
         ${postesFactures.map(p => `
-
           <div class="postes-row">
-
             <div>${p["Poste"] || ""}</div>
-
-            <div>
-              ${formatCHF(
-                p["Budget annuel"] || 0
-              )}
+            <div>${formatCHF(p["Budget annuel"] || 0)}
             </div>
 
-            <div>
-              ${formatCHF(
-                p["Montant mensuel"] || 0
-              )}
+            <div>${formatCHF(p["Montant mensuel"] || 0)}
             </div>
 
           </div>
-
-        `).join("")}
+        ).join("")}
 
       </div>
       `
