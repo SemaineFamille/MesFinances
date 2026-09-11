@@ -909,7 +909,38 @@ async function applyMonthlyTransfers(count) {
   await loadFinanceResume();
   alert("Virements mensuels ajoutés.");
 }
+function renderFinanceHistory(movements) {
 
+  const container =
+    document.getElementById("financeHistory");
+
+  if (!container) return;
+
+  const sorted = [...movements]
+    .sort((a, b) =>
+      new Date(b.Date) - new Date(a.Date)
+    )
+    .slice(0, 20);
+
+  container.innerHTML = sorted.map(m => `
+    <div class="card">
+
+      <strong>${m["Compte"] || ""}</strong><br>
+
+      📅 ${formatDate(m["Date"])}<br>
+
+      ${m["Poste"] || ""}<br>
+
+      ${m["Sens"] === "Sortie" ? "🔻" : "🔹"}
+      ${formatCHF(m["Montant"] || 0)}
+
+      ${m["Description"]
+        ? `<br><small>${m["Description"]}</small>`
+        : ""}
+
+    </div>
+  `).join("");
+}
 /* =========================
    CHARGEMENT FINANCES
 ========================= */
