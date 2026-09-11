@@ -1,4 +1,4 @@
-console.log("APP VERSION 11-09-2026 17h45");
+console.log("APP VERSION 11-09-2026 18h00");
 
 /* =========================
    OUTILS GENERAUX
@@ -224,30 +224,28 @@ async function toggleDisponibleCard() {
           .includes("facture")
       );
 
-    openFinanceModal(
-      "💸 Détail des postes",
-      <div class="postes-table">
+   openFinanceModal(
+  "💸 Détail des postes",
+  `
+  <div class="postes-table">
 
-        <div class="postes-row postes-header">
-          <div>Poste</div>
-          <div>Budget annuel</div>
-          <div>Montant mensuel</div>
-        </div>
-        ${postesFactures.map(p => `
-          <div class="postes-row">
-            <div>${p["Poste"] || ""}</div>
-            <div>${formatCHF(p["Budget annuel"] || 0)}
-            </div>
+    <div class="postes-row postes-header">
+      <div>Poste</div>
+      <div>Budget annuel</div>
+      <div>Montant mensuel</div>
+    </div>
 
-            <div>${formatCHF(p["Montant mensuel"] || 0)}
-            </div>
-
-          </div>
-        ).join("")}
-
+    ${postesFactures.map(p => `
+      <div class="postes-row">
+        <div>${p["Poste"] || ""}</div>
+        <div>${formatCHF(p["Budget annuel"] || 0)}</div>
+        <div>${formatCHF(p["Montant mensuel"] || 0)}</div>
       </div>
-      `
-    );
+    `).join("")}
+
+  </div>
+  `
+);
 
   } catch (e) {
 
@@ -911,11 +909,6 @@ async function applyMonthlyTransfers(count) {
   await loadFinanceResume();
   alert("Virements mensuels ajoutés.");
 }
-
-/* =========================
-   EPARGNE 3 - COURBE
-========================= */
-
 
 /* =========================
    CHARGEMENT FINANCES
