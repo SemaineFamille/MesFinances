@@ -195,26 +195,6 @@ function updateMonthlyCalc() {
   `;
 }
 
-function computeEpargneSplit(movements) {
-
-  let libre = 0;
-  let treize = 0;
-
-  movements.forEach(m => {
-
-    if (m["Compte"] !== "Epargne") return;
-
-    const montant = Number(m["Montant"] || 0);
-
-    if (m["Poste"] === "13eme salaire") {
-      treize += (m["Sens"] === "Entrée" ? montant : -montant);
-    } else if (m["Poste"] === "Epargne libre") {
-      libre += (m["Sens"] === "Entrée" ? montant : -montant);
-    }
-  });
-
-  return { libre, treize };
-}
 
 function toggleFinanceForm() {
   const form = document.getElementById("financeForm");
@@ -558,63 +538,7 @@ const pctReserves =
   `;
 }
 
-async function toggleReservesPreview() {
-  let container = document.getElementById("reservesPreview");
 
-  if (!container) {
-    container = document.createElement("div");
-    container.id = "reservesPreview";
-    container.className = "finance-block postes-preview";
-
-    const statsBlock = document.getElementById("financeStats");
-    statsBlock.parentNode.insertBefore(container, statsBlock.nextSibling);
-  }
-
-  const isVisible = container.style.display === "block";
-
-  if (isVisible) {
-    container.style.display = "none";
-    return;
-  }
-
-  try {
-    const postes = await getFinancePostes();
-
-    // ✅ maintenant on affiche TOUT
-    const allPostes = postes;
-
-    container.innerHTML = `
-      <h3>📋 Tous les postes</h3>
-
-      <div class="postes-table">
-        <div class="postes-row postes-header">
-          <div>Poste</div>
-          <div>Budget annuel</div>
-          <div>Montant mensuel</div>
-        </div>
-
-        ${allPostes.map(p => `
-          <div class="postes-row">
-            <div>${p["Poste"] || ""}</div>
-            <div>${formatCHF(p["Budget annuel"] || 0)}</div>
-            <div>${formatCHF(p["Montant mensuel"] || 0)}</div>
-          </div>
-        `).join("")}
-      </div>
-    `;
-
-    container.style.display = "block";
-
-  } catch (e) {
-    console.error("Erreur chargement postes", e);
-    container.innerHTML = `
-      <div class="finance-stat-item">
-        Erreur chargement postes
-      </div>
-    `;
-    container.style.display = "block";
-  }
-}
 async function toggleReservesCard() {
 
   try {
@@ -1072,7 +996,6 @@ window.toggleKptRemboursement = toggleKptRemboursement;
 window.editKpt = editKpt;
 window.deleteKpt = deleteKpt;
 window.applyMonthlyTransfersSimple = applyMonthlyTransfersSimple;
-window.toggleReservesPreview = toggleReservesPreview;
 window.toggleReservesCard = toggleReservesCard;
 window.toggleDisponibleCard = toggleDisponibleCard;
 window.addEventListener("click", function(event) {
