@@ -68,6 +68,9 @@ function renderFinanceStats(dashboardRows) {
   const epargne =
     getValue("solde epargne");
 
+  const soldeVacances =
+  getValue("solde vacances");
+
  const totalGlobal =
     factures +
     epargne +
@@ -101,6 +104,13 @@ const pctEpargne13 =
     ? (epargne13 / epargne) * 100
     : 0;
  
+const getDashboardValue = (label) => {
+
+  const row = dashboardRows.find(r =>
+    normalizeLabel(r["Libellé"])
+      .includes(normalizeLabel(label))
+  );
+
   const valeur = String(
     row?.["Valeur"] || "0"
   )
