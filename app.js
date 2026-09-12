@@ -390,6 +390,12 @@ const totalReserves =
 const totalVacances =
   getDashboardValue("solde vacances");
 
+   const vacancesDisponibles =
+  totalVacances - totalReserves;
+
+const totalVacancesGlobal =
+  totalVacances;
+
 const pctVacances =
   totalVacances > 0
     ? ((totalVacances - totalReserves) / totalVacances) * 100
