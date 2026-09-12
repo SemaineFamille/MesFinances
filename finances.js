@@ -442,7 +442,7 @@ async function toggleReservesCard() {
 function renderFinanceHistory(movements) {
 
   const container =
-    document.getElementById("financeHistory");
+  document.getElementById("financeList");
 
   if (!container) return;
 
