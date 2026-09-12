@@ -1,4 +1,4 @@
-console.log("APP VERSION 11-09-2026 18h50");
+console.log("APP VERSION 12-09-2026 11h50");
 
 /* =========================
    OUTILS GENERAUX
@@ -368,55 +368,38 @@ const pctEpargne13 =
     ? (epargne13 / epargne) * 100
     : 0;
  
-   const mouvementsVacances =
-  window.__lastMovements
-    ? window.__lastMovements.filter(
-        m => m["Compte"] === "Vacances"
-      )
-    : [];
+const getDashboardValue = (label) => {
 
-let totalReserves = 0;
-let totalVacances = 0;
+  const row = dashboardRows.find(r =>
+    normalizeLabel(r["Libellé"])
+      .includes(normalizeLabel(label))
+  );
 
-mouvementsVacances.forEach(m => {
+  const valeur = String(
+    row?.["Valeur"] || "0"
+  )
+    .replace("Fr. ", "")
+    .replace(/'/g, "");
 
-  const montant =
-    Number(m["Montant"] || 0);
+  return Number(valeur);
+};
 
-  const valeur =
-    m["Sens"] === "Entrée"
-      ? montant
-      : -montant;
+const totalReserves =
+  getDashboardValue("total réserves");
 
-  const poste =
-    normalizeLabel(m["Poste"]);
-
-  if (
-    poste.includes("voiture") ||
-    poste.includes("lunette") ||
-    poste.includes("cadeau") ||
-    poste.includes("impot") ||
-    poste.includes("tatto")
-  ) {
-    totalReserves += valeur;
-  } else {
-    totalVacances += valeur;
-  }
-
-});
-
-const totalVacancesGlobal =
-  totalVacances + totalReserves;
+const totalVacances =
+  getDashboardValue("solde vacances");
 
 const pctVacances =
-  totalVacancesGlobal > 0
-    ? (totalVacances / totalVacancesGlobal) * 100
+  totalVacances > 0
+    ? ((totalVacances - totalReserves) / totalVacances) * 100
     : 0;
 
 const pctReserves =
-  totalVacancesGlobal > 0
-    ? (totalReserves / totalVacancesGlobal) * 100
+  totalVacances > 0
+    ? (totalReserves / totalVacances) * 100
     : 0;
+``
    
    stats.innerHTML = `
 
@@ -496,7 +479,7 @@ const pctReserves =
 
     <span>
       <span class="dot seg-vacances"></span>
-      Vacances ${formatCHF(totalVacances)}
+     Vacances disponibles ${formatCHF(vacancesDisponibles)}
     </span>
 
     <span>
