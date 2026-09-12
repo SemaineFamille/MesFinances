@@ -125,7 +125,9 @@ const totalReserves =
 
 const totalVacances =
   getValue("solde vacances");
-
+const vacancesDisponibles =
+totalVacances - totalReserves;
+  
   const totalVacancesGlobal =
   totalVacances;
 
