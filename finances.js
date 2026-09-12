@@ -71,10 +71,7 @@ function renderFinanceStats(dashboardRows) {
   const soldeVacances =
   getValue("solde vacances");
 
- const totalGlobal =
-    factures +
-    epargne +
-    soldeVacances;
+
 const epargne13 = window.__lastMovements
   ? window.__lastMovements
       .filter(m =>
@@ -123,22 +120,20 @@ const getDashboardValue = (label) => {
 const totalReserves =
   getDashboardValue("total réserves");
 
-const totalVacances =
+const totalVacancesGlobal =
   getValue("solde vacances");
+
 const vacancesDisponibles =
-totalVacances - totalReserves;
-  
-  const totalVacancesGlobal =
-  totalVacances;
+  totalVacancesGlobal - totalReserves;
 
 const pctVacances =
-  totalVacances > 0
-    ? ((totalVacances - totalReserves) / totalVacances) * 100
+  totalVacancesGlobal > 0
+    ? (vacancesDisponibles / totalVacancesGlobal) * 100
     : 0;
 
 const pctReserves =
-  totalVacances > 0
-    ? (totalReserves / totalVacances) * 100
+  totalVacancesGlobal > 0
+    ? (totalReserves / totalVacancesGlobal) * 100
     : 0;
    
    stats.innerHTML = `
