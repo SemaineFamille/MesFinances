@@ -197,7 +197,7 @@ const pctReserves =
 
   <strong>🏖️ Vacances & Réserves</strong><br>
 
-  ${formatCHF(totalVacancesGlobal)}
+${formatCHF(soldeCompte)}
 
   <div class="stacked-bar">
 
