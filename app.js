@@ -332,13 +332,14 @@ function renderFinanceStats(dashboardRows) {
   const epargne =
     getValue("solde epargne");
 
-  const vacances =
-    getValue("solde vacances");
+ const soldeVacances =
+  getValue("solde vacances");
 
-  const totalGlobal =
+
+ const totalGlobal =
     factures +
     epargne +
-    vacances;
+    soldeVacances;
 const epargne13 = window.__lastMovements
   ? window.__lastMovements
       .filter(m =>
