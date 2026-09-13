@@ -3,7 +3,10 @@ const API_URL = "https://script.google.com/macros/s/AKfycbxcQPcOYKJDse5gU2dAHYk7
 /* =========================
    APPEL API
 ========================= */
-
+async function getMonthlyTransfers() {
+  const data = await api("getMonthlyTransfers");
+  return data || [];
+}
 async function fetchSheetData(action) {
   const response = await fetch(`${API_URL}?action=${action}`);
   if (!response.ok) {
