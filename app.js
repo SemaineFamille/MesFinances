@@ -1,4 +1,4 @@
-console.log("APP VERSION 13-09-2026 20h40");
+console.log("APP VERSION 13-09-2026 21h15");
 
 /* =========================
    OUTILS GENERAUX
@@ -334,10 +334,10 @@ async function applyMonthlyTransfersSimple() {
   if (factures > 0) {
     const postes = await getFinancePostes();
 
-  const monthlyItems = postes.map(p => ({
+ const monthlyItems = postes.map(p => ({
   poste: p["Poste"],
   compte: p["Compte"] || "Factures",
-  mensuel: Number(p["Budget annuel"] || 0) / 12
+  mensuel: Number(p["Montant mensuel"] || 0)
 })).filter(item => item.mensuel > 0);
 
 
@@ -409,14 +409,25 @@ async function applyMonthlyTransfersSimple() {
   // VACANCES
   // =========================
   if (vacances > 0) {
-    await addFinanceMovementApi({
-      date,
-      compte: "Vacances",
-      sens: "Entrée",
-      poste: "Versement mensuel",
-      montant: vacances,
-      description: "Versement mensuel"
-    });
+    const vacancesItems = postes
+  .filter(p => p["Compte"] === "Vacances")
+  .map(p => ({
+    poste: p["Poste"],
+    mensuel: Number(p["Montant mensuel"] || 0)
+  }))
+  .filter(item => item.mensuel > 0);
+     for (const item of vacancesItems) {
+
+  await addFinanceMovementApi({
+    date,
+    compte: "Vacances",
+    sens: "Entrée",
+    poste: item.poste,
+    montant: item.mensuel,
+    description: "Provision mensuelle"
+  });
+
+}
   }
 
   await loadFinanceScreen();
