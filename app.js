@@ -352,7 +352,7 @@ async function applyMonthlyTransfersSimple() {
   description: "Provision mensuelle"
 });
     }
-
+}
   
   // =========================
   // EPARGNE LIBRE
