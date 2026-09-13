@@ -289,7 +289,7 @@ const defaultVacances =
           <label>💳 Factures</label>
           <input type="number" id="monthlyFactures" value="${defaultFactures}">
         </div>
-        <small>Recommandé : ${Math.round(totalMensuel)} CHF</small>
+       
 
         <div class="monthly-line">
           <label>🏦 Epargne</label>
