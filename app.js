@@ -341,15 +341,6 @@ async function applyMonthlyTransfersSimple() {
 })).filter(item => item.mensuel > 0);
 
 
-    const totalMensuelTheorique = monthlyItems.reduce((sum, item) => sum + item.mensuel, 0);
-
-    if (factures < totalMensuelTheorique) {
-      alert(
-        `Le montant Factures (${formatCHF(factures)}) est inférieur au besoin mensuel théorique (${formatCHF(totalMensuelTheorique)}).`
-      );
-      return;
-    }
-
     // 1/12 exact pour chaque poste
     for (const item of monthlyItems) {
      await addFinanceMovementApi({
@@ -362,21 +353,7 @@ async function applyMonthlyTransfersSimple() {
 });
     }
 
-    // surplus éventuel
-    const surplus = factures - totalMensuelTheorique;
-
-    if (surplus > 0) {
-      await addFinanceMovementApi({
-        date,
-        compte: "Factures",
-        sens: "Entrée",
-        poste: "Disponible facture",
-        montant: surplus.toFixed(2),
-        description: "Surplus mensuel"
-      });
-    }
-  }
-
+  
   // =========================
   // EPARGNE LIBRE
   // =========================
