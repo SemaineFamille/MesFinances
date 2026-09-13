@@ -259,6 +259,9 @@ async function prepareMonthlyTransfers() {
 
     const virements =
   await getMonthlyTransfers();
+     
+     console.log("VIREMENTS", virements);
+     
      const getMontant = (compte) => {
   const row = virements.find(
     r => (r["Compte"] || "") === compte
