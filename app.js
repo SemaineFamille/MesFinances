@@ -259,6 +259,25 @@ async function prepareMonthlyTransfers() {
 
     const virements =
   await getMonthlyTransfers();
+     const getMontant = (compte) => {
+  const row = virements.find(
+    r => (r["Compte"] || "") === compte
+  );
+
+  return Number(row?.["Montant"] || 0);
+};
+
+const defaultFactures =
+  getMontant("Factures");
+
+const defaultEpargne =
+  getMontant("Epargne");
+
+const defaultEpargne13 =
+  getMontant("13eme salaire");
+
+const defaultVacances =
+  getMontant("Vacances");
 
     container.innerHTML = `
       <div class="finance-monthly-simple">
