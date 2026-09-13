@@ -1,4 +1,4 @@
-console.log("APP VERSION 12-09-2026 17h54");
+console.log("APP VERSION 13-09-2026 19h20");
 
 /* =========================
    OUTILS GENERAUX
