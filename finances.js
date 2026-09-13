@@ -334,16 +334,14 @@ async function toggleReservesCard() {
     const impots =
       getDashboardValue("impôts");
 
-    const totalReserves =
-      getDashboardValue("total réserves");
+ const totalReserves =
+  getDashboardValue("total réserves");
 
-    const vacances =
-      getDashboardValue("solde vacances") -
-      totalReserves;
+const totalVacances =
+  getDashboardValue("solde vacances");
 
-    const soldeCompte =
-      totalReserves +
-      vacances;
+const soldeCompte =
+  totalVacances + totalReserves;
 
     openFinanceModal(
       "🏖️ Vacances & Réserves",
@@ -381,6 +379,9 @@ async function toggleReservesCard() {
           else if ((p["Poste"] || "").includes("Impôts")) {
             solde = impots;
           }
+          else if ((p["Poste"] || "").includes("Vacances")) {
+  solde = totalVacances;
+}
 
           return `
             <div class="postes-row">
@@ -408,17 +409,17 @@ async function toggleReservesCard() {
 
       <div style="margin-top:20px;">
 
-        <strong>
-          🔒 Total réserves :
-          ${formatCHF(totalReserves)}
-        </strong>
+    <strong>
+  🔒 Total réserves :
+  ${formatCHF(totalReserves)}
+</strong>
 
-        <br><br>
+<br><br>
 
-        <strong>
-          ⛱️ Vacances disponibles :
-          ${formatCHF(vacances)}
-        </strong>
+<strong>
+  ⛱️ Total vacances :
+  ${formatCHF(totalVacances)}
+</strong>
 
       </div>
       `
