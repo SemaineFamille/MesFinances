@@ -64,45 +64,36 @@ function renderAssura(data) {
   const quotePartPct = Math.min((quotePartAtteinte / quotePartMax) * 100, 100);
 
 stats.innerHTML = `
-
-<div class="progress-card">
-
-  <strong>💊 Franchise</strong><br>
-  ${formatCHF(franchiseAtteinte)} / ${formatCHF(franchise)}
-
-  <div class="progress-bar">
-    <div
-      class="progress-fill"
-      style="width:${franchisePct}%">
+  <div class="progress-card">
+    <div class="progress-header">Franchise</div>
+    <div class="progress-bar">
+      <div style="width:${franchisePct}%"></div>
+    </div>
+    <div>
+      ${franchiseAtteinte.toFixed(2)} / ${franchise} CHF
     </div>
   </div>
 
-  <br>
-
-  <strong>🧾 Quote-part</strong><br>
-  ${formatCHF(quotePartAtteinte)} / ${formatCHF(quotePartMax)}
-
-  <div class="progress-bar">
-    <div
-      class="progress-fill"
-      style="width:${quotePartPct}%">
+  <div class="progress-card">
+    <div class="progress-header">Quote-part</div>
+    <div class="progress-bar">
+      <div style="width:${quotePartPct}%"></div>
+    </div>
+    <div>
+      ${quotePartAtteinte.toFixed(2)} / ${quotePartMax} CHF
     </div>
   </div>
 
-  <br>
+  <div class="progress-card">
+    💳 Total à votre charge :
+    ${totalVotrePart.toFixed(2)} CHF
+  </div>
 
-  <strong>💳 Votre part :</strong>
-  ${formatCHF(totalVotrePart)}
-
-  <br>
-
-  <strong>✅ Remboursé :</strong>
-  ${formatCHF(totalRembourse)}
-
-</div>
-
+  <div class="progress-card">
+    🏥 Total remboursé par Assura :
+    ${totalRembourse.toFixed(2)} CHF
+  </div>
 `;
-
   data.forEach(item => {
     container.innerHTML += `
       <div class="card">
