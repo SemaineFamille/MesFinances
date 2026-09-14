@@ -64,9 +64,43 @@ function renderAssura(data) {
   const quotePartPct = Math.min((quotePartAtteinte / quotePartMax) * 100, 100);
 
 stats.innerHTML = `
-  <div class="progress-card">
-    Assura OK
+
+<div class="progress-card">
+
+  <strong>💊 Franchise</strong><br>
+  ${formatCHF(franchiseAtteinte)} / ${formatCHF(franchise)}
+
+  <div class="progress-bar">
+    <div
+      class="progress-fill"
+      style="width:${franchisePct}%">
+    </div>
   </div>
+
+  <br>
+
+  <strong>🧾 Quote-part</strong><br>
+  ${formatCHF(quotePartAtteinte)} / ${formatCHF(quotePartMax)}
+
+  <div class="progress-bar">
+    <div
+      class="progress-fill"
+      style="width:${quotePartPct}%">
+    </div>
+  </div>
+
+  <br>
+
+  <strong>💳 Votre part :</strong>
+  ${formatCHF(totalVotrePart)}
+
+  <br>
+
+  <strong>✅ Remboursé :</strong>
+  ${formatCHF(totalRembourse)}
+
+</div>
+
 `;
 
   data.forEach(item => {
