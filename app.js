@@ -126,26 +126,44 @@ function toggleHistory() {
 }
 
 function handleFinanceCompteChange() {
-  const compte = document.getElementById("financeCompte").value;
-  const subContainer = document.getElementById("financeSubCategoryContainer");
-  const posteField = document.getElementById("financePoste");
+
+  const compte =
+    document.getElementById("financeCompte").value;
+
+  const subContainer =
+    document.getElementById("financeSubCategoryContainer");
+
+  const posteField =
+    document.getElementById("financePoste");
+
+  const subCategory =
+    document.getElementById("financeSubCategory");
 
   if (!subContainer || !posteField) return;
 
-  const useSubCategory =
-    compte === "Factures" ||
-    compte === "Vacances";
+  if (compte === "Vacances") {
 
-  subContainer.style.display =
-    useSubCategory ? "block" : "none";
+    subContainer.style.display = "block";
 
-  posteField.disabled = useSubCategory;
-
-  if (useSubCategory) {
+    posteField.disabled = true;
     posteField.value = "";
+
+    subCategory.innerHTML = `
+      <option value="">-- Choisir --</option>
+      <option value="🚗Voiture Réserve 🧰">Voiture</option>
+      <option value="👓Lunettes">Lunettes</option>
+      <option value="🎁Cadeaux">Cadeaux</option>
+      <option value="💰Impôts">Impôts</option>
+      <option value="🖌️Tatto">Tatto</option>
+    `;
+
+  } else {
+
+    subContainer.style.display = "none";
+
+    posteField.disabled = false;
   }
 }
-
 /* =========================
    DEMARRAGE
 ========================= */
@@ -211,9 +229,12 @@ async function addFinanceMovementManual() {
   let poste = document.getElementById("financePoste").value;
   const sub = document.getElementById("financeSubCategory").value;
 
-  if (compte === "Factures" && sub) {
-    poste = sub;
-  }
+  if (
+  (compte === "Factures" || compte === "Vacances")
+  && sub
+) {
+  poste = sub;
+}
 
   const montant = document.getElementById("financeMontant").value;
   const description = document.getElementById("financeDescription").value;
