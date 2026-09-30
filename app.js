@@ -154,7 +154,7 @@ function handleFinanceCompteChange() {
       <option value="👓Lunettes">Lunettes</option>
       <option value="🎁Cadeaux">Cadeaux</option>
       <option value="💰Impôts">Impôts</option>
-      <option value="🖌️Tatto">Tatto</option>
+      
     `;
 
   } else {
