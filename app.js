@@ -132,11 +132,16 @@ function handleFinanceCompteChange() {
 
   if (!subContainer || !posteField) return;
 
-  const isFactures = compte === "Factures";
+  const useSubCategory =
+    compte === "Factures" ||
+    compte === "Vacances";
 
-  subContainer.style.display = isFactures ? "block" : "none";
-  posteField.disabled = isFactures;
-  if (isFactures) {
+  subContainer.style.display =
+    useSubCategory ? "block" : "none";
+
+  posteField.disabled = useSubCategory;
+
+  if (useSubCategory) {
     posteField.value = "";
   }
 }
